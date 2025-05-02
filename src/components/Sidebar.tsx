@@ -104,7 +104,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
       <aside 
         className={`fixed top-0 left-0 z-50 h-screen bg-gradient-to-b from-teal-600 to-blue-900 text-white w-64 transform transition-transform duration-300 ease-in-out ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
-        } shadow-xl overflow-y-auto flex flex-col`}
+        } shadow-xl overflow-hidden flex flex-col`}
       >
         <div className="flex justify-between items-center px-4 p-2 border-b border-teal-500/30 sticky top-0 bg-teal-600 z-10">
           <h2 className="text-xl font-semibold">Menu</h2>
@@ -116,7 +116,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
             <X size={20} />
           </button>
         </div>
-        <nav className="py-2 flex-1">
+        <nav className="py-2 flex-1 overflow-y-auto pr-1 sidebar-scrollbar" style={{
+          scrollbarWidth: 'thin',
+          scrollbarColor: 'rgba(13, 148, 136, 0.5) rgba(13, 148, 136, 0.1)'
+        }}>
+
           {Object.entries(categorizedMenu).map(([category, items]) => (
             <div key={category} className="mb-2">
               <div className="px-4 py-1 text-xs font-semibold uppercase text-teal-200 tracking-wider opacity-80">
