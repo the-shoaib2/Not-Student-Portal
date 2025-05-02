@@ -45,26 +45,31 @@ const UserCard: React.FC = () => {
       </div>
       {/* Logout Confirmation Dialog */}
       {showLogoutDialog && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-white rounded-lg shadow-xl p-6 w-80 text-center">
-            <div className="flex flex-col items-center">
-              <LogOut className="text-red-600 mb-2" size={32} />
-              <h3 className="text-lg font-semibold mb-2 text-gray-900">Confirm Logout</h3>
-              <p className="text-gray-600 mb-4">Are you sure you want to log out?</p>
-              <div className="flex gap-3 justify-center">
-                <button
-                  className="px-4 py-2 rounded bg-gray-100 text-gray-700 hover:bg-gray-200 font-medium"
-                  onClick={cancelLogout}
-                >
-                  Cancel
-                </button>
-                <button
-                  className="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700 font-medium shadow"
-                  onClick={confirmLogout}
-                >
-                  Logout
-                </button>
-              </div>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm transition-all duration-200 ease-in-out">
+          <div 
+            className="bg-white rounded-lg shadow-xl p-4 max-w-xs w-full mx-4 text-center transform transition-all duration-300 ease-out scale-100 opacity-100" 
+            style={{
+              animation: 'fadeInScale 0.2s ease-out'
+            }}
+          >
+            <div className="flex items-center space-x-3 mb-2">
+              <LogOut className="text-red-600 flex-shrink-0" size={24} />
+              <h3 className="text-base font-semibold text-gray-900">Confirm Logout</h3>
+            </div>
+            <p className="text-sm text-gray-600 mb-3">Are you sure you want to log out?</p>
+            <div className="flex gap-2 justify-end">
+              <button
+                className="px-3 py-1.5 text-sm rounded bg-gray-100 text-gray-700 hover:bg-gray-200 font-medium transition-colors duration-150"
+                onClick={cancelLogout}
+              >
+                Cancel
+              </button>
+              <button
+                className="px-3 py-1.5 text-sm rounded bg-red-600 text-white hover:bg-red-700 font-medium shadow transition-colors duration-150"
+                onClick={confirmLogout}
+              >
+                Logout
+              </button>
             </div>
           </div>
         </div>
@@ -73,4 +78,4 @@ const UserCard: React.FC = () => {
   );
 };
 
-export default UserCard; 
+export default UserCard;
