@@ -65,3 +65,9 @@
     transform: scale(1);
   }
 }
+
+/* Fast animations for dialogs */
+.dialog-fast {
+  animation: fadeInScale 0.1s ease-out !important;
+  transition-duration: 100ms !important;
+}
