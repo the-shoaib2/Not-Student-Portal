@@ -1,7 +1,7 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 
-// Use secure proxy endpoint
-const BASE_URL = '/proxy';
+// Use API endpoint that will be handled by our Edge Function
+const BASE_URL = '/api';
 
 // Create API instance with configuration
 const api = axios.create({

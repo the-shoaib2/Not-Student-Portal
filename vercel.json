@@ -1,7 +1,7 @@
 {
   "rewrites": [
-    { 
-      "source": "/proxy/:path*",
+    {
+      "source": "/api/:path*",
       "destination": "/api/:path*"
     },
     {
@@ -11,7 +11,7 @@
   ],
   "headers": [
     {
-      "source": "/proxy/(.*)",
+      "source": "/api/(.*)",
       "headers": [
         {
           "key": "Access-Control-Allow-Origin",
