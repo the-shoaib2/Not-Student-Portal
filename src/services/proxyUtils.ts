@@ -23,16 +23,16 @@ export const proxyClient = axios.create({
 proxyClient.interceptors.request.use(
   async (config) => {
     // Log request details
-    console.log('[Proxy] Request:', {
-      method: config.method?.toUpperCase(),
-      url: `${config.baseURL}${config.url}`,
-      headers: config.headers,
-      data: config.data
-    });
+    // console.log('[Proxy] Request:', {
+    //   method: config.method?.toUpperCase(),
+    //   url: `${config.baseURL}${config.url}`,
+    //   headers: config.headers,
+    //   data: config.data
+    // });
     return config;
   },
-  (error) => {
-    console.error('[Proxy] Request Error:', error);
+  (error: any) => {
+    // console.error('[Proxy] Request Error:', error);
     return Promise.reject(error);
   }
 );
@@ -40,18 +40,18 @@ proxyClient.interceptors.request.use(
 // Add response interceptor
 proxyClient.interceptors.response.use(
   (response) => {
-    console.log('[Proxy] Response:', {
-      status: response.status,
-      data: response.data
-    });
+    // console.log('[Proxy] Response:', {
+    //   status: response.status,
+    //   data: response.data
+    // });
     return response;
   },
-  (error) => {
-    console.error('[Proxy] Response Error:', {
-      status: error.response?.status,
-      data: error.response?.data,
-      message: error.message
-    });
+  (error: any) => {
+    // console.error('[Proxy] Response Error:', {
+    //   status: error.response?.status,
+    //   data: error.response?.data,
+    //   message: error.message
+    // });
     return Promise.reject(error);
   }
 );
@@ -117,7 +117,7 @@ export const checkProxyStatus = async (): Promise<{ status: string; message: str
       message: 'Proxy server is working correctly',
     };
   } catch (error) {
-    console.error('[Proxy] Health check failed:', error);
+    // console.error('[Proxy] Health check failed:', error);
     return {
       status: 'error',
       message: 'Proxy server is not working correctly',

@@ -58,9 +58,14 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
     { icon: <LogOut size={20} />, text: 'Logout', path: '/logout', category: 'General', showWhenAuthenticated: true },
   ];
 
-  const filteredMenuItems = menuItems.filter(item =>
-    item.public || (isAuthenticated ? item.showWhenAuthenticated : !item.showWhenAuthenticated)
-  );
+  const filteredMenuItems = menuItems.filter(item => {
+    // Remove Login item when user is authenticated
+    if (isAuthenticated && item.text === 'Log in') {
+      return false;
+    }
+    return item.public || (isAuthenticated ? item.showWhenAuthenticated : !item.showWhenAuthenticated);
+  });
+
 
   // Group menu items by category, excluding Logout
   const categorizedMenu: { [category: string]: MenuItem[] } = {};

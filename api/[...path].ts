@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const API_BASE_URL = 'http://software.diu.edu.bd:8189';
+const API_BASE_URL = process.env.API_BASE_URL || 'http://software.diu.edu.bd:8189';
 
 export const config = {
   runtime: 'edge',
@@ -17,7 +17,7 @@ const corsHeaders = {
 
 export default async function handler(req: NextRequest) {
   // Log incoming request
-  console.log('[API Route] Received request:', {
+  // console.log('[API Route] Received request:', {
     method: req.method,
     url: req.url,
     headers: Object.fromEntries(req.headers.entries())
@@ -41,9 +41,9 @@ export default async function handler(req: NextRequest) {
 
     // Build target URL
     const targetUrl = `${API_BASE_URL}/${path}`;
-    console.log('[API Route] Target URL:', targetUrl);
+    // console.log('[API Route] Target URL:', targetUrl);
 
-    console.log('[API Route] Processing request:', {
+    // console.log('[API Route] Processing request:', {
       originalUrl: req.url,
       cleanPath: path,
       targetUrl: targetUrl,
@@ -62,12 +62,12 @@ export default async function handler(req: NextRequest) {
     });
 
     // Get request body for POST/PUT/PATCH methods
-    let body = null;
+    let body: RequestBody | null = null;
     if (['POST', 'PUT', 'PATCH'].includes(req.method)) {
       try {
         body = await req.json();
       } catch (error) {
-        console.error('[API Route] Error parsing request body:', error);
+        // console.error('[API Route] Error parsing request body:', error);
       }
     }
 
@@ -79,23 +79,23 @@ export default async function handler(req: NextRequest) {
       redirect: 'follow',
     });
 
-    console.log('[API Route] Forwarding request:', {
-      url: targetUrl,
-      method: req.method,
-      headers: Object.fromEntries(headers.entries())
-    });
+    // console.log('[API Route] Forwarding request:', {
+    //   url: targetUrl,
+    //   method: req.method,
+    //   headers: Object.fromEntries(headers.entries())
+    // });
 
     // Forward the request
     const response = await fetch(forwardRequest);
 
     // Get response data
     const responseData = await response.text();
-    console.log('[API Route] Received response:', {
-      status: response.status,
-      statusText: response.statusText,
-      headers: Object.fromEntries(response.headers.entries()),
-      body: responseData
-    });
+    // console.log('[API Route] Received response:', {
+    //   status: response.status,
+    //   statusText: response.statusText,
+    //   headers: Object.fromEntries(response.headers.entries()),
+    //   body: responseData
+    // });
 
     // Prepare response headers
     const responseHeaders = new Headers(corsHeaders);
@@ -122,10 +122,12 @@ export default async function handler(req: NextRequest) {
       });
     }
   } catch (error) {
-    console.error('[API Route] Error:', error);
+    // console.error('[API Route] Error:', error);
     return NextResponse.json(
       { message: 'Internal server error' },
       { status: 500, headers: corsHeaders }
     );
   }
 }
+
+type RequestBody = Record<string, unknown>;

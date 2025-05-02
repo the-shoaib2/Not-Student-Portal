@@ -31,18 +31,18 @@ api.interceptors.request.use(
       config.url = config.url.replace(/^\/+/, '');
 
       // Log request details
-      console.log('[API] Making request:', {
-        method: config.method?.toUpperCase(),
-        url: `${BASE_URL}/${config.url}`,
-        headers: config.headers,
-        data: config.data
-      });
+      // console.log('[API] Making request:', {
+      //   method: config.method?.toUpperCase(),
+      //   url: `${BASE_URL}/${config.url}`,
+      //   headers: config.headers,
+      //   data: config.data
+      // });
     }
 
     return config;
   },
   (error: AxiosError) => {
-    console.error('[API] Request error:', error);
+    // console.error('[API] Request error:', error);
     return Promise.reject(error);
   }
 );
@@ -51,23 +51,23 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => {
     // Log successful response
-    console.log('[API] Response received:', {
-      status: response.status,
-      url: response.config.url,
-      data: response.data
-    });
+    // console.log('[API] Response received:', {
+    //   status: response.status,
+    //   url: response.config.url,
+    //   data: response.data
+    // });
     return response;
   },
   (error: AxiosError) => {
     // Log detailed error information
-    console.error('[API] Request failed:', {
-      status: error.response?.status,
-      statusText: error.response?.statusText,
-      data: error.response?.data,
-      message: error.message,
-      url: error.config?.url,
-      method: error.config?.method
-    });
+    // console.error('[API] Request failed:', {
+    //   status: error.response?.status,
+    //   statusText: error.response?.statusText,
+    //   data: error.response?.data,
+    //   message: error.message,
+    //   url: error.config?.url,
+    //   method: error.config?.method
+    // });
 
     if (error.response?.status === 401) {
       // Clear stored data on authentication error
@@ -170,7 +170,7 @@ export interface CGPAData {
 export const authService = {
   login: async (credentials: LoginCredentials): Promise<LoginResponse> => {
     try {
-      console.log('[Auth] Attempting login...');
+      // console.log('[Auth] Attempting login...');
       
       const response = await proxyRequest({
         method: 'POST',
@@ -181,7 +181,7 @@ export const authService = {
         }
       });
 
-      console.log('[Auth] Login response:', response);
+      // console.log('[Auth] Login response:', response);
 
       if (!response || !response.accessToken) {
         throw new Error('Invalid response: Missing access token');
