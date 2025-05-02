@@ -6,6 +6,15 @@ export const config = {
   runtime: 'edge',
 };
 
+// CORS headers
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization, Accept, User-Agent',
+  'Access-Control-Allow-Credentials': 'true',
+  'Access-Control-Max-Age': '86400',
+};
+
 export default async function handler(req: NextRequest) {
   // Log incoming request
   console.log('[API Route] Received request:', {
@@ -14,62 +23,76 @@ export default async function handler(req: NextRequest) {
     headers: Object.fromEntries(req.headers.entries())
   });
 
-  // Handle CORS preflight
+  // Handle OPTIONS request
   if (req.method === 'OPTIONS') {
     return new NextResponse(null, {
       status: 204,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization, Accept',
-        'Access-Control-Max-Age': '86400',
-      },
+      headers: corsHeaders,
     });
   }
 
   try {
-    // Get target URL
-    const path = req.nextUrl.pathname.replace(/^\/(?:api|proxy)/, '');
-    const url = new URL(path, API_BASE_URL).href;
-    
+    // Get the path from the URL
+    const url = new URL(req.url);
+    let path = url.pathname;
+
+    // Clean up the path
+    if (path.startsWith('/api/')) {
+      path = path.replace('/api/', '');
+    } else if (path.startsWith('/proxy/')) {
+      path = path.replace('/proxy/', '');
+    }
+
+    // Build target URL
+    const targetUrl = `${API_BASE_URL}/${path}`;
+    console.log('[API Route] Target URL:', targetUrl);
+
+    // Get request body
+    let body: string | undefined;
+    if (!['GET', 'HEAD'].includes(req.method)) {
+      const text = await req.text();
+      if (text) {
+        try {
+          JSON.parse(text); // Validate JSON
+          body = text;
+        } catch (e) {
+          console.error('[API Route] Invalid JSON body:', e);
+          return NextResponse.json(
+            { message: 'Invalid JSON body' },
+            { status: 400, headers: corsHeaders }
+          );
+        }
+      }
+    }
+
     console.log('[API Route] Processing request:', {
       originalUrl: req.url,
       cleanPath: path,
-      targetUrl: url,
+      targetUrl: targetUrl,
       method: req.method,
       headers: Object.fromEntries(req.headers.entries())
     });
-
-    // Get request body for non-GET requests
-    let body;
-    if (req.method !== 'GET' && req.method !== 'HEAD') {
-      const contentType = req.headers.get('content-type');
-      if (contentType?.includes('application/json')) {
-        body = await req.text();
-        console.log('[API Route] Request body:', body);
-      }
-    }
 
     // Forward the request with all headers
     const headers = new Headers();
     headers.set('Content-Type', 'application/json');
     headers.set('Accept', 'application/json');
     
-    // Copy other important headers from the original request
-    const forwardHeaders = ['authorization', 'user-agent'];
-    for (const header of forwardHeaders) {
-      const value = req.headers.get(header);
-      if (value) headers.set(header, value);
-    }
+    // Copy all headers from the original request
+    req.headers.forEach((value, key) => {
+      if (!['host', 'connection'].includes(key.toLowerCase())) {
+        headers.set(key, value);
+      }
+    });
 
     console.log('[API Route] Forwarding request:', {
-      url,
+      url: targetUrl,
       method: req.method,
       headers: Object.fromEntries(headers.entries()),
       body: body ? JSON.parse(body) : undefined
     });
 
-    const response = await fetch(url, {
+    const response = await fetch(targetUrl, {
       method: req.method,
       headers,
       body,
@@ -101,19 +124,13 @@ export default async function handler(req: NextRequest) {
       }
     }
 
-    // Get response headers
-    const responseHeaders = new Headers({
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization, Accept',
+    // Merge CORS headers with response headers
+    const responseHeaders = new Headers(corsHeaders);
+    response.headers.forEach((value, key) => {
+      if (!['access-control-allow-origin'].includes(key.toLowerCase())) {
+        responseHeaders.set(key, value);
+      }
     });
-
-    // Copy relevant headers from the API response
-    const headersToForward = ['content-type', 'authorization'];
-    for (const header of headersToForward) {
-      const value = response.headers.get(header);
-      if (value) responseHeaders.set(header, value);
-    }
 
     // Return response
     return NextResponse.json(data, {
@@ -123,24 +140,13 @@ export default async function handler(req: NextRequest) {
     });
   } catch (error) {
     console.error('[API Route] Error:', {
-      name: error instanceof Error ? error.name : 'Unknown',
-      message: error instanceof Error ? error.message : String(error),
-      stack: error instanceof Error ? error.stack : undefined
+      error,
+      message: error instanceof Error ? error.message : 'Unknown error',
     });
 
     return NextResponse.json(
-      { 
-        error: 'Internal Server Error',
-        message: error instanceof Error ? error.message : String(error),
-      },
-      { 
-        status: 500,
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-          'Access-Control-Allow-Headers': 'Content-Type, Authorization, Accept',
-        },
-      }
+      { message: 'Internal server error' },
+      { status: 500, headers: corsHeaders }
     );
   }
 }

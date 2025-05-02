@@ -15,6 +15,7 @@ interface MenuItem {
   path: string;
   category: string;
   showWhenAuthenticated?: boolean;
+  public?: boolean;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
