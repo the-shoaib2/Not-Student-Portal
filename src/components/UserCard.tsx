@@ -45,11 +45,11 @@ const UserCard: React.FC = () => {
       </div>
       {/* Logout Confirmation Dialog */}
       {showLogoutDialog && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm transition-all duration-200 ease-in-out">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm transition-all duration-100 ease-in-out">
           <div 
-            className="bg-white rounded-lg shadow-xl p-4 max-w-xs w-full mx-4 text-center transform transition-all duration-300 ease-out scale-100 opacity-100" 
+            className="bg-white rounded-lg shadow-xl p-4 max-w-xs w-full mx-4 text-center transform dialog-fast" 
             style={{
-              animation: 'fadeInScale 0.2s ease-out'
+              animation: 'fadeInScale 0.1s ease-out'
             }}
           >
             <div className="flex items-center space-x-3 mb-2">
