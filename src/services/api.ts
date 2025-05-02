@@ -1,9 +1,14 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { shouldUseProxy } from './proxyUtils';
 
-// Create API instance with proxy configuration
+// API base URL based on environment
+const BASE_URL = import.meta.env.PROD 
+  ? import.meta.env.VITE_API_BASE_URL // Use direct URL in production
+  : '/api'; // Use proxy in development
+
+// Create API instance with configuration
 const api = axios.create({
-  baseURL: '/api', // This will be proxied to VITE_API_BASE_URL by Vite
+  baseURL: BASE_URL,
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
@@ -24,10 +29,15 @@ api.interceptors.request.use(
       config.headers.Authorization = `Bearer ${user.accessToken}`;
     }
 
-    // Handle proxy routing
-    if (config.url && shouldUseProxy(config.url)) {
+    // Handle URL formatting
+    if (config.url) {
       // Remove any leading slash to prevent double slashes
       config.url = config.url.replace(/^\/+/, '');
+
+      // Log request in development
+      if (import.meta.env.DEV) {
+        console.log(`[API] ${config.method?.toUpperCase()} ${BASE_URL}/${config.url}`);
+      }
     }
 
     return config;

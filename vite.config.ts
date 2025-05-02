@@ -30,7 +30,7 @@ export default defineConfig(({ mode }) => {
               const fullUrl = new URL(req.url || '', env.VITE_API_BASE_URL.trim()).href;
               console.log('[Proxy Request]', req.method, fullUrl);
               
-              // Ensure proper headers
+              // Set proper headers
               proxyReq.setHeader('Accept', 'application/json');
               proxyReq.setHeader('Content-Type', 'application/json');
             });
