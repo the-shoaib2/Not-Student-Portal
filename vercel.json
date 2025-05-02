@@ -5,13 +5,17 @@
       "destination": "/api/:path*"
     },
     {
+      "source": "/proxy/:path*",
+      "destination": "/api/:path*"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
   ],
   "headers": [
     {
-      "source": "/api/(.*)",
+      "source": "/(api|proxy)/(.*)",
       "headers": [
         {
           "key": "Access-Control-Allow-Origin",

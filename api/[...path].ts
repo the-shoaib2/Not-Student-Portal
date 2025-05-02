@@ -22,13 +22,14 @@ export default async function handler(req: NextRequest) {
 
   try {
     // Get the target path and construct the URL
-    const path = req.nextUrl.pathname.replace('/api', '');
+    const path = req.nextUrl.pathname.replace(/^\/(?:api|proxy)/, '');
     const url = new URL(path, API_BASE_URL).href;
     
     console.log('[API Route] Proxying request:', {
-      method: req.method,
-      path,
-      url
+      originalPath: req.nextUrl.pathname,
+      cleanPath: path,
+      targetUrl: url,
+      method: req.method
     });
 
     // Get the request body if present

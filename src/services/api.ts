@@ -1,7 +1,7 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 
-// Use API endpoint that will be handled by our Edge Function
-const BASE_URL = '/api';
+// Use proxy endpoint that will be handled by our Edge Function
+const BASE_URL = '/proxy';
 
 // Create API instance with configuration
 const api = axios.create({
@@ -16,13 +16,11 @@ const api = axios.create({
 
 // Add request interceptor to handle authentication and proxy
 api.interceptors.request.use(
-  (config: InternalAxiosRequestConfig) => {
-    // Add authentication token if available
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-    if (user.accessToken) {
-      if (!config.headers) {
-        config.headers = new axios.AxiosHeaders();
-      }
+  async (config: InternalAxiosRequestConfig) => {
+    // Get stored user data
+    const userJson = localStorage.getItem('user');
+    if (userJson) {
+      const user = JSON.parse(userJson);
       config.headers.Authorization = `Bearer ${user.accessToken}`;
     }
 
@@ -31,36 +29,49 @@ api.interceptors.request.use(
       // Remove any leading slash to prevent double slashes
       config.url = config.url.replace(/^\/+/, '');
 
-      // Log request in development
-      // if (import.meta.env.DEV) {
-      //   console.log(`[API] ${config.method?.toUpperCase()} ${BASE_URL}/${config.url}`);
-      // }
+      // Log request details
+      console.log('[API] Making request:', {
+        method: config.method?.toUpperCase(),
+        url: `${BASE_URL}/${config.url}`,
+        headers: config.headers,
+        data: config.data
+      });
     }
 
     return config;
   },
   (error: AxiosError) => {
-    // console.error('[API] Request error:', error);
+    console.error('[API] Request error:', error);
     return Promise.reject(error);
   }
 );
 
 // Add response interceptor to handle common errors
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // Log successful response
+    console.log('[API] Response received:', {
+      status: response.status,
+      url: response.config.url,
+      data: response.data
+    });
+    return response;
+  },
   (error: AxiosError) => {
-    const status = error.response?.status;
-    if (status === 401) {
-      // Handle unauthorized access
+    // Log detailed error information
+    console.error('[API] Request failed:', {
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      data: error.response?.data,
+      message: error.message,
+      url: error.config?.url,
+      method: error.config?.method
+    });
+
+    if (error.response?.status === 401) {
+      // Clear stored data on authentication error
       localStorage.removeItem('user');
       localStorage.removeItem('isAuthenticated');
-      window.location.href = '/login';
-    } else if (status === 403) {
-      console.error('[API] Forbidden access:', error);
-    } else if (status === 404) {
-      console.error('[API] Resource not found:', error);
-    } else if (status && status >= 500) {
-      console.error('[API] Server error:', error);
     }
     return Promise.reject(error);
   }

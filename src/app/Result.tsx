@@ -6,18 +6,7 @@ const Result: React.FC = () => {
 
   return (
     <div className="bg-gray-100 min-h-screen">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-teal-600 to-blue-600 p-4">
-        <div className="container mx-auto flex items-center">
-          <button className="text-white mr-4">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
-          <h1 className="text-white text-xl">Student Portal</h1>
-        </div>
-      </div>
-
+     
       {/* Page Title */}
       <div className="border-b border-gray-300 py-4 text-center bg-white">
         <h1 className="text-xl font-medium">Academic Result</h1>
@@ -216,11 +205,6 @@ const Result: React.FC = () => {
             <a href="#" className="text-orange-600 hover:underline">Teaching Evaluation.</a>
           </p>
         </div>
-      </div>
-
-      {/* Footer */}
-      <div className="bg-gray-900 text-gray-400 py-4 text-center text-sm">
-        <p>All Rights Reserved @ Daffodil International University</p>
       </div>
     </div>
   );
