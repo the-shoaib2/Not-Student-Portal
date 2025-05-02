@@ -84,7 +84,7 @@ const Login: React.FC = () => {
           <div className="bg-white m-5 shadow-lg rounded-lg p-8 w-full max-w-sm">
             <div className="flex flex-col items-center mb-6">
               <img src="/diuLogo.png" alt="DIU Logo" className="w-16 h-16 mb-2" />
-              <h2 className="text-sm font-semibold text-gray-700">Student Portal Login</h2>
+              <h2 className="text-lg font-semibold text-gray-700">Student Portal Login</h2>
             </div>
             <form onSubmit={handleSubmit}>
               <div className="mb-4">

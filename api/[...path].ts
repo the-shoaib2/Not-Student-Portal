@@ -61,11 +61,21 @@ export default async function handler(req: NextRequest) {
       headers.delete(header);
     });
 
+    // Get request body for POST/PUT/PATCH methods
+    let body = null;
+    if (['POST', 'PUT', 'PATCH'].includes(req.method)) {
+      try {
+        body = await req.json();
+      } catch (error) {
+        console.error('[API Route] Error parsing request body:', error);
+      }
+    }
+
     // Create the request to forward
     const forwardRequest = new Request(targetUrl, {
       method: req.method,
       headers: headers,
-      body: req.body,
+      body: body ? JSON.stringify(body) : null,
       redirect: 'follow',
     });
 
