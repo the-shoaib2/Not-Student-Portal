@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const API_BASE_URL = process.env.VITE_API_BASE_URL;
+const API_BASE_URL = 'http://software.diu.edu.bd:8189';
 
 export const config = {
   runtime: 'edge',
@@ -37,33 +37,11 @@ export default async function handler(req: NextRequest) {
     let path = url.pathname;
 
     // Clean up the path
-    if (path.startsWith('/api/')) {
-      path = path.replace('/api/', '');
-    } else if (path.startsWith('/proxy/')) {
-      path = path.replace('/proxy/', '');
-    }
+    path = path.replace(/^\/(?:api|proxy)\//, '');
 
     // Build target URL
     const targetUrl = `${API_BASE_URL}/${path}`;
     console.log('[API Route] Target URL:', targetUrl);
-
-    // Get request body
-    let body: string | undefined;
-    if (!['GET', 'HEAD'].includes(req.method)) {
-      const text = await req.text();
-      if (text) {
-        try {
-          JSON.parse(text); // Validate JSON
-          body = text;
-        } catch (e) {
-          console.error('[API Route] Invalid JSON body:', e);
-          return NextResponse.json(
-            { message: 'Invalid JSON body' },
-            { status: 400, headers: corsHeaders }
-          );
-        }
-      }
-    }
 
     console.log('[API Route] Processing request:', {
       originalUrl: req.url,
@@ -74,57 +52,42 @@ export default async function handler(req: NextRequest) {
     });
 
     // Forward the request with all headers
-    const headers = new Headers();
+    const headers = new Headers(req.headers);
     headers.set('Content-Type', 'application/json');
     headers.set('Accept', 'application/json');
     
-    // Copy all headers from the original request
-    req.headers.forEach((value, key) => {
-      if (!['host', 'connection'].includes(key.toLowerCase())) {
-        headers.set(key, value);
-      }
+    // Remove problematic headers
+    ['host', 'connection'].forEach(header => {
+      headers.delete(header);
+    });
+
+    // Create the request to forward
+    const forwardRequest = new Request(targetUrl, {
+      method: req.method,
+      headers: headers,
+      body: req.body,
+      redirect: 'follow',
     });
 
     console.log('[API Route] Forwarding request:', {
       url: targetUrl,
       method: req.method,
-      headers: Object.fromEntries(headers.entries()),
-      body: body ? JSON.parse(body) : undefined
+      headers: Object.fromEntries(headers.entries())
     });
 
-    const response = await fetch(targetUrl, {
-      method: req.method,
-      headers,
-      body,
-    });
+    // Forward the request
+    const response = await fetch(forwardRequest);
 
-    // Handle response
-    const responseText = await response.text();
+    // Get response data
+    const responseData = await response.text();
     console.log('[API Route] Received response:', {
       status: response.status,
       statusText: response.statusText,
       headers: Object.fromEntries(response.headers.entries()),
-      body: responseText
+      body: responseData
     });
 
-    // Try to parse response as JSON
-    let data;
-    try {
-      data = JSON.parse(responseText);
-    } catch {
-      // If not JSON, wrap in an error object
-      if (!response.ok) {
-        data = { 
-          error: response.statusText || 'Request failed',
-          message: responseText,
-          status: response.status
-        };
-      } else {
-        data = { message: responseText };
-      }
-    }
-
-    // Merge CORS headers with response headers
+    // Prepare response headers
     const responseHeaders = new Headers(corsHeaders);
     response.headers.forEach((value, key) => {
       if (!['access-control-allow-origin'].includes(key.toLowerCase())) {
@@ -132,18 +95,24 @@ export default async function handler(req: NextRequest) {
       }
     });
 
-    // Return response
-    return NextResponse.json(data, {
-      status: response.status,
-      statusText: response.statusText,
-      headers: responseHeaders,
-    });
+    // Try to parse response as JSON
+    try {
+      const jsonData = JSON.parse(responseData);
+      return NextResponse.json(jsonData, {
+        status: response.status,
+        statusText: response.statusText,
+        headers: responseHeaders,
+      });
+    } catch {
+      // If not JSON, return as text
+      return new NextResponse(responseData, {
+        status: response.status,
+        statusText: response.statusText,
+        headers: responseHeaders,
+      });
+    }
   } catch (error) {
-    console.error('[API Route] Error:', {
-      error,
-      message: error instanceof Error ? error.message : 'Unknown error',
-    });
-
+    console.error('[API Route] Error:', error);
     return NextResponse.json(
       { message: 'Internal server error' },
       { status: 500, headers: corsHeaders }

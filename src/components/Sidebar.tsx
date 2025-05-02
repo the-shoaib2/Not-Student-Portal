@@ -25,7 +25,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
 
   const menuItems: MenuItem[] = [
-    { icon: <LogIn size={20} />, text: 'Log in', path: '/login', category: 'General', showWhenAuthenticated: false },
+    { icon: <LogIn size={20} />, text: 'Log in', path: '/login', category: 'General', showWhenAuthenticated: false, public: true },
     { icon: <Home size={20} />, text: 'Home', path: '/', category: 'General', showWhenAuthenticated: true },
     { icon: <ClipboardList size={20} />, text: 'Dashboard', path: '/dashboard', category: 'General', showWhenAuthenticated: true },
     { icon: <User size={20} />, text: 'Profile', path: '/profile', category: 'Profile', showWhenAuthenticated: true },
@@ -44,21 +44,22 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
     { icon: <Laptop size={20} />, text: 'Laptop', path: '/laptop', category: 'Resources', showWhenAuthenticated: true },
     { icon: <ClipboardList size={20} />, text: 'Routine', path: '/routine', category: 'Academics', showWhenAuthenticated: true },
     { icon: <Users size={20} />, text: 'Mentor Meeting', path: '/mentor-meeting', category: 'Academics', showWhenAuthenticated: true },
-    { icon: <GraduationCap size={20} />, text: 'Result', path: '/result', category: 'Academics', showWhenAuthenticated: true },
-    { icon: <Bell size={20} />, text: 'Notices', path: '/notices', category: 'General', showWhenAuthenticated: true },
-    { icon: <FileCheck size={20} />, text: 'Digital Certificate', path: '/certificate-verify', category: 'Applications', showWhenAuthenticated: true },
+    { icon: <GraduationCap size={20} />, text: 'Result', path: '/result', category: 'Academics', showWhenAuthenticated: true, public: true },
+    { icon: <Bell size={20} />, text: 'Notices', path: '/notices', category: 'General', showWhenAuthenticated: true, public: true },
+    { icon: <FileCheck size={20} />, text: 'Digital Certificate', path: '/certificate-verify', category: 'Applications', showWhenAuthenticated: true, public: true },
     { icon: <CreditCard size={20} />, text: 'Transport Card Apply', path: '/transport-card-apply', category: 'Applications', showWhenAuthenticated: true },
-    { icon: <Briefcase size={20} />, text: 'Internship', path: '/internship', category: 'Applications', showWhenAuthenticated: true },
-    { icon: <Building2 size={20} />, text: 'Hall Portal', path: '/hall', category: 'Resources', showWhenAuthenticated: true },
-    { icon: <FileText size={20} />, text: 'Student Application', path: '/student-application', category: 'Applications', showWhenAuthenticated: true },
+    { icon: <Briefcase size={20} />, text: 'Internship', path: '/internship', category: 'Applications', showWhenAuthenticated: true, public: true },
+    { icon: <Building2 size={20} />, text: 'Hall Portal', path: '/hall', category: 'Resources', showWhenAuthenticated: true, public: true },
+    { icon: <FileText size={20} />, text: 'Student Application', path: '/student-application', category: 'Applications', showWhenAuthenticated: true, public: true },
     { icon: <Award size={20} />, text: 'Alumni Card Apply', path: '/alumni-card-apply', category: 'Alumni', showWhenAuthenticated: true },
-    { icon: <BookOpen size={20} />, text: 'Library', path: '/library', category: 'Resources', showWhenAuthenticated: true },
-    { icon: <Calendar size={20} />, text: 'Academic Calendar', path: '/calendar', category: 'Resources', showWhenAuthenticated: true },
+    { icon: <BookOpen size={20} />, text: 'Library', path: '/library', category: 'Resources', showWhenAuthenticated: true, public: true },
+    { icon: <Calendar size={20} />, text: 'Academic Calendar', path: '/calendar', category: 'Resources', showWhenAuthenticated: true, public: true },
+    { icon: <Briefcase size={20} />, text: 'skill.jobs', path: '/skill-jobs', category: 'Resources', showWhenAuthenticated: true, public: true },
     { icon: <LogOut size={20} />, text: 'Logout', path: '/logout', category: 'General', showWhenAuthenticated: true },
   ];
 
   const filteredMenuItems = menuItems.filter(item =>
-    isAuthenticated ? item.showWhenAuthenticated : !item.showWhenAuthenticated
+    item.public || (isAuthenticated ? item.showWhenAuthenticated : !item.showWhenAuthenticated)
   );
 
   // Group menu items by category, excluding Logout

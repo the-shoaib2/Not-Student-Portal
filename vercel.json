@@ -2,7 +2,11 @@
   "rewrites": [
     {
       "source": "/proxy/:path*",
-      "destination": "/api/:path*"
+      "destination": "http://software.diu.edu.bd:8189/:path*"
+    },
+    {
+      "source": "/api/:path*",
+      "destination": "http://software.diu.edu.bd:8189/:path*"
     },
     {
       "source": "/(.*)",
