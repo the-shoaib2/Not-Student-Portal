@@ -1,7 +1,6 @@
 /// <reference types="node" />
 import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
-import type { ProxyOptions } from 'vite';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
@@ -36,6 +35,37 @@ export default defineConfig(({ mode }) => {
             });
             proxy.on('proxyRes', (proxyRes, req) => {
               console.log('[Proxy Response]', proxyRes.statusCode, req.url);
+            });
+          },
+        },
+        '/proxy': {
+          target: env.VITE_API_BASE_URL.trim(),
+          changeOrigin: true,
+          secure: false,
+          rewrite: (path) => path.replace(/^\/proxy/, ''),
+          configure: (proxy) => {
+            proxy.on('error', (err) => {
+              console.error('[Proxy Error]', err);
+            });
+            proxy.on('proxyReq', (proxyReq, req) => {
+              // Log the full URL being requested
+              const fullUrl = new URL(req.url || '', env.VITE_API_BASE_URL.trim()).href;
+              console.log('[Proxy Request]', {
+                method: req.method,
+                url: fullUrl,
+                headers: proxyReq.getHeaders()
+              });
+              
+              // Set proper headers
+              proxyReq.setHeader('Accept', 'application/json');
+              proxyReq.setHeader('Content-Type', 'application/json');
+            });
+            proxy.on('proxyRes', (proxyRes, req) => {
+              console.log('[Proxy Response]', {
+                statusCode: proxyRes.statusCode,
+                url: req.url,
+                headers: proxyRes.headers
+              });
             });
           },
         },
