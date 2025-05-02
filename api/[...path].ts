@@ -18,10 +18,10 @@ const corsHeaders = {
 export default async function handler(req: NextRequest) {
   // Log incoming request
   // console.log('[API Route] Received request:', {
-    method: req.method,
-    url: req.url,
-    headers: Object.fromEntries(req.headers.entries())
-  });
+  //   method: req.method,
+  //   url: req.url,
+  //   headers: Object.fromEntries(req.headers.entries())
+  // });
 
   // Handle OPTIONS request
   if (req.method === 'OPTIONS') {
@@ -44,12 +44,12 @@ export default async function handler(req: NextRequest) {
     // console.log('[API Route] Target URL:', targetUrl);
 
     // console.log('[API Route] Processing request:', {
-      originalUrl: req.url,
-      cleanPath: path,
-      targetUrl: targetUrl,
-      method: req.method,
-      headers: Object.fromEntries(req.headers.entries())
-    });
+    //   originalUrl: req.url,
+    //   cleanPath: path,
+    //   targetUrl: targetUrl,
+    //   method: req.method,
+    //   headers: Object.fromEntries(req.headers.entries())
+    // });
 
     // Forward the request with all headers
     const headers = new Headers(req.headers);
