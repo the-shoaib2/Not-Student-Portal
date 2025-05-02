@@ -1,5 +1,4 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
-import { shouldUseProxy } from './proxyUtils';
 
 // API base URL based on environment
 const BASE_URL = import.meta.env.PROD 
