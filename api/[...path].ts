@@ -7,7 +7,14 @@ export const config = {
 };
 
 export default async function handler(req: NextRequest) {
-  // Handle CORS preflight requests
+  // Log incoming request
+  console.log('[API Route] Received request:', {
+    method: req.method,
+    url: req.url,
+    headers: Object.fromEntries(req.headers.entries())
+  });
+
+  // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new NextResponse(null, {
       status: 204,
@@ -21,30 +28,22 @@ export default async function handler(req: NextRequest) {
   }
 
   try {
-    // Get the target path and construct the URL
-    const path = req.nextUrl.pathname.replace(/^\/(?:api|proxy)/, '');
+    // Get target URL
+    const path = req.nextUrl.pathname.replace('/api', '');
     const url = new URL(path, API_BASE_URL).href;
-    
-    console.log('[API Route] Proxying request:', {
-      originalPath: req.nextUrl.pathname,
-      cleanPath: path,
-      targetUrl: url,
-      method: req.method
-    });
 
-    // Get the request body if present
+    // Get request body for non-GET requests
     let body;
     if (req.method !== 'GET' && req.method !== 'HEAD') {
       const contentType = req.headers.get('content-type');
       if (contentType?.includes('application/json')) {
         body = await req.text();
+        console.log('[API Route] Request body:', body);
       }
     }
 
-    console.log(`[Proxy] ${req.method} ${url}`);
-    if (body) console.log('[Proxy] Request Body:', body);
-
     // Forward the request
+    console.log('[API Route] Forwarding request to:', url);
     const response = await fetch(url, {
       method: req.method,
       headers: {
@@ -54,12 +53,13 @@ export default async function handler(req: NextRequest) {
       body,
     });
 
-    // Read and log the response
+    // Get response data
     const responseText = await response.text();
-    console.log(`[Proxy] Response Status: ${response.status}`);
-    console.log('[Proxy] Response Body:', responseText);
+    console.log('[API Route] Response:', {
+      status: response.status,
+      body: responseText
+    });
 
-    // Parse the response if it's JSON
     let data;
     try {
       data = JSON.parse(responseText);
@@ -67,7 +67,7 @@ export default async function handler(req: NextRequest) {
       data = { message: responseText };
     }
 
-    // Return the response
+    // Return response
     return NextResponse.json(data, {
       status: response.status,
       headers: {
@@ -77,7 +77,12 @@ export default async function handler(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('[Proxy Error]:', error);
+    console.error('[API Route] Error:', {
+      name: error instanceof Error ? error.name : 'Unknown',
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined
+    });
+
     return NextResponse.json(
       { 
         error: 'Internal Server Error',

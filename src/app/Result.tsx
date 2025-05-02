@@ -5,7 +5,7 @@ const Result: React.FC = () => {
   const [semester, setSemester] = useState('');
 
   return (
-    <div className="bg-gray-100 min-h-screen">
+    <div className="min-h-screen">
      
       {/* Page Title */}
       <div className="border-b border-gray-300 py-4 text-center bg-white">
