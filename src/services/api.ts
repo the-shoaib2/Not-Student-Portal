@@ -1,7 +1,7 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 
-// Always use /api proxy to handle HTTP/HTTPS mixed content
-const BASE_URL = '/api';
+// Use secure proxy endpoint
+const BASE_URL = '/proxy';
 
 // Create API instance with configuration
 const api = axios.create({

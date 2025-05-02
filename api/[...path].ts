@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const API_BASE_URL = process.env.VITE_API_BASE_URL || 'http://software.diu.edu.bd:8189';
+const API_BASE_URL = 'http://software.diu.edu.bd:8189';
 
 export const config = {
   runtime: 'edge',
@@ -22,7 +22,7 @@ export default async function handler(req: NextRequest) {
 
   try {
     // Get the target path and construct the URL
-    const path = req.nextUrl.pathname.replace('/api', '');
+    const path = req.nextUrl.pathname.replace('/proxy', '');
     const url = new URL(path, API_BASE_URL).href;
 
     // Get the request body if present
@@ -76,7 +76,14 @@ export default async function handler(req: NextRequest) {
         error: 'Internal Server Error',
         message: error instanceof Error ? error.message : String(error),
       },
-      { status: 500 }
+      { 
+        status: 500,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization, Accept',
+        },
+      }
     );
   }
 }

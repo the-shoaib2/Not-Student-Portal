@@ -1,7 +1,7 @@
 {
   "rewrites": [
-    {
-      "source": "/api/:path*",
+    { 
+      "source": "/proxy/:path*",
       "destination": "/api/:path*"
     },
     {
@@ -11,7 +11,7 @@
   ],
   "headers": [
     {
-      "source": "/api/(.*)",
+      "source": "/proxy/(.*)",
       "headers": [
         {
           "key": "Access-Control-Allow-Origin",
@@ -23,7 +23,11 @@
         },
         {
           "key": "Access-Control-Allow-Headers",
-          "value": "Content-Type, Authorization"
+          "value": "Content-Type, Authorization, Accept"
+        },
+        {
+          "key": "Access-Control-Max-Age",
+          "value": "86400"
         }
       ]
     }
