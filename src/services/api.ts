@@ -1,4 +1,5 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
+import { proxyRequest } from './proxyUtils';
 
 // Use proxy endpoint that will be handled by our Edge Function
 const BASE_URL = '/proxy';
@@ -81,14 +82,15 @@ api.interceptors.response.use(
 export interface LoginCredentials {
   username: string;
   password: string;
-  grecaptcha: string;
+  grecaptcha?: string;
 }
 
 export interface LoginResponse {
-  name: string;
-  message: string;
   accessToken: string;
-  userName: string;
+  id: string;
+  name: string;
+  email: string;
+  roles: string[];
   commaSeparatedRoles: string;
   deviceName: string;
 }
@@ -97,6 +99,8 @@ export interface PasswordChangeRequest {
   oldPassword: string;
   newPassword: string;
   confirmNewPassword: string;
+  email: string;
+  phone: string;
 }
 
 export interface ForgotPasswordRequest {
@@ -166,28 +170,39 @@ export interface CGPAData {
 export const authService = {
   login: async (credentials: LoginCredentials): Promise<LoginResponse> => {
     try {
-      const response = await api.post<LoginResponse>('/login', {
-        ...credentials,
-        deviceName: navigator.userAgent,
+      console.log('[Auth] Attempting login...');
+      
+      const response = await proxyRequest({
+        method: 'POST',
+        url: '/login',
+        data: {
+          ...credentials,
+          deviceName: navigator.userAgent,
+        }
       });
 
-      if (!response.data || !response.data.accessToken) {
+      console.log('[Auth] Login response:', response);
+
+      if (!response || !response.accessToken) {
         throw new Error('Invalid response: Missing access token');
       }
 
       const userData = {
-        ...response.data,
+        ...response,
         lastLoginTime: new Date().toISOString(),
       };
       
       localStorage.setItem('user', JSON.stringify(userData));
       localStorage.setItem('isAuthenticated', 'true');
       
-      return response.data;
+      return response;
     } catch (error) {
+      // Clear auth data
       localStorage.removeItem('user');
       localStorage.removeItem('isAuthenticated');
-        throw error;
+
+      // Re-throw the error
+      throw error;
     }
   },
 

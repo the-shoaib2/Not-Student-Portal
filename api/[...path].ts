@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const API_BASE_URL = 'http://software.diu.edu.bd:8189';
+const API_BASE_URL = process.env.VITE_API_BASE_URL;
 
 export const config = {
   runtime: 'edge',
