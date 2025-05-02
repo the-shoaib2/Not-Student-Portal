@@ -1,9 +1,7 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 
-// API base URL based on environment
-const BASE_URL = import.meta.env.PROD 
-  ? import.meta.env.VITE_API_BASE_URL // Use direct URL in production
-  : '/api'; // Use proxy in development
+// Always use /api proxy to handle HTTP/HTTPS mixed content
+const BASE_URL = '/api';
 
 // Create API instance with configuration
 const api = axios.create({
@@ -34,15 +32,15 @@ api.interceptors.request.use(
       config.url = config.url.replace(/^\/+/, '');
 
       // Log request in development
-      if (import.meta.env.DEV) {
-        console.log(`[API] ${config.method?.toUpperCase()} ${BASE_URL}/${config.url}`);
-      }
+      // if (import.meta.env.DEV) {
+      //   console.log(`[API] ${config.method?.toUpperCase()} ${BASE_URL}/${config.url}`);
+      // }
     }
 
     return config;
   },
   (error: AxiosError) => {
-    console.error('[API] Request error:', error);
+    // console.error('[API] Request error:', error);
     return Promise.reject(error);
   }
 );
@@ -178,7 +176,7 @@ export const authService = {
     } catch (error) {
       localStorage.removeItem('user');
       localStorage.removeItem('isAuthenticated');
-      throw error;
+        throw error;
     }
   },
 
