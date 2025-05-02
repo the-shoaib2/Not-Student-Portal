@@ -27,19 +27,32 @@ const Login: React.FC = () => {
     setError('');
 
     try {
+      if (!studentId || !password) {
+        throw new Error('Please enter both student ID and password');
+      }
+
       const response = await authService.login({
         username: studentId,
         password: password,
         grecaptcha: '', // Add reCAPTCHA implementation if needed
       });
 
+      if (!response || !response.accessToken) {
+        throw new Error('Invalid response from server');
+      }
+
+      // Store user data and token
       login(response);
+      
       toast.success(`Welcome back, ${response.name}!`);
       navigate('/');
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Login failed';
       setError(errorMessage);
       toast.error(errorMessage);
+      // Clear stored data on error
+      localStorage.removeItem('user');
+      localStorage.removeItem('isAuthenticated');
     } finally {
       setIsLoading(false);
     }
@@ -68,7 +81,7 @@ const Login: React.FC = () => {
       <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col items-center gap-12">
           {/* Login Card */}
-          <div className="bg-white shadow-lg rounded-lg p-8 w-full max-w-sm">
+          <div className="bg-white m-5 shadow-lg rounded-lg p-8 w-full max-w-sm">
             <div className="flex flex-col items-center mb-6">
               <img src="/diuLogo.png" alt="DIU Logo" className="w-16 h-16 mb-2" />
               <h2 className="text-sm font-semibold text-gray-700">Student Portal Login</h2>
