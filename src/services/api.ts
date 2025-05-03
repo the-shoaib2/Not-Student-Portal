@@ -260,14 +260,22 @@ export const resultService = {
   },
 
   getStudentResult: async (semesterId: string, studentId: string): Promise<Result> => {
-    const response = await api.get<Result>('/result', {
-      params: {
-        semesterId,
-        studentId,
-        grecaptcha: ''
+    try {
+      const response = await api.get<Result>('/result', {
+        params: {
+          semesterId,
+          studentId,
+          grecaptcha: ''
+        }
+      });
+      if (!response.data || typeof response.data !== 'object') {
+        throw new Error('Invalid response format');
       }
-    });
-    return response.data;
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching student result:', error);
+      throw error;
+    }
   },
 
   getStudentInfo: async (studentId: string): Promise<StudentInfo> => {

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { resultService } from '../services/api';
-import {  } from 'lucide-react';
+import { Search, Loader } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 
 interface ResultProps {}
 
@@ -171,17 +172,19 @@ const Result: React.FC<ResultProps> = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!studentId || !semester) {
-      alert('Please fill all required fields');
+      toast.error('Please fill all required fields');
       return;
     }
 
     try {
+      setIsLoading(true);
+      
       // Fetch student info first
       const info = await resultService.getStudentInfo(studentId);
       if (!info) {
-        throw new Error('Student not found');
+        toast.error('Failed to fetch student information');
+        return;
       }
-
       setStudentInfo({
         program: info.programName || '',
         name: info.studentName || '',
@@ -195,23 +198,25 @@ const Result: React.FC<ResultProps> = () => {
         programType: info.programType || '',
         currentSemester: info.semesterName || ''
       });
-      setStudentInfoError(null);
 
-      // Then fetch result data
-      const response = await resultService.getStudentResult(semester, studentId);
-      console.log('Result fetched successfully:', response);
-      
-      if (!response || (!Array.isArray(response) && typeof response !== 'object')) {
-        throw new Error('Invalid response format');
+      // Fetch result data
+      const result = await resultService.getStudentResult(semester, studentId);
+      if (!result || typeof result !== 'object') {
+        toast.error('Invalid result data received');
+        return;
       }
 
-      // Handle both array and single object responses
-      const resultArray = Array.isArray(response) ? response : [response];
+      // Handle single result object
+      const resultArray = Array.isArray(result) ? result : [result];
       setResultData(resultArray as ResultData[]);
       setShowResults(true); // Show results after successful fetch
-    } catch (error) {
+      setIsLoading(false);
+      toast.success('Result loaded successfully!');
+    } catch (error: any) {
       console.error('Error fetching result:', error);
-      alert('Failed to fetch result');
+      setIsLoading(false);
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to load result';
+      toast.error(errorMessage);
       setResultData([]);
       setStudentInfo({
         program: '',
@@ -299,15 +304,18 @@ const Result: React.FC<ResultProps> = () => {
                 </div>
               </div>
             </div>
-            <div className="flex justify-center md:justify-start">
+            <div className="flex justify-center py-2 px-2 sm:py-0 md:justify-start">
               <button 
                 onClick={handleSubmit}
                 className="bg-teal-600 hover:bg-teal-700 text-white px-3 py-1 sm:py-1.5 text-xs sm:text-sm rounded-md transition duration-300 flex items-center shadow-sm w-full md:w-auto justify-center"
+                disabled={isLoading}
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
-                </svg>
-                SHOW RESULT
+                {isLoading ? (
+                  <Loader className="h-4 w-4 mr-1 animate-spin" />
+                ) : (
+                  <Search className="h-4 w-4 mr-1" />
+                )}
+                {isLoading ? 'SHOWING RESULT...' : 'SHOW RESULT'}
               </button>
             </div>
           </div>
@@ -537,7 +545,7 @@ const Result: React.FC<ResultProps> = () => {
                 </tr>
               </tbody>
             </table>
-            <p className="text-xs mt-1 text-orange-500 text-right">Effective from Summer Semester 2007</p>
+            <p className="text-xs mt-1 text-orange-500 text-center">Effective from Summer Semester 2007</p>
           </div>
         </div>
       </div>
