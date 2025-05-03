@@ -1,4 +1,10 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
+
+declare module 'axios' {
+  interface InternalAxiosRequestConfig {
+    _retry?: boolean;
+  }
+}
 import { proxyRequest } from './proxyUtils';
 
 // Use proxy endpoint that will be handled by our Edge Function
@@ -11,7 +17,7 @@ const api = axios.create({
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   },
-  timeout: 30000, // 30 seconds timeout
+  timeout: 100000, // 100 seconds timeout
   withCredentials: true, // Required for cookies, authorization headers with HTTPS
 });
 
@@ -47,33 +53,43 @@ api.interceptors.request.use(
   }
 );
 
-// Add response interceptor to handle common errors
+// Add response interceptor to handle common errors and retry logic
 api.interceptors.response.use(
   (response) => {
-    // Log successful response
-    // console.log('[API] Response received:', {
-    //   status: response.status,
-    //   url: response.config.url,
-    //   data: response.data
-    // });
     return response;
   },
   (error: AxiosError) => {
-    // Log detailed error information
-    // console.error('[API] Request failed:', {
-    //   status: error.response?.status,
-    //   statusText: error.response?.statusText,
-    //   data: error.response?.data,
-    //   message: error.message,
-    //   url: error.config?.url,
-    //   method: error.config?.method
-    // });
+    const originalRequest = error.config;
+    
+    // Check if we should retry based on the endpoint
+    const shouldRetry = 
+      originalRequest?.url?.includes('/result') ||
+      originalRequest?.url?.includes('/studentInfo') ||
+      originalRequest?.url?.includes('/semesterList');
+
+    // Check if we've already retried
+    if (!originalRequest || originalRequest._retry) {
+      return Promise.reject(error);
+    }
 
     if (error.response?.status === 401) {
-      // Clear stored data on authentication error
       localStorage.removeItem('user');
       localStorage.removeItem('isAuthenticated');
+      return Promise.reject(error);
     }
+
+    if (shouldRetry) {
+      // Add retry flag to request config
+      (originalRequest as any)._retry = true;
+      
+      // Wait for a short delay before retrying
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve(api(originalRequest));
+        }, 1000);
+      });
+    }
+
     return Promise.reject(error);
   }
 );
@@ -137,16 +153,22 @@ export interface Semester {
 
 export interface Result {
   semesterId: string;
+  semesterName: string;
+  semesterYear: number;
   studentId: string;
-  courses: Array<{
-    courseCode: string;
-    courseName: string;
-    credit: number;
-    grade: string;
-    gradePoint: number;
-  }>;
-  sgpa: number;
+  courseId: string;
+  customCourseId: string;
+  courseTitle: string;
+  totalCredit: number;
+  grandTotal: number | null;
+  pointEquivalent: number;
+  gradeLetter: string;
   cgpa: number;
+  blocked: string;
+  blockCause: string | null;
+  tevalSubmitted: string;
+  teval: string;
+  semesterAccountsClearance: string | null;
 }
 
 // Payment Interfaces

@@ -12,7 +12,7 @@ import axios, { AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 // Create a custom axios instance for the proxy
 const proxyClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
-  timeout: 30000, // 30 seconds timeout
+  timeout: 100000, // 100 seconds timeout
 });
 
 // Request interceptor for logging and transformation
@@ -79,7 +79,7 @@ export const proxyRequest = async (
   } catch (error) {
     // You can implement custom error handling here
     // For example, retry logic, fallback responses, etc.
-    console.error('[Proxy] Request failed:', error);
+    // console.error('[Proxy] Request failed:', error);
     throw error;
   }
 };

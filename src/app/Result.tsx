@@ -77,13 +77,13 @@ const Result: React.FC<ResultProps> = () => {
       try {
         const response = await resultService.getSemesterList();
         if (isSubscribed) {
-          console.log('Semester list response:', response);
+          // console.log('Semester list response:', response);
           setSemesters(response);
           setError(null);
         }
       } catch (err) {
         if (isSubscribed) {
-          console.error('Error fetching semesters:', err);
+          // console.error('Error fetching semesters:', err);
           setError('Failed to load semesters. Please try again later.');
         }
       } finally {
@@ -206,14 +206,36 @@ const Result: React.FC<ResultProps> = () => {
         return;
       }
 
-      // Handle single result object
+      // Handle the array of results
       const resultArray = Array.isArray(result) ? result : [result];
-      setResultData(resultArray as ResultData[]);
+      
+      // Transform the data to match the expected format
+      const transformedResults = resultArray.map((result: any) => ({
+        semesterId: result.semesterId,
+        semesterName: result.semesterName,
+        semesterYear: result.semesterYear,
+        studentId: result.studentId,
+        courseId: result.courseId,
+        customCourseId: result.customCourseId,
+        courseTitle: result.courseTitle,
+        totalCredit: result.totalCredit,
+        grandTotal: result.grandTotal,
+        pointEquivalent: result.pointEquivalent,
+        gradeLetter: result.gradeLetter,
+        cgpa: result.cgpa,
+        blocked: result.blocked,
+        blockCause: result.blockCause,
+        tevalSubmitted: result.tevalSubmitted,
+        teval: result.teval,
+        semesterAccountsClearance: result.semesterAccountsClearance
+      }));
+
+      setResultData(transformedResults as ResultData[]);
       setShowResults(true); // Show results after successful fetch
       setIsLoading(false);
       toast.success('Result loaded successfully!');
     } catch (error: any) {
-      console.error('Error fetching result:', error);
+      // console.error('Error fetching result:', error);
       setIsLoading(false);
       const errorMessage = error.response?.data?.message || error.message || 'Failed to load result';
       toast.error(errorMessage);
