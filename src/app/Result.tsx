@@ -396,48 +396,28 @@ const Result: React.FC<ResultProps> = () => {
               </div>
             ) : (
               <>
-                <div className="shadow overflow-auto rounded-lg mb-4">
-                  <table className="min-w-full border-collapse text-sm">
-                    <thead className="bg-teal-600">
-                      <tr>
-                        <th className="text-white px-3 py-2 text-left whitespace-nowrap font-medium">Course Code</th>
-                        <th className="text-white px-3 py-2 text-left whitespace-nowrap font-medium">Course Title</th>
-                        <th className="text-white px-3 py-2 text-left whitespace-nowrap font-medium">Credit</th>
-                        <th className="text-white px-3 py-2 text-left whitespace-nowrap font-medium">Grade</th>
-                        <th className="text-white px-3 py-2 text-left whitespace-nowrap font-medium">Point</th>
+                <table className="min-w-full mb-4 border border-gray-200 rounded-lg overflow-hidden text-sm">
+                  <thead>
+                    <tr>
+                      <th className="bg-teal-600 text-white px-3 py-2 text-left">Course Code</th>
+                      <th className="bg-teal-600 text-white px-3 py-2 text-left">Course Title</th>
+                      <th className="bg-teal-600 text-white px-3 py-2 text-left">Credit</th>
+                      <th className="bg-teal-600 text-white px-3 py-2 text-left">Grade</th>
+                      <th className="bg-teal-600 text-white px-3 py-2 text-left">Grade Point</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {resultData.map((course, index) => (
+                      <tr key={index} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
+                        <td className="px-3 py-2 border-b border-gray-200">{course.customCourseId}</td>
+                        <td className="px-3 py-2 border-b border-gray-200">{course.courseTitle}</td>
+                        <td className="px-3 py-2 border-b border-gray-200">{course.totalCredit}</td>
+                        <td className="px-3 py-2 border-b border-gray-200 font-medium">{course.gradeLetter}</td>
+                        <td className="px-3 py-2 border-b border-gray-200">{course.pointEquivalent}</td>
                       </tr>
-                    </thead>
-                    <tbody>
-                      {resultData.map((course, index) => (
-                        <tr key={index} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
-                          <td className="px-3 py-2 border-b border-gray-200 whitespace-nowrap">{course.customCourseId}</td>
-                          <td className="px-3 py-2 border-b border-gray-200">{course.courseTitle}</td>
-                          <td className="px-3 py-2 border-b border-gray-200 whitespace-nowrap">{course.totalCredit}</td>
-                          <td className="px-3 py-2 border-b border-gray-200 font-medium whitespace-nowrap">{course.gradeLetter}</td>
-                          <td className="px-3 py-2 border-b border-gray-200 whitespace-nowrap">{course.pointEquivalent}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-                
-                {/* Mobile view cards for small screens */}
-                <div className="md:hidden space-y-3 mb-4">
-                  {resultData.map((course, index) => (
-                    <div key={index} className="bg-white border rounded-lg p-3 shadow-sm">
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="font-medium text-teal-700">{course.customCourseId}</span>
-                        <span className="bg-teal-600 text-white px-2 py-0.5 rounded text-xs">{course.gradeLetter}</span>
-                      </div>
-                      <p className="text-sm mb-2 text-gray-800">{course.courseTitle}</p>
-                      <div className="flex justify-between text-xs text-gray-600">
-                        <span>Credit: {course.totalCredit}</span>
-                        <span>Grade Point: {course.pointEquivalent}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                
+                    ))}
+                  </tbody>
+                </table>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-center text-sm">
                   <div className="bg-purple-50 p-2 rounded-md">
                     <p className="text-purple-700 font-medium">Total Credit Requirement: {studentInfo.programCredit || 148}</p>
