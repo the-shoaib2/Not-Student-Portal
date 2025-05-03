@@ -143,6 +143,7 @@ export interface StudentInfo {
   semesterId: string;
   semesterName: string;
   shift: string;
+  completedCredits: string;
 }
 
 // Result Interfaces
@@ -323,14 +324,26 @@ export const paymentService = {
 
 // Dashboard Service
 export const dashboardService = {
-  
-  getDropSemesterList: async () => {
-    const response = await api.get('/dropSemester/dropSemesterList');
-    return response.data;
+  getDropSemesterList: async (): Promise<any> => {
+    try {
+      const response = await api.get('/dropSemester/dropSemesterList');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching drop semester list:', error);
+      throw error;
+    }
   },
 
   getCGPAData: async (): Promise<CGPAData> => {
-    const response = await api.get<CGPAData>('/dashboard/studentSGPAGraph');
-    return response.data;
-  },
+    try {
+      const response = await api.get('/dashboard/studentSGPAGraph');
+      if (!response.data || typeof response.data !== 'object') {
+        throw new Error('Invalid response format');
+      }
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching CGPA data:', error);
+      throw error;
+    }
+  }
 };
