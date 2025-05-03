@@ -383,53 +383,58 @@ const Result: React.FC<ResultProps> = () => {
           </div>
         </div>
 
-        {/* Academic Result Table - Always shown */}
+        {/* Academic Result Table */}
         <div className="bg-white rounded-lg shadow-sm p-4 mb-4">
           <h2 className="text-base font-medium mb-3 text-teal-700 border-b pb-2">Academic Result {selectedSemesterName ? `of ${selectedSemesterName}` : ''}</h2>
-          <div className="overflow-x-auto">
-            {!showResults ? (
-              <div className="text-center py-8 text-gray-500">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto text-gray-300 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                <p>Please enter your Student ID and select a Semester to view your results.</p>
-              </div>
-            ) : (
-              <>
-                <table className="min-w-full mb-4 border border-gray-200 rounded-lg overflow-hidden text-sm">
-                  <thead>
+          <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
+            <div className="w-full inline-block min-w-full align-middle">
+              <table className="min-w-full border border-teal-100 rounded-lg overflow-hidden text-xs">
+                <thead>
+                  <tr>
+                    <th className="bg-teal-600 text-white px-2 py-1 text-left text-xs whitespace-nowrap">Course Code</th>
+                    <th className="bg-teal-600 text-white px-2 py-1 text-left text-xs">Course Title</th>
+                    <th className="bg-teal-600 text-white px-2 py-1 text-left text-xs whitespace-nowrap">Credit</th>
+                    <th className="bg-teal-600 text-white px-2 py-1 text-left text-xs whitespace-nowrap">Grade</th>
+                    <th className="bg-teal-600 text-white px-2 py-1 text-left text-xs whitespace-nowrap">Grade Point</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {!showResults ? (
                     <tr>
-                      <th className="bg-teal-600 text-white px-3 py-2 text-left">Course Code</th>
-                      <th className="bg-teal-600 text-white px-3 py-2 text-left">Course Title</th>
-                      <th className="bg-teal-600 text-white px-3 py-2 text-left">Credit</th>
-                      <th className="bg-teal-600 text-white px-3 py-2 text-left">Grade</th>
-                      <th className="bg-teal-600 text-white px-3 py-2 text-left">Grade Point</th>
+                      <td colSpan={5} className="px-2 py-1 text-center text-gray-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto text-gray-300 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <p>Please enter your Student ID and select a Semester to view your results.</p>
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {resultData.map((course, index) => (
+                  ) : (
+                    resultData.map((course, index) => (
                       <tr key={index} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
-                        <td className="px-3 py-2 border-b border-gray-200">{course.customCourseId}</td>
-                        <td className="px-3 py-2 border-b border-gray-200">{course.courseTitle}</td>
-                        <td className="px-3 py-2 border-b border-gray-200">{course.totalCredit}</td>
-                        <td className="px-3 py-2 border-b border-gray-200 font-medium">{course.gradeLetter}</td>
-                        <td className="px-3 py-2 border-b border-gray-200">{course.pointEquivalent}</td>
+                        <td className="px-2 py-1 border-b border-teal-100 whitespace-nowrap">{course.customCourseId}</td>
+                        <td className="px-2 py-1 border-b border-teal-100">{course.courseTitle}</td>
+                        <td className="px-2 py-1 border-b border-teal-100 whitespace-nowrap text-center">{course.totalCredit}</td>
+                        <td className="px-2 py-1 border-b border-teal-100 font-medium whitespace-nowrap text-center">{course.gradeLetter}</td>
+                        <td className="px-2 py-1 border-b border-teal-100 whitespace-nowrap text-center">{course.pointEquivalent}</td>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-center text-sm">
-                  <div className="bg-purple-50 p-2 rounded-md">
-                    <p className="text-purple-700 font-medium">Total Credit Requirement: {studentInfo.programCredit || 148}</p>
-                  </div>
-                  <div className="bg-purple-50 p-2 rounded-md">
-                    <p className="text-purple-700 font-medium">Total Credits Taken: {calculateTotalCredits()}</p>
-                  </div>
-                  <div className="bg-purple-50 p-2 rounded-md">
-                    <p className="text-purple-700 font-medium">SGPA: {calculateSGPA()}</p>
-                  </div>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+            
+            {showResults && (
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-center text-sm">
+                <div className="bg-purple-50 p-2 rounded-md">
+                  <p className="text-purple-700 font-medium">Total Credit Requirement: {studentInfo.programCredit || 148}</p>
                 </div>
-              </>
+                <div className="bg-purple-50 p-2 rounded-md">
+                  <p className="text-purple-700 font-medium">Total Credits Taken: {calculateTotalCredits()}</p>
+                </div>
+                <div className="bg-purple-50 p-2 rounded-md">
+                  <p className="text-purple-700 font-medium">SGPA: {calculateSGPA()}</p>
+                </div>
+              </div>
             )}
           </div>
         </div>
@@ -451,7 +456,7 @@ const Result: React.FC<ResultProps> = () => {
           </>
         )}
         
-        {/* UGC Grading System - Always shown at bottom */}
+        {/* UGC Grading System*/}
         <div className="bg-white rounded-lg shadow-sm p-4 mb-4">
           <h2 className="text-base font-medium mb-3 text-teal-700 border-b pb-2">UGC Uniform Grading System</h2>
           <div className="overflow-x-auto">
