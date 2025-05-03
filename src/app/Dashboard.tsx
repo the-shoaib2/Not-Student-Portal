@@ -1,41 +1,104 @@
-import React, { Suspense, useState, useEffect } from 'react';
+import React, { Suspense, useState, useEffect, useMemo } from 'react';
 import { Skeleton } from '../components/Skeleton';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faGraduationCap, faMoneyBill, faCalendar, faChartLine } from '@fortawesome/free-solid-svg-icons';
+import { Line } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
+import { profileService, paymentService, dashboardService } from '../services/api';
 
-// Dashboard stats type definition
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+
+// Type definitions
 interface DashboardStat {
   id: number;
   title: string;
   value: string;
-  icon: string;
+  icon: any;
   color: string;
+}
+
+interface DashboardStudentInfo {
+  cgpa: string;
+  completedCredits: string;
+  currentSemester: string;
+}
+
+interface DashboardPaymentSummary {
+  dueAmount: string;
+}
+
+interface DashboardSGPAData {
+  semesters: string[];
+  sgpa: number[];
+}
+
+interface DashboardError {
+  message: string;
+  code?: string;
 }
 
 // Dashboard component content
 const DashboardContent: React.FC = () => {
   const [stats, setStats] = useState<DashboardStat[]>([]);
+  const [sgpaData, setSGPAData] = useState<DashboardSGPAData>({ semesters: [], sgpa: [] });
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<DashboardError | null>(null);
 
-  // Simulate data loading
   useEffect(() => {
-    // Simulate API call delay
-    const timer = setTimeout(() => {
-      // Mock data
-      const mockStats: DashboardStat[] = [
-        { id: 1, title: 'Current CGPA', value: '3.75', icon: '📊', color: 'bg-blue-100 text-blue-800' },
-        { id: 2, title: 'Completed Credits', value: '96', icon: '🎓', color: 'bg-green-100 text-green-800' },
-        { id: 3, title: 'Current Semester', value: 'Fall 2023', icon: '📅', color: 'bg-purple-100 text-purple-800' },
-        { id: 4, title: 'Due Payments', value: '$1,250', icon: '💰', color: 'bg-red-100 text-red-800' },
-      ];
-      
-      setStats(mockStats);
-      setLoading(false);
-    }, 1500); // 1.5 second delay to simulate loading
+    const fetchDashboardData = async () => {
+      setError(null);
+      try {
+        const [studentInfo, paymentSummary, sgpaGraph] = await Promise.all([
+          profileService.getStudentInfo(),
+          paymentService.getPaymentLedger(),
+          dashboardService.getCGPAData()
+        ]);
 
-    return () => clearTimeout(timer);
+        const dashboardStats: DashboardStat[] = [
+          { id: 1, title: 'Current CGPA', value: studentInfo.cgpa, icon: faChartLine, color: 'bg-blue-100 text-blue-800' },
+          { id: 2, title: 'Completed Credits', value: studentInfo.completedCredits, icon: faGraduationCap, color: 'bg-green-100 text-green-800' },
+          { id: 3, title: 'Current Semester', value: studentInfo.currentSemester, icon: faCalendar, color: 'bg-purple-100 text-purple-800' },
+          { id: 4, title: 'Due Payments', value: paymentSummary.dueAmount, icon: faMoneyBill, color: 'bg-red-100 text-red-800' },
+        ];
+
+        setStats(dashboardStats);
+        setSGPAData(sgpaGraph);
+        setLoading(false);
+      } catch (error: any) {
+        console.error('Error fetching dashboard data:', error);
+        setError({
+          message: error.message || 'Failed to load dashboard data',
+          code: error.code
+        });
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
   }, []);
 
   if (loading) {
     return <DashboardSkeleton />;
+  }
+
+  if (error) {
+    return (
+      <div className="p-6 text-center">
+        <div className="bg-red-100 text-red-800 p-4 rounded-lg mb-4">
+          <h3 className="text-lg font-semibold mb-2">Error Loading Dashboard</h3>
+          <p>{error.message}</p>
+        </div>
+        <button
+          onClick={() => {
+            setLoading(true);
+            fetchDashboardData();
+          }}
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
+        >
+          Retry
+        </button>
+      </div>
+    );
   }
 
   return (
@@ -51,7 +114,7 @@ const DashboardContent: React.FC = () => {
                 <p className="text-sm font-medium">{stat.title}</p>
                 <p className="text-2xl font-bold">{stat.value}</p>
               </div>
-              <div className="text-3xl">{stat.icon}</div>
+              <div className="text-3xl"><FontAwesomeIcon icon={stat.icon} size="lg" /></div>
             </div>
           </div>
         ))}
@@ -76,6 +139,40 @@ const DashboardContent: React.FC = () => {
             <p className="text-sm text-gray-600">Check your exam schedule</p>
             <p className="text-xs text-gray-500 mt-1">2 weeks ago</p>
           </div>
+        </div>
+      </div>
+
+      {/* SGPA Graph */}
+      <div className="bg-white rounded-lg shadow p-4 mt-6">
+        <h3 className="text-lg font-semibold mb-3">Semester-wise SGPA</h3>
+        <div className="h-64">
+          {sgpaData.semesters.length > 0 && (
+            <Line
+              data={{
+                labels: sgpaData.semesters,
+                datasets: [
+                  {
+                    label: 'SGPA',
+                    data: sgpaData.sgpa,
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1,
+                    fill: false,
+                  },
+                ],
+              }}
+              options={{
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                  y: {
+                    beginAtZero: false,
+                    min: Math.min(...sgpaData.sgpa) - 0.5,
+                    max: Math.max(...sgpaData.sgpa) + 0.5,
+                  },
+                },
+              }}
+            />
+          )}
         </div>
       </div>
     </div>

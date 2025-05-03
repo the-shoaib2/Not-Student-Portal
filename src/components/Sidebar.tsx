@@ -25,9 +25,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
 
   const menuItems: MenuItem[] = [
-    ...(isAuthenticated ? [] : [
-      { icon: <LogIn size={20} />, text: 'Log in', path: '/login', category: 'General', showWhenAuthenticated: false, public: true }
-    ]),
+    { icon: <LogIn size={20} />, text: 'Log in', path: '/login', category: 'General', showWhenAuthenticated: false, public: true },
     { icon: <Home size={20} />, text: 'Home', path: '/', category: 'General', showWhenAuthenticated: true },
     { icon: <ClipboardList size={20} />, text: 'Dashboard', path: '/dashboard', category: 'General', showWhenAuthenticated: true },
     { icon: <User size={20} />, text: 'Profile', path: '/profile', category: 'Profile', showWhenAuthenticated: true },

@@ -110,13 +110,23 @@ export interface ForgotPasswordRequest {
 // Profile Interfaces
 export interface StudentInfo {
   studentId: string;
-  name: string;
-  program: string;
-  batch: string;
+  fkCampus: string;
+  campusName: string;
+  studentName: string;
+  batchId: string;
+  batchNo: number;
+  programCredit: number;
+  programId: string;
+  programName: string;
+  progShortName: string;
+  programType: string;
+  deptShortName: string;
+  departmentName: string;
+  facultyName: string;
+  facShortName: string;
+  semesterId: string;
+  semesterName: string;
   shift: string;
-  email: string;
-  phone: string;
-  // Add other profile fields as needed
 }
 
 // Result Interfaces
@@ -235,8 +245,13 @@ export const profileService = {
 // Result Service
 export const resultService = {
   getSemesterList: async (): Promise<Semester[]> => {
-    const response = await api.get<Semester[]>('/result/semesterList');
-    return response.data;
+    try {
+      const response = await api.get<Semester[]>('/result/semesterList');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching semester list:', error);
+      throw error;
+    }
   },
 
   getLiveResultSemesterList: async (): Promise<Semester[]> => {
@@ -251,6 +266,13 @@ export const resultService = {
         studentId,
         grecaptcha: ''
       }
+    });
+    return response.data;
+  },
+
+  getStudentInfo: async (studentId: string): Promise<StudentInfo> => {
+    const response = await api.get<StudentInfo>('/result/studentInfo', {
+      params: { studentId }
     });
     return response.data;
   },
@@ -271,6 +293,7 @@ export const paymentService = {
 
 // Dashboard Service
 export const dashboardService = {
+  
   getDropSemesterList: async () => {
     const response = await api.get('/dropSemester/dropSemesterList');
     return response.data;

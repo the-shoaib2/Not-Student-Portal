@@ -1,12 +1,197 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { resultService } from '../services/api';
+import {  } from 'lucide-react';
 
-const Result: React.FC = () => {
+interface ResultProps {}
+
+interface ResultData {
+  semesterId: string;
+  semesterName: string;
+  semesterYear: number;
+  studentId: string;
+  courseId: string;
+  customCourseId: string;
+  courseTitle: string;
+  totalCredit: number;
+  grandTotal: number | null;
+  pointEquivalent: number;
+  gradeLetter: string;
+  cgpa: number;
+  blocked: string;
+  blockCause: string | null;
+  tevalSubmitted: string;
+  teval: string;
+  semesterAccountsClearance: string | null;
+  // Additional fields for student info
+  program?: string;
+  studentName?: string;
+  enrollmentSemester?: string;
+  batch?: string;
+}
+
+const Result: React.FC<ResultProps> = () => {
   const [studentId, setStudentId] = useState('');
   const [semester, setSemester] = useState('');
+  const [selectedSemesterName, setSelectedSemesterName] = useState('');
+  const [semesters, setSemesters] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [resultData, setResultData] = useState<ResultData[]>([]);
+  const [studentInfo, setStudentInfo] = useState({
+    program: '',
+    name: '',
+    id: '',
+    enrollment: '',
+    batch: ''
+  });
+  const [studentInfoLoading, setStudentInfoLoading] = useState(false);
+  const [studentInfoError, setStudentInfoError] = useState<string | null>(null);
+
+  // Fetch semesters when component mounts
+  useEffect(() => {
+    let isSubscribed = true;
+
+    const fetchSemesters = async () => {
+      try {
+        const response = await resultService.getSemesterList();
+        if (isSubscribed) {
+          console.log('Semester list response:', response);
+          setSemesters(response);
+          setError(null);
+        }
+      } catch (err) {
+        if (isSubscribed) {
+          console.error('Error fetching semesters:', err);
+          setError('Failed to load semesters. Please try again later.');
+        }
+      } finally {
+        if (isSubscribed) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    fetchSemesters();
+
+    return () => {
+      isSubscribed = false;
+    };
+  }, []);
+
+  // Fetch student info when student ID changes
+  useEffect(() => {
+    const fetchStudentInfo = async () => {
+      if (!studentId) {
+        setStudentInfo({
+          program: '',
+          name: '',
+          id: '',
+          enrollment: '',
+          batch: ''
+        });
+        setStudentInfoError(null);
+        return;
+      }
+      
+      setStudentInfoLoading(true);
+      setStudentInfoError(null);
+      
+      try {
+        const info = await resultService.getStudentInfo(studentId);
+        if (!info) {
+          throw new Error('Student not found');
+        }
+        
+        setStudentInfo({
+          program: info.programName || '',
+          name: info.studentName || '',
+          id: studentId,
+          enrollment: info.shift || '',
+          batch: info.batchNo?.toString() || ''
+        });
+        setStudentInfoError(null);
+      } catch (error) {
+        console.error('Error fetching student info:', error);
+        setStudentInfo({
+          program: '',
+          name: '',
+          id: studentId,
+          enrollment: '',
+          batch: ''
+        });
+        setStudentInfoError('Failed to fetch student information. Please check the ID and try again.');
+      } finally {
+        setStudentInfoLoading(false);
+      }
+    };
+
+    fetchStudentInfo();
+  }, [studentId]);
+
+  // Handle form submission
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!studentId || !semester) {
+      alert('Please fill all required fields');
+      return;
+    }
+
+    try {
+      // Fetch student info first
+      const info = await resultService.getStudentInfo(studentId);
+      if (!info) {
+        throw new Error('Student not found');
+      }
+
+      setStudentInfo({
+        program: info.programName || '',
+        name: info.studentName || '',
+        id: studentId,
+        enrollment: info.shift || '',
+        batch: info.batchNo?.toString() || ''
+      });
+      setStudentInfoError(null);
+
+      // Then fetch result data
+      const response = await resultService.getStudentResult(semester, studentId);
+      console.log('Result fetched successfully:', response);
+      
+      if (!response || (!Array.isArray(response) && typeof response !== 'object')) {
+        throw new Error('Invalid response format');
+      }
+
+      // Handle both array and single object responses
+      const resultArray = Array.isArray(response) ? response : [response];
+      setResultData(resultArray as ResultData[]);
+    } catch (error) {
+      console.error('Error fetching result:', error);
+      alert('Failed to fetch result');
+      setResultData([]);
+      setStudentInfo({
+        program: '',
+        name: '',
+        id: studentId,
+        enrollment: '',
+        batch: ''
+      });
+      setStudentInfoError('Failed to fetch student information. Please check the ID and try again.');
+    }
+  };
+
+  const calculateTotalCredits = () => {
+    return resultData.reduce((total, course) => total + course.totalCredit, 0);
+  };
+
+  const calculateSGPA = () => {
+    const totalPoints = resultData.reduce((total, course) => {
+      return total + (course.pointEquivalent * course.totalCredit);
+    }, 0);
+    const totalCredits = calculateTotalCredits();
+    return totalCredits > 0 ? (totalPoints / totalCredits).toFixed(2) : '0.00';
+  };
 
   return (
     <div className="min-h-screen">
-     
       {/* Page Title */}
       <div className="border-b border-gray-300 py-4 text-center bg-white">
         <h1 className="text-xl font-medium">Academic Result</h1>
@@ -32,12 +217,24 @@ const Result: React.FC = () => {
                 id="semester" 
                 className="border-b border-gray-400 focus:outline-none focus:border-blue-500 w-64 appearance-none pr-8"
                 value={semester}
-                onChange={(e) => setSemester(e.target.value)}
+                onChange={(e) => {
+                setSemester(e.target.value);
+                const selectedSem = semesters.find(s => s.semesterId === e.target.value);
+                setSelectedSemesterName(selectedSem ? `${selectedSem.semesterName} ${selectedSem.semesterYear}` : '');
+              }}
               >
                 <option value="">Select a semester</option>
-                <option value="Spring 2023">Spring 2023</option>
-                <option value="Fall 2022">Fall 2022</option>
-                <option value="Summer 2022">Summer 2022</option>
+                {isLoading ? (
+                  <option value="">Loading...</option>
+                ) : error ? (
+                  <option value="">{error}</option>
+                ) : (
+                  semesters.map((sem) => (
+                    <option key={sem.semesterId} value={sem.semesterId}>
+                      {sem.semesterName} {sem.semesterYear}
+                    </option>
+                  ))
+                )}
               </select>
               <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
                 <svg className="w-4 h-4 fill-current text-gray-500" viewBox="0 0 20 20">
@@ -46,7 +243,10 @@ const Result: React.FC = () => {
               </div>
             </div>
           </div>
-          <button className="bg-orange-400 hover:bg-orange-500 text-white px-4 py-2 rounded flex items-center">
+          <button 
+            onClick={handleSubmit}
+            className="bg-orange-400 hover:bg-orange-500 text-white px-4 py-2 rounded flex items-center"
+          >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
             </svg>
@@ -73,21 +273,40 @@ const Result: React.FC = () => {
             <div className="mb-4 md:mb-0">
               <h2 className="text-lg font-medium mb-4">Student Info</h2>
               <div className="space-y-2">
-                <div>
-                  <span className="text-gray-600">Program</span>
-                </div>
-                <div>
-                  <span className="text-gray-600">Name of Student</span>
-                </div>
-                <div>
-                  <span className="text-gray-600">Student Id</span>
-                </div>
-                <div>
-                  <span className="text-gray-600">Enrollment</span>
-                </div>
-                <div>
-                  <span className="text-gray-600">Batch</span>
-                </div>
+                {studentInfoLoading ? (
+                  <div className="animate-pulse space-y-2">
+                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                    <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                    <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+                  </div>
+                ) : studentInfoError ? (
+                  <div className="text-red-500 text-sm py-2">{studentInfoError}</div>
+                ) : (
+                  <>
+                    <div>
+                      <span className="text-gray-600">Program: </span>
+                      <span>{studentInfo.program}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">Name of Student: </span>
+                      <span>{studentInfo.name}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">Student Id: </span>
+                      <span>{studentInfo.id}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">Enrollment: </span>
+                      <span>{studentInfo.enrollment}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">Batch: </span>
+                      <span>{studentInfo.batch}</span>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
 
@@ -174,7 +393,7 @@ const Result: React.FC = () => {
 
         {/* Academic Result Table */}
         <div className="bg-white border border-gray-300 p-4 mb-4">
-          <h2 className="text-lg font-medium mb-4">Academic Result of :</h2>
+          <h2 className="text-lg font-medium mb-4">Academic Result of {selectedSemesterName}</h2>
           <div className="overflow-x-auto">
             <table className="min-w-full mb-4">
               <thead>
@@ -187,14 +406,22 @@ const Result: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {/* Course rows will be populated dynamically */}
+                {resultData.map((course, index) => (
+                  <tr key={index} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
+                    <td className="px-4 py-2 border-b border-gray-200">{course.customCourseId}</td>
+                    <td className="px-4 py-2 border-b border-gray-200">{course.courseTitle}</td>
+                    <td className="px-4 py-2 border-b border-gray-200">{course.totalCredit}</td>
+                    <td className="px-4 py-2 border-b border-gray-200">{course.gradeLetter}</td>
+                    <td className="px-4 py-2 border-b border-gray-200">{course.pointEquivalent}</td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
           <div className="flex flex-col md:flex-row justify-between text-purple-700 font-medium">
-            <p>Total Credit Requirement: </p>
-            <p>Total Credits Taken : 0</p>
-            <p>SGPA : </p>
+            <p>Total Credit Requirement: 148</p>
+            <p>Total Credits Taken: {calculateTotalCredits()}</p>
+            <p>SGPA: {calculateSGPA()}</p>
           </div>
         </div>
 
