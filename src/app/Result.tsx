@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { resultService } from '../services/api';
-import { Search, Loader } from 'lucide-react';
+import { Search, Loader, BookOpen } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
 interface ResultProps {}
@@ -307,7 +307,7 @@ const Result: React.FC<ResultProps> = () => {
             <div className="flex justify-center py-2 px-2 sm:py-0 md:justify-start">
               <button 
                 onClick={handleSubmit}
-                className="bg-teal-600 hover:bg-teal-700 text-white px-3 py-1 sm:py-1.5 text-xs sm:text-sm rounded-md transition duration-300 flex items-center shadow-sm w-full md:w-auto justify-center"
+                className="bg-teal-600 hover:bg-teal-700 text-white px-3 py-1 sm:py-1.5 text-xs sm:text-sm rounded-md transition duration-300 flex items-center shadow-sm w-full md:w-auto justify-center cursor-pointer gap-2 border border-teal-600"
                 disabled={isLoading}
               >
                 {isLoading ? (
@@ -315,7 +315,7 @@ const Result: React.FC<ResultProps> = () => {
                 ) : (
                   <Search className="h-4 w-4 mr-1" />
                 )}
-                {isLoading ? 'SHOWING RESULT...' : 'SHOW RESULT'}
+                {isLoading ? 'SHOWING RESULT' : 'SHOW RESULT'}
               </button>
             </div>
           </div>
@@ -325,10 +325,7 @@ const Result: React.FC<ResultProps> = () => {
               Now you can get semester result through SMS. For getting Semester Result through SMS please click here to read
             </p>
             <button className="bg-pink-500 hover:bg-pink-600 text-white px-2 sm:px-3 py-0.5 sm:py-1 rounded-md flex items-center transition duration-300 shadow-sm whitespace-nowrap text-xs">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-              </svg>
+              <BookOpen className="h-4 w-4 mr-1" />
               INSTRUCTION
             </button>
           </div>
