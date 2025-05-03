@@ -6,6 +6,7 @@ declare module 'axios' {
   }
 }
 import { proxyRequest } from './proxyUtils';
+import { url } from 'inspector';
 
 // Use proxy endpoint that will be handled by our Edge Function
 const BASE_URL = '/proxy';
@@ -144,6 +145,103 @@ export interface StudentInfo {
   semesterName: string;
   shift: string;
   completedCredits: string;
+  photoUrl?: string;
+  // Additional fields from the detailed profile
+  photoFile?: string;
+  personId?: number;
+  firstName?: string;
+  lastName?: string;
+  nickName?: string;
+  sex?: string;
+  bloodGroup?: string;
+  birthDate?: string;
+  religion?: string;
+  email?: string;
+  mobile?: string;
+  presentHouse?: string;
+  presentStreet?: string;
+  presentCity?: string;
+  preDisId?: number;
+  preDivisionId?: number;
+  preCountryCode?: string;
+  presentDistrict?: string;
+  presentCountry?: string;
+  presentZipCode?: string;
+  presentPhone?: string;
+  permanentHouse?: string;
+  permanentStreet?: string;
+  permanentCity?: string;
+  perDisId?: number;
+  permanentDistrict?: string;
+  permanentCountry?: string;
+  permanentZipCode?: string;
+  permanentPhone?: string;
+  fatherName?: string;
+  motherName?: string;
+  maritalStatus?: string;
+  passportNo?: string;
+  nationality?: string;
+  voterId?: string;
+  tin?: string;
+  notes?: string;
+  workPhone?: string;
+  placeOfBirth?: string;
+  socialNetId?: string;
+  fatherMobile?: string;
+  fatherEmail?: string;
+  fatherOccupation?: string;
+  fatherDesignation?: string;
+  fatherEmployerName?: string;
+  fatherAnnualIncome?: number;
+  motherMobile?: string;
+  motherEmail?: string;
+  motherOccupation?: string;
+  motherDesignation?: string;
+  motherEmployerName?: string;
+  motherAnnualIncome?: number;
+  parentAddress?: string;
+  localGuardianName?: string;
+  localGuardianMobile?: string;
+  localGuardianEmail?: string;
+  localGuardianRelation?: string;
+  localGuardianAddress?: string;
+  bearEduExpense?: string;
+  prePostOffice?: string;
+  prePoliceStation?: string;
+  perPostOffice?: string;
+  perPoliceStation?: string;
+  emailAlternative?: string;
+  hostelAddress?: string;
+  messAddress?: string;
+  otherAddress?: string;
+}
+
+export interface PresentAddressInfo {
+  presentDistrictName: string | null;
+  presentDivisionName: string | null;
+  presentCountryName: string | null;
+}
+
+export interface PermanentAddressInfo {
+  permanentDistrictName: string | null;
+  permanentDivisionName: string | null;
+  permanentCountryName: string | null;
+}
+
+export interface EducationInfo {
+  id: string;
+  institute: string;
+  degree: string;
+  major: string;
+  result: string;
+  scale: string;
+  passingYear: string;
+  duration: string;
+}
+
+export interface PhotographInfo {
+  photoUrl: string;
+  photoData: string;
 }
 
 // Result Interfaces
@@ -198,6 +296,8 @@ export interface CGPAData {
   data: number[];
   // Add other CGPA graph related fields
 }
+
+
 
 // Auth Service
 export const authService = {
@@ -259,10 +359,142 @@ export const authService = {
 
 // Profile Service
 export const profileService = {
-  getStudentInfo: async (): Promise<StudentInfo> => {
-    const response = await api.get<StudentInfo>('/profile/studentInfo');
-    return response.data;
+  // Helper function to get auth token
+  getAuthToken: () => {
+    const userJson = localStorage.getItem('user');
+    let token = '';
+    if (userJson) {
+      try {
+        const user = JSON.parse(userJson);
+        token = user.accessToken;
+      } catch (error) {
+        console.error('Error parsing user data from localStorage:', error);
+      }
+    }
+    return token;
   },
+
+  // Get basic student information
+  getStudentInfo: async (): Promise<StudentInfo> => {
+    try {
+      const token = profileService.getAuthToken();
+      console.log('Auth token for student info:', token ? 'Token exists' : 'No token');
+      
+      const response = await proxyRequest({
+        method: 'GET',
+        url: '/profile/studentInfo',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          accessToken: token,
+          'Accept': 'application/json'
+        }
+      });
+      
+      console.log('Raw student info API response:', response);
+      
+      if (!response) {
+        console.warn('API returned empty response for student info');
+        return {} as StudentInfo;
+      }
+      
+      return response;
+    } catch (error) {
+      console.error('Error fetching student info:', error);
+      // Return a default object with empty values to prevent UI errors
+      return {} as StudentInfo;
+    }
+  },
+
+  // Get student photograph
+  getPhotograph: async (): Promise<PhotographInfo> => {
+    try {
+      const token = profileService.getAuthToken();
+
+      const base64Data = await proxyRequest({
+        method: 'GET',
+        url: '/profileUpdate/photograph',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          accessToken: token,
+          Accept: 'application/json',
+        },
+      });
+
+      const photoUrl = `data:image/jpeg;base64,${base64Data}`;
+
+      return { photoUrl, photoData: photoUrl };
+    } catch (error) {
+      console.error('Failed to fetch photograph:', error);
+      return { photoUrl: '', photoData: '' };
+    }
+  },
+
+
+  // Get education list
+  getEducationList: async (): Promise<EducationInfo[]> => {
+    try {
+      const token = profileService.getAuthToken();
+      
+      const response = await proxyRequest({
+        method: 'GET',
+        url: '/profile/educationList',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          accessToken: token,
+          'Accept': 'application/json'
+        }
+      });
+      
+      return response || [];
+    } catch (error) {
+      console.error('Error fetching education list:', error);
+      return [];
+    }
+  },
+
+  // Get present address
+  getPresentAddress: async (): Promise<PresentAddressInfo> => {
+    try {
+      const token = profileService.getAuthToken();
+      
+      const response = await proxyRequest({
+        method: 'GET',
+        url: '/profile/presentAddress',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          accessToken: token,
+          'Accept': 'application/json'
+        }
+      });
+      
+      return response || { presentDistrictName: null, presentDivisionName: null, presentCountryName: null };
+    } catch (error) {
+      console.error('Error fetching present address:', error);
+      return { presentDistrictName: null, presentDivisionName: null, presentCountryName: null };
+    }
+  },
+
+  // Get permanent address
+  getPermanentAddress: async (): Promise<PermanentAddressInfo> => {
+    try {
+      const token = profileService.getAuthToken();
+      
+      const response = await proxyRequest({
+        method: 'GET',
+        url: '/profile/permanentAddress',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          accessToken: token,
+          'Accept': 'application/json'
+        }
+      });
+      
+      return response || { permanentDistrictName: null, permanentDivisionName: null, permanentCountryName: null };
+    } catch (error) {
+      console.error('Error fetching permanent address:', error);
+      return { permanentDistrictName: null, permanentDivisionName: null, permanentCountryName: null };
+    }
+  }
 };
 
 // Result Service

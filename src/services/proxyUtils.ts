@@ -77,24 +77,33 @@ export const proxyRequest = async ({
   method,
   url,
   data,
-  headers = {}
+  headers = {},
+  responseType
 }: {
   method: string;
   url: string;
   data?: any;
   headers?: Record<string, string>;
+  responseType?: 'arraybuffer' | 'blob' | 'document' | 'json' | 'text';
 }) => {
   try {
     const response = await proxyClient.request({
       method,
       url,
       data,
+      responseType,
       headers: {
-        ...headers,
         'Accept': 'application/json',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        ...headers  // This will override the default Accept header if provided
       }
     });
+    // If responseType is blob or arraybuffer, return the whole response
+    // This allows the caller to access response.data as a Blob or ArrayBuffer
+    if (responseType === 'blob' || responseType === 'arraybuffer') {
+      return response;
+    }
+    // Otherwise just return the data
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {

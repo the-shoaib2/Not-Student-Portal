@@ -56,9 +56,19 @@ export default defineConfig(({ mode }) => {
                 headers: proxyReq.getHeaders()
               });
               
-              // Set proper headers
-              proxyReq.setHeader('Accept', 'application/json');
-              proxyReq.setHeader('Content-Type', 'application/json');
+              // Check if this is a photograph request
+              if (req.url && req.url.includes('/profileUpdate/photograph')) {
+                // For photograph requests, set appropriate headers for image content
+                proxyReq.setHeader('Accept', 'image/jpeg, image/png, image/*, */*');
+                // Don't set Content-Type for GET requests to images
+                if (req.method !== 'GET') {
+                  proxyReq.setHeader('Content-Type', 'application/json');
+                }
+              } else {
+                // For all other requests, use default JSON headers
+                proxyReq.setHeader('Accept', 'application/json');
+                proxyReq.setHeader('Content-Type', 'application/json');
+              }
             });
             proxy.on('proxyRes', (proxyRes, req) => {
               console.log('[Proxy Response]', {
