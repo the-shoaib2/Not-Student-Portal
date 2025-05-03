@@ -251,27 +251,27 @@ const Result: React.FC<ResultProps> = () => {
       </div>
 
       {/* Form Section */}
-      <div className="container mx-auto px-2 sm:px-3 py-4 max-w-4xl">
-        <div className="bg-white rounded-lg shadow-sm p-2 sm:p-3 md:p-4 mb-4">
-          <h2 className="text-base font-medium mb-2 sm:mb-3 text-gray-700 border-b pb-2">Search Results</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1 sm:gap-2 items-end mb-4">
+      <div className="container mx-auto px-1 sm:px-2 md:px-3 py-3 sm:py-4 max-w-4xl">
+        <div className="bg-white rounded-lg shadow-sm p-1.5 sm:p-2 md:p-4 mb-3 sm:mb-4">
+          <h2 className="text-sm sm:text-base font-medium mb-1.5 sm:mb-2 text-gray-700 border-b pb-1 sm:pb-2">Search Results</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0.5 sm:gap-1 items-end mb-3 sm:mb-4">
             <div>
-              <label htmlFor="studentId" className="block text-red-500 mb-1 text-sm font-medium">Student Id *</label>
+              <label htmlFor="studentId" className="block text-red-500 mb-1 text-xs sm:text-sm font-medium">Student Id *</label>
               <input 
                 type="text" 
                 id="studentId" 
-                className="w-full px-3 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-1 focus:ring-teal-500 transition"
+                className="w-full px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm border rounded-md focus:outline-none focus:ring-1 focus:ring-teal-500 transition"
                 value={studentId}
                 onChange={(e) => setStudentId(e.target.value)}
                 placeholder="Enter your student ID"
               />
             </div>
             <div>
-              <label htmlFor="semester" className="block text-red-500 mb-1 text-sm font-medium">Select Semester *</label>
+              <label htmlFor="semester" className="block text-red-500 mb-1 text-xs sm:text-sm font-medium">Select Semester *</label>
               <div className="relative">
                 <select 
                   id="semester" 
-                  className="w-full px-3 py-1.5 text-sm border rounded-md appearance-none focus:outline-none focus:ring-1 focus:ring-teal-500 transition"
+                  className="w-full px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm border rounded-md appearance-none focus:outline-none focus:ring-1 focus:ring-teal-500 transition"
                   value={semester}
                   onChange={(e) => {
                   setSemester(e.target.value);
@@ -302,7 +302,7 @@ const Result: React.FC<ResultProps> = () => {
             <div className="flex justify-center md:justify-start">
               <button 
                 onClick={handleSubmit}
-                className="bg-teal-600 hover:bg-teal-700 text-white px-4 py-1.5 text-sm rounded-md transition duration-300 flex items-center shadow-sm w-full md:w-auto justify-center"
+                className="bg-teal-600 hover:bg-teal-700 text-white px-3 py-1 sm:py-1.5 text-xs sm:text-sm rounded-md transition duration-300 flex items-center shadow-sm w-full md:w-auto justify-center"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
@@ -312,11 +312,11 @@ const Result: React.FC<ResultProps> = () => {
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-center justify-between bg-pink-50 p-2 rounded-md text-xs">
+          <div className="flex flex-col sm:flex-row items-center justify-between bg-pink-50 p-1.5 sm:p-2 rounded-md text-xs">
             <p className="text-pink-600 mb-2 sm:mb-0 text-center sm:text-left">
               Now you can get semester result through SMS. For getting Semester Result through SMS please click here to read
             </p>
-            <button className="bg-pink-500 hover:bg-pink-600 text-white px-3 py-1 rounded-md flex items-center transition duration-300 shadow-sm whitespace-nowrap">
+            <button className="bg-pink-500 hover:bg-pink-600 text-white px-2 sm:px-3 py-0.5 sm:py-1 rounded-md flex items-center transition duration-300 shadow-sm whitespace-nowrap text-xs">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" viewBox="0 0 20 20" fill="currentColor">
                 <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
                 <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
@@ -327,8 +327,8 @@ const Result: React.FC<ResultProps> = () => {
         </div>
         
         {/* Student Info */}
-        <div className="bg-white rounded-lg shadow-sm p-2 sm:p-3 md:p-4 mb-4">
-          <h2 className="text-base font-medium mb-2 sm:mb-3 text-teal-700 border-b pb-2">Student Information</h2>
+        <div className="bg-white rounded-lg shadow-sm p-1.5 sm:p-2 md:p-4 mb-3 sm:mb-4">
+          <h2 className="text-sm sm:text-base font-medium mb-1.5 sm:mb-2 text-teal-700 border-b pb-1 sm:pb-2">Student Information</h2>
           <div className="space-y-2">
             {studentInfoLoading ? (
               <div className="animate-pulse space-y-2">
@@ -341,9 +341,9 @@ const Result: React.FC<ResultProps> = () => {
             ) : studentInfoError ? (
               <div className="text-red-500 text-xs py-2 bg-red-50 p-2 rounded-md">{studentInfoError}</div>
             ) : (
-              <div className="bg-teal-50 p-2 rounded-md text-xs sm:text-sm">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 sm:gap-2">
-                 
+              <div className="bg-teal-50 p-1.5 sm:p-2 rounded-md text-xs sm:text-sm">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-0.5 sm:gap-1 md:gap-2">
+                  
                   
                   <div>
                     <span className="text-gray-600">Student ID: </span>
@@ -389,24 +389,24 @@ const Result: React.FC<ResultProps> = () => {
         </div>
 
         {/* Academic Result Table */}
-        <div className="bg-white rounded-lg shadow-sm p-2 sm:p-3 md:p-4 mb-4">
-          <h2 className="text-base font-medium mb-2 sm:mb-3 text-teal-700 border-b pb-2">Academic Result {selectedSemesterName ? `of ${selectedSemesterName}` : ''}</h2>
-          <div className="overflow-x-auto -mx-1 sm:-mx-2 px-1 sm:px-2">
+        <div className="bg-white rounded-lg shadow-sm p-1.5 sm:p-2 md:p-4 mb-3 sm:mb-4">
+          <h2 className="text-sm sm:text-base font-medium mb-1.5 sm:mb-2 text-teal-700 border-b pb-1 sm:pb-2">Academic Result {selectedSemesterName ? `of ${selectedSemesterName}` : ''}</h2>
+          <div className="overflow-x-auto -mx-1.5 sm:-mx-2 px-1.5 sm:px-2">
             <div className="w-full inline-block min-w-full align-middle">
-              <table className="min-w-full border border-teal-100 rounded-lg overflow-hidden text-[10px] sm:text-xs">
+              <table className="min-w-full border border-teal-100 rounded-lg overflow-hidden text-[9px] sm:text-[10px] md:text-xs">
                 <thead>
                   <tr>
-                    <th className="bg-teal-600 text-white text-center border border-teal-200 px-2 py-1 text-left text-xs whitespace-nowrap">Course Code</th>
-                    <th className="bg-teal-600 text-white text-center border border-teal-200 px-2 py-1 text-left text-xs whitespace-nowrap">Course Title</th>
-                    <th className="bg-teal-600 text-white text-center border border-teal-200 px-2 py-1 text-left text-xs whitespace-nowrap">Credit</th>
-                    <th className="bg-teal-600 text-white text-center border border-teal-200 px-2 py-1 text-left text-xs whitespace-nowrap">Grade</th>
-                    <th className="bg-teal-600 text-white text-center border border-teal-200 px-2 py-1 text-left text-xs whitespace-nowrap">Grade Point</th>
+                    <th className="bg-teal-600 text-white text-center border border-teal-200 px-1 sm:px-2 py-0.5 sm:py-1 text-left text-[9px] sm:text-xs whitespace-nowrap">Course Code</th>
+                    <th className="bg-teal-600 text-white text-center border border-teal-200 px-1 sm:px-2 py-0.5 sm:py-1 text-left text-[9px] sm:text-xs whitespace-nowrap">Course Title</th>
+                    <th className="bg-teal-600 text-white text-center border border-teal-200 px-1 sm:px-2 py-0.5 sm:py-1 text-left text-[9px] sm:text-xs whitespace-nowrap">Credit</th>
+                    <th className="bg-teal-600 text-white text-center border border-teal-200 px-1 sm:px-2 py-0.5 sm:py-1 text-left text-[9px] sm:text-xs whitespace-nowrap">Grade</th>
+                    <th className="bg-teal-600 text-white text-center border border-teal-200 px-1 sm:px-2 py-0.5 sm:py-1 text-left text-[9px] sm:text-xs whitespace-nowrap">Grade Point</th>
                   </tr>
                 </thead>
                 <tbody>
                   {!showResults ? (
                     <tr>
-                      <td colSpan={5} className="px-2 py-1 text-center text-gray-500">
+                      <td colSpan={5} className="px-1 sm:px-2 py-0.5 sm:py-1 text-center text-gray-500">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto text-gray-300 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
@@ -416,11 +416,11 @@ const Result: React.FC<ResultProps> = () => {
                   ) : (
                     resultData.map((course, index) => (
                       <tr key={index} className={index % 2 === 0 ? 'bg-teal-50' : 'bg-white'}>
-                        <td className="px-2 py-1 border border-teal-200 whitespace-nowrap">{course.customCourseId}</td>
-                        <td className="px-2 py-1 border border-teal-200">{course.courseTitle}</td>
-                        <td className="px-2 py-1 border border-teal-200 whitespace-nowrap text-center">{course.totalCredit}</td>
-                        <td className="px-2 py-1 border border-teal-200 font-medium whitespace-nowrap text-center">{course.gradeLetter}</td>
-                        <td className="px-2 py-1 border border-teal-200 whitespace-nowrap text-center">{course.pointEquivalent}</td>
+                        <td className="px-1 sm:px-2 py-0.5 sm:py-1 border border-teal-200 whitespace-nowrap">{course.customCourseId}</td>
+                        <td className="px-1 sm:px-2 py-0.5 sm:py-1 border border-teal-200">{course.courseTitle}</td>
+                        <td className="px-1 sm:px-2 py-0.5 sm:py-1 border border-teal-200 whitespace-nowrap text-center">{course.totalCredit}</td>
+                        <td className="px-1 sm:px-2 py-0.5 sm:py-1 border border-teal-200 font-medium whitespace-nowrap text-center">{course.gradeLetter}</td>
+                        <td className="px-1 sm:px-2 py-0.5 sm:py-1 border border-teal-200 whitespace-nowrap text-center">{course.pointEquivalent}</td>
                       </tr>
                     ))
                   )}
@@ -429,14 +429,14 @@ const Result: React.FC<ResultProps> = () => {
             </div>
             
             {showResults && (
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-1 sm:gap-2 mt-3 sm:mt-4 text-center text-[10px] sm:text-xs">
-                <div className="bg-purple-50 p-1 sm:p-2 rounded-md">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-0.5 sm:gap-1 mt-2 sm:mt-3 text-center text-[9px] sm:text-[10px] md:text-xs">
+                <div className="bg-purple-50 p-0.5 sm:p-1 md:p-2 rounded-md">
                   <p className="text-purple-700 font-medium">Total Credit Requirement: {studentInfo.programCredit || 148}</p>
                 </div>
-                <div className="bg-purple-50 p-1 sm:p-2 rounded-md">
+                <div className="bg-purple-50 p-0.5 sm:p-1 md:p-2 rounded-md">
                   <p className="text-purple-700 font-medium">Total Credits Taken: {calculateTotalCredits()}</p>
                 </div>
-                <div className="bg-purple-50 p-1 sm:p-2 rounded-md">
+                <div className="bg-purple-50 p-0.5 sm:p-1 md:p-2 rounded-md">
                   <p className="text-purple-700 font-medium">SGPA: {calculateSGPA()}</p>
                 </div>
               </div>
@@ -462,78 +462,78 @@ const Result: React.FC<ResultProps> = () => {
         )}
         
         {/* UGC Grading System*/}
-        <div className="bg-white rounded-lg shadow-sm p-2 sm:p-3 md:p-4 mb-4">
-          <h2 className="text-base font-medium mb-2 sm:mb-3 text-teal-700 border-b pb-2">UGC Uniform Grading System</h2>
-          <div className="overflow-x-auto -mx-1 sm:-mx-2 px-1 sm:px-2">
-            <table className="min-w-full border border-teal-100 rounded-lg overflow-hidden text-[10px] sm:text-xs">
+        <div className="bg-white rounded-lg shadow-sm p-1.5 sm:p-2 md:p-4 mb-3 sm:mb-4">
+          <h2 className="text-sm sm:text-base font-medium mb-1.5 sm:mb-2 text-teal-700 border-b pb-1 sm:pb-2">UGC Uniform Grading System</h2>
+          <div className="overflow-x-auto -mx-1.5 sm:-mx-2 px-1.5 sm:px-2">
+            <table className="min-w-full border border-teal-100 rounded-lg overflow-hidden text-[9px] sm:text-[10px] md:text-xs">
               <thead>
                 <tr>
-                  <th className="bg-teal-600 text-white text-center border border-teal-200 px-2 py-1">Marks</th>
-                  <th className="bg-teal-600 text-white text-center border border-teal-200 px-2 py-1">Grade</th>
-                  <th className="bg-teal-600 text-white text-center border border-teal-200 px-2 py-1">Grade Point</th>
-                  <th className="bg-teal-600 text-white text-center border border-teal-200 px-2 py-1">Remarks</th>
+                  <th className="bg-teal-600 text-white text-center border border-teal-200 px-1 sm:px-2 py-0.5 sm:py-1">Marks</th>
+                  <th className="bg-teal-600 text-white text-center border border-teal-200 px-1 sm:px-2 py-0.5 sm:py-1">Letter Grade</th>
+                  <th className="bg-teal-600 text-white text-center border border-teal-200 px-1 sm:px-2 py-0.5 sm:py-1">Grade Point</th>
+                  <th className="bg-teal-600 text-white text-center border border-teal-200 px-1 sm:px-2 py-0.5 sm:py-1">Classification</th>
                 </tr>
               </thead>
               <tbody>
                 <tr className="bg-teal-50 hover:bg-teal-100 transition">
-                  <td className="px-2 py-1 border border-teal-200">80-100%</td>
-                  <td className="px-2 py-1 border border-teal-200 font-medium">A+</td>
-                  <td className="px-2 py-1 border border-teal-200">4.00</td>
-                  <td className="px-2 py-1 border border-teal-200">Outstanding</td>
+                  <td className="px-1 sm:px-2 py-0.5 sm:py-1 border border-teal-200">80-100%</td>
+                  <td className="px-1 sm:px-2 py-0.5 sm:py-1 border border-teal-200 font-medium">A+</td>
+                  <td className="px-1 sm:px-2 py-0.5 sm:py-1 border border-teal-200">4.00</td>
+                  <td className="px-1 sm:px-2 py-0.5 sm:py-1 border border-teal-200">Outstanding</td>
                 </tr>
                 <tr className="bg-white hover:bg-teal-100 transition">
-                  <td className="px-2 py-1 border border-teal-200">75-79%</td>
-                  <td className="px-2 py-1 border border-teal-200 font-medium">A</td>
-                  <td className="px-2 py-1 border border-teal-200">3.75</td>
-                  <td className="px-2 py-1 border border-teal-200">Excellent</td>
+                  <td className="px-1 sm:px-2 py-0.5 sm:py-1 border border-teal-200">75-79%</td>
+                  <td className="px-1 sm:px-2 py-0.5 sm:py-1 border border-teal-200 font-medium">A</td>
+                  <td className="px-1 sm:px-2 py-0.5 sm:py-1 border border-teal-200">3.75</td>
+                  <td className="px-1 sm:px-2 py-0.5 sm:py-1 border border-teal-200">Excellent</td>
                 </tr>
                 <tr className="bg-teal-50 hover:bg-teal-100 transition">
-                  <td className="px-2 py-1 border border-teal-200">70-74%</td>
-                  <td className="px-2 py-1 border border-teal-200 font-medium">A-</td>
-                  <td className="px-2 py-1 border border-teal-200">3.50</td>
-                  <td className="px-2 py-1 border border-teal-200">Very Good</td>
+                  <td className="px-1 sm:px-2 py-0.5 sm:py-1 border border-teal-200">70-74%</td>
+                  <td className="px-1 sm:px-2 py-0.5 sm:py-1 border border-teal-200 font-medium">A-</td>
+                  <td className="px-1 sm:px-2 py-0.5 sm:py-1 border border-teal-200">3.50</td>
+                  <td className="px-1 sm:px-2 py-0.5 sm:py-1 border border-teal-200">Very Good</td>
                 </tr>
                 <tr className="bg-white hover:bg-teal-100 transition">
-                  <td className="px-2 py-1 border border-teal-200">65-69%</td>
-                  <td className="px-2 py-1 border border-teal-200 font-medium">B+</td>
-                  <td className="px-2 py-1 border border-teal-200">3.25</td>
-                  <td className="px-2 py-1 border border-teal-200">Good</td>
+                  <td className="px-1 sm:px-2 py-0.5 sm:py-1 border border-teal-200">65-69%</td>
+                  <td className="px-1 sm:px-2 py-0.5 sm:py-1 border border-teal-200 font-medium">B+</td>
+                  <td className="px-1 sm:px-2 py-0.5 sm:py-1 border border-teal-200">3.25</td>
+                  <td className="px-1 sm:px-2 py-0.5 sm:py-1 border border-teal-200">Good</td>
                 </tr>
                 <tr className="bg-teal-50 hover:bg-teal-100 transition">
-                  <td className="px-2 py-1 border border-teal-200">60-64%</td>
-                  <td className="px-2 py-1 border border-teal-200 font-medium">B</td>
-                  <td className="px-2 py-1 border border-teal-200">3.00</td>
-                  <td className="px-2 py-1 border border-teal-200">Satisfactory</td>
+                  <td className="px-1 sm:px-2 py-0.5 sm:py-1 border border-teal-200">60-64%</td>
+                  <td className="px-1 sm:px-2 py-0.5 sm:py-1 border border-teal-200 font-medium">B</td>
+                  <td className="px-1 sm:px-2 py-0.5 sm:py-1 border border-teal-200">3.00</td>
+                  <td className="px-1 sm:px-2 py-0.5 sm:py-1 border border-teal-200">Satisfactory</td>
                 </tr>
                 <tr className="bg-white hover:bg-teal-100 transition">
-                  <td className="px-2 py-1 border border-teal-200">55-59%</td>
-                  <td className="px-2 py-1 border border-teal-200 font-medium">B-</td>
-                  <td className="px-2 py-1 border border-teal-200">2.75</td>
-                  <td className="px-2 py-1 border border-teal-200">Above Average</td>
+                  <td className="px-1 sm:px-2 py-0.5 sm:py-1 border border-teal-200">55-59%</td>
+                  <td className="px-1 sm:px-2 py-0.5 sm:py-1 border border-teal-200 font-medium">B-</td>
+                  <td className="px-1 sm:px-2 py-0.5 sm:py-1 border border-teal-200">2.75</td>
+                  <td className="px-1 sm:px-2 py-0.5 sm:py-1 border border-teal-200">Above Average</td>
                 </tr>
                 <tr className="bg-teal-50 hover:bg-teal-100 transition">
-                  <td className="px-2 py-1 border border-teal-200">50-54%</td>
-                  <td className="px-2 py-1 border border-teal-200 font-medium">C+</td>
-                  <td className="px-2 py-1 border border-teal-200">2.50</td>
-                  <td className="px-2 py-1 border border-teal-200">Average</td>
+                  <td className="px-1 sm:px-2 py-0.5 sm:py-1 border border-teal-200">50-54%</td>
+                  <td className="px-1 sm:px-2 py-0.5 sm:py-1 border border-teal-200 font-medium">C+</td>
+                  <td className="px-1 sm:px-2 py-0.5 sm:py-1 border border-teal-200">2.50</td>
+                  <td className="px-1 sm:px-2 py-0.5 sm:py-1 border border-teal-200">Average</td>
                 </tr>
                 <tr className="bg-white hover:bg-teal-100 transition">
-                  <td className="px-2 py-1 border border-teal-200">45-49%</td>
-                  <td className="px-2 py-1 border border-teal-200 font-medium">C</td>
-                  <td className="px-2 py-1 border border-teal-200">2.25</td>
-                  <td className="px-2 py-1 border border-teal-200">Below Average</td>
+                  <td className="px-1 sm:px-2 py-0.5 sm:py-1 border border-teal-200">45-49%</td>
+                  <td className="px-1 sm:px-2 py-0.5 sm:py-1 border border-teal-200 font-medium">C</td>
+                  <td className="px-1 sm:px-2 py-0.5 sm:py-1 border border-teal-200">2.25</td>
+                  <td className="px-1 sm:px-2 py-0.5 sm:py-1 border border-teal-200">Below Average</td>
                 </tr>
                 <tr className="bg-teal-50 hover:bg-teal-100 transition">
-                  <td className="px-2 py-1 border border-teal-200">40-44%</td>
-                  <td className="px-2 py-1 border border-teal-200 font-medium">D</td>
-                  <td className="px-2 py-1 border border-teal-200">2.00</td>
-                  <td className="px-2 py-1 border border-teal-200">Pass</td>
+                  <td className="px-1 sm:px-2 py-0.5 sm:py-1 border border-teal-200">40-44%</td>
+                  <td className="px-1 sm:px-2 py-0.5 sm:py-1 border border-teal-200 font-medium">D</td>
+                  <td className="px-1 sm:px-2 py-0.5 sm:py-1 border border-teal-200">2.00</td>
+                  <td className="px-1 sm:px-2 py-0.5 sm:py-1 border border-teal-200">Pass</td>
                 </tr>
                 <tr className="bg-white hover:bg-teal-100 transition">
-                  <td className="px-2 py-1 border border-teal-200">00-39%</td>
-                  <td className="px-2 py-1 border border-teal-200 font-medium">F</td>
-                  <td className="px-2 py-1 border border-teal-200">0.00</td>
-                  <td className="px-2 py-1 border border-teal-200">Fail</td>
+                  <td className="px-1 sm:px-2 py-0.5 sm:py-1 border border-teal-200">00-39%</td>
+                  <td className="px-1 sm:px-2 py-0.5 sm:py-1 border border-teal-200 font-medium">F</td>
+                  <td className="px-1 sm:px-2 py-0.5 sm:py-1 border border-teal-200">0.00</td>
+                  <td className="px-1 sm:px-2 py-0.5 sm:py-1 border border-teal-200">Fail</td>
                 </tr>
               </tbody>
             </table>
