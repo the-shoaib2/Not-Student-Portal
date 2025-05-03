@@ -246,15 +246,15 @@ const Result: React.FC<ResultProps> = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Page Title */}
-      <div className="border-b border-gray-300 py-3 text-center bg-white shadow-sm">
-        <h1 className="text-lg md:text-xl font-medium text-teal-700">Academic Result</h1>
+      <div className="border-b border-gray-300 text-center bg-white shadow-sm">
+        <h1 className="text-lg md:text-xl font-medium text-teal-700 py-2">Academic Result</h1>
       </div>
 
       {/* Form Section */}
-      <div className="container mx-auto px-3 py-4 max-w-4xl">
-        <div className="bg-white rounded-lg shadow-sm p-4 mb-4">
-          <h2 className="text-base font-medium mb-3 text-gray-700 border-b pb-2">Search Results</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 items-end mb-4">
+      <div className="container mx-auto px-2 sm:px-3 py-4 max-w-4xl">
+        <div className="bg-white rounded-lg shadow-sm p-2 sm:p-3 md:p-4 mb-4">
+          <h2 className="text-base font-medium mb-2 sm:mb-3 text-gray-700 border-b pb-2">Search Results</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1 sm:gap-2 items-end mb-4">
             <div>
               <label htmlFor="studentId" className="block text-red-500 mb-1 text-sm font-medium">Student Id *</label>
               <input 
@@ -327,8 +327,8 @@ const Result: React.FC<ResultProps> = () => {
         </div>
         
         {/* Student Info */}
-        <div className="bg-white rounded-lg shadow-sm p-4 mb-4">
-          <h2 className="text-base font-medium mb-3 text-teal-700 border-b pb-2">Student Information</h2>
+        <div className="bg-white rounded-lg shadow-sm p-2 sm:p-3 md:p-4 mb-4">
+          <h2 className="text-base font-medium mb-2 sm:mb-3 text-teal-700 border-b pb-2">Student Information</h2>
           <div className="space-y-2">
             {studentInfoLoading ? (
               <div className="animate-pulse space-y-2">
@@ -341,8 +341,8 @@ const Result: React.FC<ResultProps> = () => {
             ) : studentInfoError ? (
               <div className="text-red-500 text-xs py-2 bg-red-50 p-2 rounded-md">{studentInfoError}</div>
             ) : (
-              <div className="bg-teal-50 p-3 rounded-md text-sm">
-                <div className="flex flex-col space-y-2">
+              <div className="bg-teal-50 p-2 rounded-md text-xs sm:text-sm">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 sm:gap-2">
                  
                   
                   <div>
@@ -352,7 +352,8 @@ const Result: React.FC<ResultProps> = () => {
                   <div>
                     <span className="text-gray-600">Student Name: </span>
                     <span className="text-gray-800 font-medium">{studentInfo.name}</span>
-                  </div>                  <div>
+                  </div>
+                  <div>
                     <span className="text-gray-600">Program: </span>
                     <span className="text-gray-800 font-medium">{studentInfo.program}</span>
                   </div>
@@ -388,11 +389,11 @@ const Result: React.FC<ResultProps> = () => {
         </div>
 
         {/* Academic Result Table */}
-        <div className="bg-white rounded-lg shadow-sm p-4 mb-4">
-          <h2 className="text-base font-medium mb-3 text-teal-700 border-b pb-2">Academic Result {selectedSemesterName ? `of ${selectedSemesterName}` : ''}</h2>
-          <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
+        <div className="bg-white rounded-lg shadow-sm p-2 sm:p-3 md:p-4 mb-4">
+          <h2 className="text-base font-medium mb-2 sm:mb-3 text-teal-700 border-b pb-2">Academic Result {selectedSemesterName ? `of ${selectedSemesterName}` : ''}</h2>
+          <div className="overflow-x-auto -mx-1 sm:-mx-2 px-1 sm:px-2">
             <div className="w-full inline-block min-w-full align-middle">
-              <table className="min-w-full border border-teal-100 rounded-lg overflow-hidden text-xs">
+              <table className="min-w-full border border-teal-100 rounded-lg overflow-hidden text-[10px] sm:text-xs">
                 <thead>
                   <tr>
                     <th className="bg-teal-600 text-white text-center border border-teal-200 px-2 py-1 text-left text-xs whitespace-nowrap">Course Code</th>
@@ -428,14 +429,14 @@ const Result: React.FC<ResultProps> = () => {
             </div>
             
             {showResults && (
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-4 text-center text-xs">
-                <div className="bg-purple-50 p-2 rounded-md">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-1 sm:gap-2 mt-3 sm:mt-4 text-center text-[10px] sm:text-xs">
+                <div className="bg-purple-50 p-1 sm:p-2 rounded-md">
                   <p className="text-purple-700 font-medium">Total Credit Requirement: {studentInfo.programCredit || 148}</p>
                 </div>
-                <div className="bg-purple-50 p-2 rounded-md">
+                <div className="bg-purple-50 p-1 sm:p-2 rounded-md">
                   <p className="text-purple-700 font-medium">Total Credits Taken: {calculateTotalCredits()}</p>
                 </div>
-                <div className="bg-purple-50 p-2 rounded-md">
+                <div className="bg-purple-50 p-1 sm:p-2 rounded-md">
                   <p className="text-purple-700 font-medium">SGPA: {calculateSGPA()}</p>
                 </div>
               </div>
@@ -449,7 +450,7 @@ const Result: React.FC<ResultProps> = () => {
             <div className="bg-orange-50 p-3 rounded-lg shadow-sm mb-4 text-sm">
               <p className="text-gray-800 flex items-start">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-orange-500 mr-1 flex-shrink-0 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                 </svg>
                 <span>
                   <span className="font-bold">N.B. :</span> If you see Teaching Evaluation Pending in any course. Please complete 
@@ -461,10 +462,10 @@ const Result: React.FC<ResultProps> = () => {
         )}
         
         {/* UGC Grading System*/}
-        <div className="bg-white rounded-lg shadow-sm p-4 mb-4">
-          <h2 className="text-base font-medium mb-3 text-teal-700 border-b pb-2">UGC Uniform Grading System</h2>
-          <div className="overflow-x-auto">
-            <table className="min-w-full border border-teal-100 rounded-lg overflow-hidden text-xs">
+        <div className="bg-white rounded-lg shadow-sm p-2 sm:p-3 md:p-4 mb-4">
+          <h2 className="text-base font-medium mb-2 sm:mb-3 text-teal-700 border-b pb-2">UGC Uniform Grading System</h2>
+          <div className="overflow-x-auto -mx-1 sm:-mx-2 px-1 sm:px-2">
+            <table className="min-w-full border border-teal-100 rounded-lg overflow-hidden text-[10px] sm:text-xs">
               <thead>
                 <tr>
                   <th className="bg-teal-600 text-white text-center border border-teal-200 px-2 py-1">Marks</th>
