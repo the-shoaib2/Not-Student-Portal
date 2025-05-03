@@ -33,7 +33,7 @@ interface StudentInfo {
   program: string;
   name: string;
   id: string;
-  enrollment: string;
+  semesterName: string;
   batch: string;
   department: string;
   faculty: string;
@@ -55,7 +55,7 @@ const Result: React.FC<ResultProps> = () => {
     program: '',
     name: '',
     id: '',
-    enrollment: '',
+    semesterName: '',
     batch: '',
     department: '',
     faculty: '',
@@ -107,7 +107,7 @@ const Result: React.FC<ResultProps> = () => {
           program: '',
           name: '',
           id: '',
-          enrollment: '',
+          semesterName: '',
           batch: '',
           department: '',
           faculty: '',
@@ -133,7 +133,7 @@ const Result: React.FC<ResultProps> = () => {
           program: info.programName || '',
           name: info.studentName || '',
           id: studentId,
-          enrollment: info.shift || '',
+          semesterName: info.semesterName || '',
           batch: info.batchNo?.toString() || '',
           department: info.departmentName || '',
           faculty: info.facultyName || '',
@@ -149,7 +149,7 @@ const Result: React.FC<ResultProps> = () => {
           program: '',
           name: '',
           id: studentId,
-          enrollment: '',
+          semesterName: '',
           batch: '',
           department: '',
           faculty: '',
@@ -186,7 +186,7 @@ const Result: React.FC<ResultProps> = () => {
         program: info.programName || '',
         name: info.studentName || '',
         id: studentId,
-        enrollment: info.shift || '',
+        semesterName: info.semesterName || '',
         batch: info.batchNo?.toString() || '',
         department: info.departmentName || '',
         faculty: info.facultyName || '',
@@ -217,7 +217,7 @@ const Result: React.FC<ResultProps> = () => {
         program: '',
         name: '',
         id: studentId,
-        enrollment: '',
+        semesterName: '',
         batch: '',
         department: '',
         faculty: '',
@@ -343,39 +343,43 @@ const Result: React.FC<ResultProps> = () => {
             ) : (
               <div className="bg-teal-50 p-3 rounded-md text-sm">
                 <div className="flex flex-col space-y-2">
-                  <div className="flex items-center mb-1">
-                    <span className="text-teal-700 font-medium text-base mr-3">{studentInfo.name || "Md. Shoaib Khan"}</span>
-                    <span className="bg-teal-600 text-white px-2 py-0.5 rounded text-xs">{studentInfo.id || "0242310005101484"}</span>
-                  </div>
+                 
                   
                   <div>
+                    <span className="text-gray-600">Student ID: </span>
+                    <span className="text-gray-800 font-medium">{studentInfo.id}</span>
+                  </div>                  
+                  <div>
+                    <span className="text-gray-600">Student Name: </span>
+                    <span className="text-gray-800 font-medium">{studentInfo.name}</span>
+                  </div>                  <div>
                     <span className="text-gray-600">Program: </span>
-                    <span className="text-gray-800 font-medium">{studentInfo.program || "B.Sc. in Computer Science & Engineering"}</span>
+                    <span className="text-gray-800 font-medium">{studentInfo.program}</span>
                   </div>
                   
                   <div>
-                    <span className="text-gray-600">Enrollment: </span>
-                    <span className="text-gray-800 font-medium">{studentInfo.enrollment || "Spring 2023"}</span>
+                    <span className="text-gray-600">Semester Name: </span>
+                    <span className="text-gray-800 font-medium">{studentInfo.semesterName}</span>
                   </div>
                   
                   <div>
                     <span className="text-gray-600">Batch: </span>
-                    <span className="text-gray-800 font-medium">{studentInfo.batch || "64"}</span>
+                    <span className="text-gray-800 font-medium">{studentInfo.batch}</span>
                   </div>
                   
                   <div>
                     <span className="text-gray-600">Department: </span>
-                    <span className="text-gray-800 font-medium">{studentInfo.department || "Computer Science & Engineering"}</span>
+                    <span className="text-gray-800 font-medium">{studentInfo.department}</span>
                   </div>
                   
                   <div>
                     <span className="text-gray-600">Faculty: </span>
-                    <span className="text-gray-800 font-medium">{studentInfo.faculty || "Faculty of Science & Information Technology"}</span>
+                    <span className="text-gray-800 font-medium">{studentInfo.faculty}</span>
                   </div>
                   
                   <div>
                     <span className="text-gray-600">Campus: </span>
-                    <span className="text-gray-800 font-medium">{studentInfo.campus || "DSC"}</span>
+                    <span className="text-gray-800 font-medium">{studentInfo.campus}</span>
                   </div>
                 </div>
               </div>
@@ -391,11 +395,11 @@ const Result: React.FC<ResultProps> = () => {
               <table className="min-w-full border border-teal-100 rounded-lg overflow-hidden text-xs">
                 <thead>
                   <tr>
-                    <th className="bg-teal-600 text-white px-2 py-1 text-left text-xs whitespace-nowrap">Course Code</th>
-                    <th className="bg-teal-600 text-white px-2 py-1 text-left text-xs">Course Title</th>
-                    <th className="bg-teal-600 text-white px-2 py-1 text-left text-xs whitespace-nowrap">Credit</th>
-                    <th className="bg-teal-600 text-white px-2 py-1 text-left text-xs whitespace-nowrap">Grade</th>
-                    <th className="bg-teal-600 text-white px-2 py-1 text-left text-xs whitespace-nowrap">Grade Point</th>
+                    <th className="bg-teal-600 text-white text-center border border-teal-200 px-2 py-1 text-left text-xs whitespace-nowrap">Course Code</th>
+                    <th className="bg-teal-600 text-white text-center border border-teal-200 px-2 py-1 text-left text-xs whitespace-nowrap">Course Title</th>
+                    <th className="bg-teal-600 text-white text-center border border-teal-200 px-2 py-1 text-left text-xs whitespace-nowrap">Credit</th>
+                    <th className="bg-teal-600 text-white text-center border border-teal-200 px-2 py-1 text-left text-xs whitespace-nowrap">Grade</th>
+                    <th className="bg-teal-600 text-white text-center border border-teal-200 px-2 py-1 text-left text-xs whitespace-nowrap">Grade Point</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -410,12 +414,12 @@ const Result: React.FC<ResultProps> = () => {
                     </tr>
                   ) : (
                     resultData.map((course, index) => (
-                      <tr key={index} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
-                        <td className="px-2 py-1 border-b border-teal-100 whitespace-nowrap">{course.customCourseId}</td>
-                        <td className="px-2 py-1 border-b border-teal-100">{course.courseTitle}</td>
-                        <td className="px-2 py-1 border-b border-teal-100 whitespace-nowrap text-center">{course.totalCredit}</td>
-                        <td className="px-2 py-1 border-b border-teal-100 font-medium whitespace-nowrap text-center">{course.gradeLetter}</td>
-                        <td className="px-2 py-1 border-b border-teal-100 whitespace-nowrap text-center">{course.pointEquivalent}</td>
+                      <tr key={index} className={index % 2 === 0 ? 'bg-teal-50' : 'bg-white'}>
+                        <td className="px-2 py-1 border border-teal-200 whitespace-nowrap">{course.customCourseId}</td>
+                        <td className="px-2 py-1 border border-teal-200">{course.courseTitle}</td>
+                        <td className="px-2 py-1 border border-teal-200 whitespace-nowrap text-center">{course.totalCredit}</td>
+                        <td className="px-2 py-1 border border-teal-200 font-medium whitespace-nowrap text-center">{course.gradeLetter}</td>
+                        <td className="px-2 py-1 border border-teal-200 whitespace-nowrap text-center">{course.pointEquivalent}</td>
                       </tr>
                     ))
                   )}
@@ -424,7 +428,7 @@ const Result: React.FC<ResultProps> = () => {
             </div>
             
             {showResults && (
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-center text-sm">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-4 text-center text-xs">
                 <div className="bg-purple-50 p-2 rounded-md">
                   <p className="text-purple-700 font-medium">Total Credit Requirement: {studentInfo.programCredit || 148}</p>
                 </div>
@@ -463,10 +467,10 @@ const Result: React.FC<ResultProps> = () => {
             <table className="min-w-full border border-teal-100 rounded-lg overflow-hidden text-xs">
               <thead>
                 <tr>
-                  <th className="bg-teal-600 text-white px-2 py-1">Marks</th>
-                  <th className="bg-teal-600 text-white px-2 py-1">Grade</th>
-                  <th className="bg-teal-600 text-white px-2 py-1">Grade Point</th>
-                  <th className="bg-teal-600 text-white px-2 py-1">Remarks</th>
+                  <th className="bg-teal-600 text-white text-center border border-teal-200 px-2 py-1">Marks</th>
+                  <th className="bg-teal-600 text-white text-center border border-teal-200 px-2 py-1">Grade</th>
+                  <th className="bg-teal-600 text-white text-center border border-teal-200 px-2 py-1">Grade Point</th>
+                  <th className="bg-teal-600 text-white text-center border border-teal-200 px-2 py-1">Remarks</th>
                 </tr>
               </thead>
               <tbody>
