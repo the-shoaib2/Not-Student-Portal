@@ -5,6 +5,7 @@ import { toast } from 'react-hot-toast';
 import { Confetti } from '../components/magicui/confetti';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../components/ui/dialog';
 import { Button } from '../components/ui/button';
+import PageTitle from '../components/PageTitle';
 
 interface ResultProps {}
 
@@ -282,12 +283,13 @@ const Result: React.FC<ResultProps> = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Page Title */}
-      <div className="border-b border-gray-300 text-center bg-white shadow-sm">
-        <h1 className="text-lg md:text-xl font-medium text-teal-700 py-2">Academic Result</h1>
-      </div>
-
+      <PageTitle
+        title="Academic Result"
+        icon="Award"
+        // subtitle="Powered by !DIU Portal"
+      />
       {/* Form Section */}
-      <div className="container mx-auto px-1 sm:px-2 md:px-3 py-3 sm:py-4 max-w-4xl">
+      <div className="container mx-auto px-4 sm:px-4 md:px-3 py-3 sm:py-4 max-w-4xl">
         <div className="bg-white rounded-lg shadow-sm p-1.5 sm:p-2 md:p-4 mb-3 sm:mb-4">
           <h2 className="text-sm sm:text-base font-medium mb-1.5 sm:mb-2 text-gray-700 border-b pb-1 sm:pb-2">Search Results</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0.5 sm:gap-1 items-end mb-3 sm:mb-4">
