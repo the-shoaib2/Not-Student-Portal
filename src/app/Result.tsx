@@ -492,7 +492,7 @@ const Result: React.FC<ResultProps> = () => {
                 </svg>
                 <span>
                   <span className="font-bold">N.B. :</span> If you see Teaching Evaluation Pending in any course. Please complete 
-                  <a href="#" className="text-orange-600 hover:underline ml-1">Teaching Evaluation.</a>
+                  <a href="/teaching-evaluation" className="text-orange-600 hover:underline ml-1">Teaching Evaluation.</a>
                 </span>
               </p>
             </div>
