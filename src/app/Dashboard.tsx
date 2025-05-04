@@ -9,6 +9,7 @@ import {
   calculatePaymentSummary,
   PaymentSummary,
   CGPAData,
+  SGPAData,
   profileService,
   StudentInfo
 } from '../services/api';
@@ -19,7 +20,7 @@ const Dashboard = () => {
   const pageIcon = 'LayoutDashboard';
 
   const [paymentSummary, setPaymentSummary] = useState<PaymentSummary | null>(null);
-  const [cgpaData, setCgpaData] = useState<CGPAData | null>(null);
+  const [cgpaData, setCgpaData] = useState<CGPAData | SGPAData[] | null>(null);
   const [studentInfo, setStudentInfo] = useState<StudentInfo | null>(null);
   const [dropSemesters, setDropSemesters] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -46,6 +47,7 @@ const Dashboard = () => {
       try {
         const cgpaGraph = await dashboardService.getCGPAData();
         console.log('CGPA Graph:', cgpaGraph);
+        console.log('CGPA Graph Type:', typeof cgpaGraph, 'Keys:', Object.keys(cgpaGraph || {}));
         setCgpaData(cgpaGraph);
       } catch (err) {
         console.error('CGPA data fetch error:', err);
@@ -102,7 +104,7 @@ const Dashboard = () => {
 
           <div className="grid md:grid-cols-2 gap-6 mb-6">
             <CGPAProgressionCard 
-              cgpaData={cgpaData?.sgpaData} 
+              cgpaData={cgpaData} 
               loading={loading}
               error={error}
             />

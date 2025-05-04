@@ -1,21 +1,26 @@
 import React from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
+import { CGPAData, SGPAData } from "../../services/api";
 
-interface SGPAData {
-  semester: string;
-  sgpa: number;
-}
 
 interface CGPAProgressionCardProps {
-  cgpaData?: SGPAData[] | null;
+  cgpaData?: CGPAData | SGPAData[] | null;
   loading?: boolean;
   error?: string | null;
 }
 
 const CGPAProgressionCard: React.FC<CGPAProgressionCardProps> = ({ cgpaData, loading, error }) => {
+  // Log the data for debugging
+  console.log('CGPAProgressionCard - cgpaData:', cgpaData, 'loading:', loading, 'error:', error);
+
   // Prepare data for the chart
-  const semesters = cgpaData?.map((item) => item.semester) || [];
-  const sgpas = cgpaData?.map((item) => item.sgpa) || [];
+  const semesters = Array.isArray(cgpaData) 
+    ? cgpaData.map((item: SGPAData) => item.semester)
+    : cgpaData?.sgpaData?.map((item: SGPAData) => item.semester) || [];
+
+  const sgpas = Array.isArray(cgpaData)
+    ? cgpaData.map((item: SGPAData) => item.sgpa)
+    : cgpaData?.sgpaData?.map((item: SGPAData) => item.sgpa) || [];
 
   return (
     <Card className="shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300">
@@ -27,7 +32,7 @@ const CGPAProgressionCard: React.FC<CGPAProgressionCardProps> = ({ cgpaData, loa
           <div className="w-full h-40 flex items-center justify-center text-gray-400">Loading...</div>
         ) : error ? (
           <div className="w-full h-40 flex items-center justify-center text-red-500">{error}</div>
-        ) : cgpaData && cgpaData.length > 0 ? (
+        ) : (Array.isArray(cgpaData) ? cgpaData.length > 0 : cgpaData?.sgpaData && cgpaData.sgpaData.length > 0) ? (
           <div className="w-full overflow-x-auto">
             <svg width={Math.max(semesters.length * 70, 350)} height="220" style={{ minWidth: 350 }}>
               {/* Y Axis */}
@@ -35,7 +40,7 @@ const CGPAProgressionCard: React.FC<CGPAProgressionCardProps> = ({ cgpaData, loa
               {/* X Axis */}
               <line x1="40" y1="180" x2={40 + semesters.length * 60} y2="180" stroke="#ccc" strokeWidth="2" />
               {/* Bars */}
-              {sgpas.map((sgpa, idx) => {
+              {sgpas.map((sgpa: number, idx: number) => {
                 const barHeight = Math.max(0, (sgpa / 4.0) * 140); // Assuming max SGPA is 4.0
                 return (
                   <g key={idx}>
