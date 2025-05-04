@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGraduationCap, faMoneyBill, faCalendar, faChartLine } from '@fortawesome/free-solid-svg-icons';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
-import { profileService, paymentService, dashboardService } from '../services/api';
+import { profileService, dashboardService, formatBDT } from '../services/api';
 
 // Register Chart.js components
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
@@ -52,64 +52,68 @@ const DashboardContent: React.FC = () => {
       setIsLoading(true);
       setError(null);
       
-      // Fetch student info with error handling
-      const studentResponse = await profileService.getStudentInfo().catch(err => {
-        console.error('Failed to fetch student info:', err);
-        return null;
-      });
+      // Fetch student info
+      const studentResponse = await profileService.getStudentInfo();
       
-      const paymentResponse = await paymentService.getPaymentScheme().catch(err => {
-        console.error('Failed to fetch payment scheme:', err);
-        return null;
-      });
+      // Fetch payment summary
+      const paymentResponse = await dashboardService.getPaymentLedgerSummary();
       
-      const sgpaResponse = await dashboardService.getCGPAData().catch(err => {
-        console.error('Failed to fetch CGPA data:', err);
-        return null;
-      });
+      // Fetch CGPA data
+      const sgpaResponse = await dashboardService.getCGPAData();
 
+      // Prepare dashboard stats
       const dashboardStats: DashboardStat[] = [
-        { id: 1, title: 'Current CGPA', value: studentResponse?.cgpa ? studentResponse.cgpa.toString() : 'N/A', icon: faChartLine, color: 'bg-blue-100 text-blue-800' },
-        { id: 2, title: 'Completed Credits', value: studentResponse?.completedCredits || 'N/A', icon: faGraduationCap, color: 'bg-green-100 text-green-800' },
-        { id: 3, title: 'Current Semester', value: studentResponse?.semesterName || 'N/A', icon: faCalendar, color: 'bg-purple-100 text-purple-800' },
-        { id: 4, title: 'Due Payments', value: paymentResponse?.amount ? paymentResponse.amount.toString() : 'N/A', icon: faMoneyBill, color: 'bg-red-100 text-red-800' },
+        { 
+          id: 1, 
+          title: 'Current CGPA', 
+          value: studentResponse?.cgpa ? studentResponse.cgpa.toString() : 'N/A', 
+          icon: faChartLine, 
+          color: 'bg-blue-100 text-blue-800' 
+        },
+        { 
+          id: 2, 
+          title: 'Completed Credits', 
+          value: studentResponse?.completedCredits || 'N/A', 
+          icon: faGraduationCap, 
+          color: 'bg-green-100 text-green-800' 
+        },
+        { 
+          id: 3, 
+          title: 'Current Semester', 
+          value: studentResponse?.semesterName || 'N/A', 
+          icon: faCalendar, 
+          color: 'bg-purple-100 text-purple-800' 
+        },
+        { 
+          id: 4, 
+          title: 'Due Payments', 
+          value: paymentResponse ? formatBDT(paymentResponse.totalDebit - paymentResponse.totalCredit) : 'N/A', 
+          icon: faMoneyBill, 
+          color: 'bg-red-100 text-red-800' 
+        },
       ];
 
-      // Set student info with null checks
+      // Set student info
       if (studentResponse) {
         setStudentInfo({
-          ...studentResponse,
-          cgpa: studentResponse.cgpa || 'N/A'
-        });
-      } else {
-        setError({
-          message: 'Failed to fetch student information',
-          code: 'STUDENT_INFO_ERROR'
+          cgpa: studentResponse.cgpa?.toString() || 'N/A',
+          completedCredits: studentResponse.completedCredits || 'N/A',
+          currentSemester: studentResponse.semesterName || 'N/A'
         });
       }
 
-      // Set payment summary with null checks
+      // Set payment summary
       if (paymentResponse) {
         setPaymentSummary({
-          dueAmount: paymentResponse.amount?.toString() || 'N/A'
-        });
-      } else {
-        setError({
-          message: 'Failed to fetch payment information',
-          code: 'PAYMENT_INFO_ERROR'
+          dueAmount: formatBDT(paymentResponse.totalDebit - paymentResponse.totalCredit)
         });
       }
 
-      // Set SGPA data with null checks
-      if (sgpaResponse) {
+      // Set SGPA data
+      if (sgpaResponse && sgpaResponse.labels && sgpaResponse.data) {
         setSgpaData({
-          labels: sgpaResponse.labels || [],
-          data: sgpaResponse.data || []
-        });
-      } else {
-        setError({
-          message: 'Failed to fetch SGPA data',
-          code: 'SGPA_DATA_ERROR'
+          labels: sgpaResponse.labels,
+          data: sgpaResponse.data
         });
       }
 
@@ -154,37 +158,26 @@ const DashboardContent: React.FC = () => {
     <div className="p-6">
       <h2 className="text-2xl font-bold mb-6 text-center">Student Dashboard</h2>
       
-      {/* Student Info Section */}
-      {studentInfo && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div className="bg-blue-100 text-blue-800 rounded-lg shadow p-4">
-            <p className="text-sm font-medium">Current CGPA</p>
-            <p className="text-2xl font-bold">{studentInfo.cgpa}</p>
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        {stats.map((stat) => (
+          <div key={stat.id} className={`rounded-lg shadow p-4 ${stat.color}`}>
+            <div className="flex justify-between items-center">
+              <div>
+                <p className="text-sm font-medium">{stat.title}</p>
+                <p className="text-2xl font-bold">{stat.value}</p>
+              </div>
+              <FontAwesomeIcon icon={stat.icon} className="text-2xl" />
+            </div>
           </div>
-          <div className="bg-green-100 text-green-800 rounded-lg shadow p-4">
-            <p className="text-sm font-medium">Completed Credits</p>
-            <p className="text-2xl font-bold">{studentInfo.completedCredits}</p>
-          </div>
-          <div className="bg-purple-100 text-purple-800 rounded-lg shadow p-4">
-            <p className="text-sm font-medium">Current Semester</p>
-            <p className="text-2xl font-bold">{studentInfo.currentSemester}</p>
-          </div>
-        </div>
-      )}
-      
-      {/* Payment Summary */}
-      {paymentSummary && (
-        <div className="bg-red-100 text-red-800 rounded-lg shadow p-4 mb-6">
-          <p className="text-sm font-medium">Due Payments</p>
-          <p className="text-2xl font-bold">{paymentSummary.dueAmount}</p>
-        </div>
-      )}
+        ))}
+      </div>
       
       {/* SGPA Graph */}
-      <div className="bg-white rounded-lg shadow p-4 mt-6">
-        <h3 className="text-lg font-semibold mb-3">Semester-wise SGPA</h3>
-        <div className="h-64">
-          {sgpaData && sgpaData.labels.length > 0 && (
+      {sgpaData && sgpaData.labels.length > 0 && (
+        <div className="bg-white rounded-lg shadow p-4 mt-6">
+          <h3 className="text-lg font-semibold mb-3">Semester-wise SGPA</h3>
+          <div className="h-64">
             <Line
               data={{
                 labels: sgpaData.labels,
@@ -210,9 +203,9 @@ const DashboardContent: React.FC = () => {
                 },
               }}
             />
-          )}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
@@ -237,18 +230,10 @@ const DashboardSkeleton: React.FC = () => (
       ))}
     </div>
     
-    {/* Recent Activity Skeleton */}
+    {/* SGPA Graph Skeleton */}
     <div className="bg-white rounded-lg shadow p-4">
       <Skeleton className="h-6 w-40 mb-4" />
-      <div className="space-y-4">
-        {[...Array(3)].map((_, index) => (
-          <div key={index} className="p-3 border-b">
-            <Skeleton className="h-5 w-48 mb-2" />
-            <Skeleton className="h-4 w-full mb-2" />
-            <Skeleton className="h-3 w-20" />
-          </div>
-        ))}
-      </div>
+      <Skeleton className="h-64 w-full" />
     </div>
   </div>
 );
