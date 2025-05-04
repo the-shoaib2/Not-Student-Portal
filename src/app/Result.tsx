@@ -336,7 +336,7 @@ const Result: React.FC<ResultProps> = () => {
               </div>
             </div>
             <div className="flex justify-center py-2 px-2 sm:py-0 md:justify-start">
-              <button 
+              <Button
                 onClick={handleSubmit}
                 className="bg-teal-600 hover:bg-teal-700 text-white px-3 py-1 sm:py-1.5 text-xs sm:text-sm rounded-md transition duration-300 flex items-center shadow-sm w-full md:w-auto justify-center cursor-pointer gap-2 border border-teal-600"
                 disabled={isLoading}
@@ -347,7 +347,7 @@ const Result: React.FC<ResultProps> = () => {
                   <Search className="h-4 w-4 mr-1" />
                 )}
                 {isLoading ? 'SHOWING RESULT' : 'SHOW RESULT'}
-              </button>
+              </Button>
             </div>
           </div>
 
