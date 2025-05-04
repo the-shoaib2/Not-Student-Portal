@@ -133,7 +133,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
               <div className="px-4 py-1 text-xs font-semibold uppercase text-teal-200 tracking-wider opacity-80">
                 {category}
               </div>
-              {items.map((item, index) => {
+              {items.map((item) => {
                 const isActive = location.pathname === item.path;
                 return (
                   <Link 

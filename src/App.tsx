@@ -28,7 +28,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <Toaster position="top-right" />
+        <Toaster position="top-center" />
         <BrowserRouter>
           <div className="flex flex-col min-h-screen">
             <Navbar toggleSidebar={toggleSidebar} />
