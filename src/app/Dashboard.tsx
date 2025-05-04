@@ -28,7 +28,8 @@ import PageTitle from '../components/PageTitle';
 
 // Shadcn UI Components
 import { Button } from '../components/ui/button';
-import { Card, CardContent } from '../components/ui/card';
+import { Card, CardContent, CardHeader } from '../components/ui/card';
+import { Table, TableBody, TableRow, TableCell } from '../components/ui/table';
 
 // Register Chart.js components
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
@@ -140,9 +141,9 @@ const Dashboard = () => {
             </div>
 
             {/* Student Profile Summary */}
-            <div className="bg-white shadow-lg rounded-lg p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xl font-semibold text-primary">Basic Information</h3>
+            <Card className="shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300">
+              <CardHeader className="p-2 sm:p-3 bg-gradient-to-r from-teal-50 to-cyan-50 border-b flex justify-between items-center">
+                <h2 className="text-base font-semibold text-teal-800">Basic Information</h2>
                 <Button 
                   variant="outline" 
                   size="sm" 
@@ -150,38 +151,50 @@ const Dashboard = () => {
                 >
                   More Details
                 </Button>
-              </div>
-              <Card>
-                <CardContent className="p-4 space-y-2">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <span className="text-muted-foreground text-sm block mb-1">Name</span>
-                      <p className="font-medium">{studentInfo?.firstName} {studentInfo?.lastName}</p>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground text-sm block mb-1">Birth Date</span>
-                      <p className="font-medium">{studentInfo?.birthDate}</p>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground text-sm block mb-1">Mobile</span>
-                      <p className="font-medium">{studentInfo?.mobile}</p>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground text-sm block mb-1">Blood Group</span>
-                      <p className="font-medium">{studentInfo?.bloodGroup}</p>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground text-sm block mb-1">Father's Name</span>
-                      <p className="font-medium">{studentInfo?.fatherName}</p>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground text-sm block mb-1">Mother's Name</span>
-                      <p className="font-medium">{studentInfo?.motherName}</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+              </CardHeader>
+              <CardContent className="p-2 sm:p-3">
+                <Table>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell className="text-xs text-gray-500 w-1/3">Name</TableCell>
+                      <TableCell className="text-sm font-medium text-gray-800">
+                        {studentInfo?.firstName} {studentInfo?.lastName}
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="text-xs text-gray-500">Birth Date</TableCell>
+                      <TableCell className="text-sm font-medium text-gray-800">
+                        {studentInfo?.birthDate ? new Date(studentInfo.birthDate).toLocaleDateString() : 'Not provided'}
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="text-xs text-gray-500">Mobile</TableCell>
+                      <TableCell className="text-sm font-medium text-gray-800">
+                        {studentInfo?.mobile || 'Not provided'}
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="text-xs text-gray-500">Blood Group</TableCell>
+                      <TableCell className="text-sm font-medium text-gray-800">
+                        {studentInfo?.bloodGroup || 'Not provided'}
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="text-xs text-gray-500">Father's Name</TableCell>
+                      <TableCell className="text-sm font-medium text-gray-800">
+                        {studentInfo?.fatherName || 'Not provided'}
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="text-xs text-gray-500">Mother's Name</TableCell>
+                      <TableCell className="text-sm font-medium text-gray-800">
+                        {studentInfo?.motherName || 'Not provided'}
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>

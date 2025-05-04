@@ -369,7 +369,7 @@ export const profileService = {
         const user = JSON.parse(userJson);
         token = user.accessToken;
       } catch (error) {
-        console.error('Error parsing user data from localStorage:', error);
+        // console.error('Error parsing user data from localStorage:', error);
       }
     }
     return token;
@@ -391,10 +391,10 @@ export const profileService = {
       });
       
       
-      if (!response) {
-        console.warn('API returned empty response for student info');
-        return {} as StudentInfo;
-      }
+      // if (!response) {
+      //   console.warn('API returned empty response for student info');
+      //   return {} as StudentInfo;
+      // }
       
       return response;
     } catch (error) {
@@ -441,7 +441,7 @@ export const profileService = {
 
   // Get education list
   getEducationList: async (): Promise<EducationInfo[]> => {
-    try {
+    // try {
       const token = profileService.getAuthToken();
       
       const response = await proxyRequest({
@@ -455,15 +455,15 @@ export const profileService = {
       });
       
       return response || [];
-    } catch (error) {
-      console.error('Error fetching education list:', error);
-      return [];
-    }
+    // } catch (error) {
+    //   console.error('Error fetching education list:', error);
+    //   return [];
+    // }
   },
 
   // Get present address
   getPresentAddress: async (): Promise<PresentAddressInfo> => {
-    try {
+    // try {
       const token = profileService.getAuthToken();
       
       const response = await proxyRequest({
@@ -477,15 +477,15 @@ export const profileService = {
       });
       
       return response || { presentDistrictName: null, presentDivisionName: null, presentCountryName: null };
-    } catch (error) {
-      console.error('Error fetching present address:', error);
-      return { presentDistrictName: null, presentDivisionName: null, presentCountryName: null };
-    }
+    // } catch (error) {
+    //   console.error('Error fetching present address:', error);
+    //   return { presentDistrictName: null, presentDivisionName: null, presentCountryName: null };
+    // }
   },
 
   // Get permanent address
   getPermanentAddress: async (): Promise<PermanentAddressInfo> => {
-    try {
+    // try {
       const token = profileService.getAuthToken();
       
       const response = await proxyRequest({
@@ -499,23 +499,23 @@ export const profileService = {
       });
       
       return response || { permanentDistrictName: null, permanentDivisionName: null, permanentCountryName: null };
-    } catch (error) {
-      console.error('Error fetching permanent address:', error);
-      return { permanentDistrictName: null, permanentDivisionName: null, permanentCountryName: null };
-    }
+    // } catch (error) {
+    //   console.error('Error fetching permanent address:', error);
+    //   return { permanentDistrictName: null, permanentDivisionName: null, permanentCountryName: null };
+    // }
   }
 };
 
 // Result Service
 export const resultService = {
   getSemesterList: async (): Promise<Semester[]> => {
-    try {
+    // try {
       const response = await api.get<Semester[]>('/result/semesterList');
       return response.data;
-    } catch (error) {
-      console.error('Error fetching semester list:', error);
-      throw error;
-    }
+    // } catch (error) {
+      // console.error('Error fetching semester list:', error);
+      // throw error;
+    // }
   },
 
   getLiveResultSemesterList: async (): Promise<Semester[]> => {
@@ -524,7 +524,7 @@ export const resultService = {
   },
 
   getStudentResult: async (semesterId: string, studentId: string): Promise<Result> => {
-    try {
+    // try {
       const response = await api.get<Result>('/result', {
         params: {
           semesterId,
@@ -532,14 +532,14 @@ export const resultService = {
           grecaptcha: ''
         }
       });
-      if (!response.data || typeof response.data !== 'object') {
-        throw new Error('Invalid response format');
-      }
+      // if (!response.data || typeof response.data !== 'object') {
+      //   throw new Error('Invalid response format');
+      // }
       return response.data;
-    } catch (error) {
-      console.error('Error fetching student result:', error);
-      throw error;
-    }
+    // } catch (error) {
+      // console.error('Error fetching student result:', error);
+      // throw error;
+    // }
   },
 
   getStudentInfo: async (studentId: string): Promise<StudentInfo> => {
@@ -600,7 +600,7 @@ export const calculatePaymentSummary = (data: PaymentData): PaymentSummary => {
 export const dashboardService = {
 
   getPaymentLedgerSummary: async (): Promise<PaymentData> => {
-    try {
+    // try {
       const token = profileService.getAuthToken();
       const response = await proxyRequest({
         method: 'GET',
@@ -615,18 +615,18 @@ export const dashboardService = {
         retryDelay: 2000 // 2 seconds between retries
       });
       return response;
-    } catch (error) {
-      console.error('Error fetching payment ledger summary:', error);
-      return {
-        totalCredit: 0,
-        totalDebit: 0,
-        totalOther: 0
-      };
-    }
+    // } catch (error) {
+      // console.error('Error fetching payment ledger summary:', error);
+      // return {
+        // totalCredit: 0,
+        // totalDebit: 0,
+        // totalOther: 0
+      // };
+    // }
   },
 
   getDropSemesterList: async (): Promise<any> => {
-    try {
+    // try {
       const token = profileService.getAuthToken();
       const response = await proxyRequest({
         method: 'GET',
@@ -641,14 +641,14 @@ export const dashboardService = {
         retryDelay: 2000 // 2 seconds between retries
       });
       return response;
-    } catch (error) {
-      console.error('Error fetching drop semester list:', error);
-      return [];
-    }
+    // } catch (error) {
+    //   console.error('Error fetching drop semester list:', error);
+    //   return [];
+    // }
   },
 
   getCGPAData: async (): Promise<CGPAData> => {
-    try {
+    // try {
       const token = profileService.getAuthToken();
       const response = await proxyRequest({
         method: 'GET',
@@ -662,13 +662,13 @@ export const dashboardService = {
         maxRetries: 3,   // 3 retries
         retryDelay: 2000 // 2 seconds between retries
       });
-      if (!response || typeof response !== 'object') {
-        throw new Error('Invalid response format');
-      }
+      // if (!response || typeof response !== 'object') {
+      //   throw new Error('Invalid response format');
+      // }
       return response;
-    } catch (error) {
-      console.error('Error fetching CGPA data:', error);
-      throw error;
-    }
+    // } catch (error) {
+    //   console.error('Error fetching CGPA data:', error);
+    //   throw error;
+    // }
   }
 };
