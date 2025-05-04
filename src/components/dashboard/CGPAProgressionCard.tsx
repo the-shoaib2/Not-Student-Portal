@@ -28,13 +28,20 @@ const chartConfig: ChartConfig = {
 };
 
 const getBarColor = (sgpa: number) => {
-  if (sgpa >= 3.75) return '#6366f1';  // Indigo for Excellent
-  if (sgpa >= 3.50) return '#06b6d4';  // Cyan for Very Good
-  if (sgpa >= 3.00) return '#34d399';  // Teal for Good
-  if (sgpa >= 2.50) return '#f59e42';  // Orange for Satisfactory
-  if (sgpa >= 2.00) return '#f472b6';  // Pink for Acceptable
-  return '#f43f5e';                    // Rose for Poor
-};
+  if (sgpa >= 3.75) return '#1f6f6f';  // Dark Teal (Excellent)
+  if (sgpa >= 3.50) return '#54a1a1';  // Medium Teal (Very Good)
+  if (sgpa >= 3.00) return '#9fc8c8';  // Light Teal (Good)
+  if (sgpa >= 2.75) return '#54a1a1';  // Medium Teal (Still Teal)
+  if (sgpa >= 2.50) return '#1f6f6f';  // Dark Teal (Still Teal)
+  if (sgpa >= 2.00) return '#2066a8';  // Dark Blue (Satisfactory)
+  if (sgpa >= 1.50) return '#3594cc';  // Medium Blue (Acceptable)
+  if (sgpa >= 1.00) return '#8cc5e3';  // Light Blue (Below Acceptable)
+  if (sgpa >= 0.50) return '#a00000';  // Dark Red (Poor)
+  return '#d8a6a6';                    // Light Red (Fail)
+
+}
+;
+
 
 const CGPAProgressionCard: React.FC<CGPAProgressionCardProps> = ({ cgpaData, loading, error }) => {
   // Prepare data for the chart using useMemo for performance optimization

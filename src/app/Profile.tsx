@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { profileService, StudentInfo, PresentAddressInfo, PermanentAddressInfo, PhotographInfo, EducationInfo } from '../services/api';
 import { Card, CardContent, CardHeader } from '../components/ui/card';
 // Removed unused Button import
-import ProfilePictureCard from '../components/profile/ProfilePictureCard';
+import ProfileCard from '../components/profile/ProfileCard';
 import PageTitle from '../components/PageTitle';
 
 // Import components directly
@@ -212,7 +212,7 @@ const ProfileComponent: React.FC = () => {
         </CardHeader>
         <CardContent className="p-4 sm:p-5">
           <div className="flex flex-col md:flex-row items-center md:items-start gap-4 sm:gap-6">
-            <ProfilePictureCard 
+            <ProfileCard 
               studentInfo={studentInfo} 
               photograph={photograph}
               loading={loading}
