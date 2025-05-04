@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar,Cell, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
 import { 
   ChartConfig,
   ChartContainer,
@@ -28,12 +28,12 @@ const chartConfig: ChartConfig = {
 };
 
 const getBarColor = (sgpa: number) => {
-  if (sgpa >= 3.75) return '#10b981';  // Emerald Green for Excellent
-  if (sgpa >= 3.50) return '#22c55e';  // Green for Very Good
-  if (sgpa >= 3.00) return '#84cc16';  // Lime Green for Good
-  if (sgpa >= 2.50) return '#eab308';  // Yellow for Satisfactory
-  if (sgpa >= 2.00) return '#f97316';  // Orange for Acceptable
-  return '#ef4444';                    // Red for Poor
+  if (sgpa >= 3.75) return '#6366f1';  // Indigo for Excellent
+  if (sgpa >= 3.50) return '#06b6d4';  // Cyan for Very Good
+  if (sgpa >= 3.00) return '#34d399';  // Teal for Good
+  if (sgpa >= 2.50) return '#f59e42';  // Orange for Satisfactory
+  if (sgpa >= 2.00) return '#f472b6';  // Pink for Acceptable
+  return '#f43f5e';                    // Rose for Poor
 };
 
 const CGPAProgressionCard: React.FC<CGPAProgressionCardProps> = ({ cgpaData, loading, error }) => {

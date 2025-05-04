@@ -1,5 +1,8 @@
 import React from 'react';
-import { Card, CardContent, CardHeader } from '../ui/card';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '../ui/button';
+import { Edit, Camera } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardFooter } from '../ui/card';
 import { StudentInfo } from '../../services/api';
 import { PhotographInfo } from '../../services/api';
 import Base64ImageCard from '../ImageView';
@@ -19,6 +22,11 @@ const ProfilePictureCard: React.FC<ProfilePictureCardProps> = ({
   loading = { photograph: false },
   useBase64Card = false
 }) => {
+  const navigate = useNavigate();
+
+  const handleEditProfile = () => {
+    navigate('/profile-update');
+  };
   const getBase64Data = () => {
     if (!photograph?.photoUrl) return { base64: '', format: 'jpeg' };
     
@@ -28,7 +36,7 @@ const ProfilePictureCard: React.FC<ProfilePictureCardProps> = ({
       return { base64: match[2], format: match[1] };
     }
 
-    return { base64: '', format: 'jpeg' }; // Default to jpeg if unable to extract data
+    return { base64: '', format: 'jpeg' }; 
   };
 
   return (
@@ -57,12 +65,23 @@ const ProfilePictureCard: React.FC<ProfilePictureCardProps> = ({
               />
             )
           ) : (
-            <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-500">
-              No Photo
+            <div className="w-full h-full flex flex-col items-center justify-center bg-gray-100 text-gray-500 space-y-2">
+              <Camera className="w-12 h-12 text-gray-400" />
+              <span>No Photo</span>
             </div>
           )}
         </div>
       </CardContent>
+      <CardFooter className="flex justify-end p-4">
+        <Button 
+          variant="ghost" 
+          className="text-gray-700 hover:bg-gray-100"
+          onClick={handleEditProfile}
+        >
+          <Edit className="w-4 h-4 mr-2" />
+          Edit Profile
+        </Button>
+      </CardFooter>
     </Card>
   );
 };

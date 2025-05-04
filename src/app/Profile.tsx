@@ -83,7 +83,7 @@ const ProfileComponent: React.FC = () => {
         presentAddress: false,
         permanentAddress: false
       });
-      console.log('Forced loading state to false after timeout');
+      // console.log('Forced loading state to false after timeout');
     }, 3000);
     
     return () => clearTimeout(timer);
@@ -149,7 +149,7 @@ const ProfileComponent: React.FC = () => {
         // Fetch present address
         try {
           const presentAddressData = await profileService.getPresentAddress();
-          console.log('Present address received:', presentAddressData);
+          // console.log('Present address received:', presentAddressData);
           setPresentAddress(presentAddressData);
         } catch (error: any) {
           console.error('Error fetching present address:', error);
@@ -161,7 +161,7 @@ const ProfileComponent: React.FC = () => {
         // Fetch permanent address
         try {
           const permanentAddressData = await profileService.getPermanentAddress();
-          console.log('Permanent address received:', permanentAddressData);
+          // console.log('Permanent address received:', permanentAddressData);
           setPermanentAddress(permanentAddressData);
         } catch (error: any) {
           console.error('Error fetching permanent address:', error);
@@ -173,7 +173,7 @@ const ProfileComponent: React.FC = () => {
         // Fetch education info
         try {
           const educationData = await profileService.getEducationList();
-          console.log('Education info received:', educationData);
+          // console.log('Education info received:', educationData);
           setEducationInfo(educationData);
         } catch (error: any) {
           console.error('Error fetching education info:', error);
@@ -206,8 +206,7 @@ const ProfileComponent: React.FC = () => {
       {/* Profile Header */}
       <Card className="mb-8 overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 transform hover:-translate-y-1">
         <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-700 p-4 sm:p-6 text-white">
-          <h2 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
-            <span className="inline-block w-2 h-8 bg-white rounded-full mr-2"></span>
+          <h2 className="text-xl sm:text-xl font-bold flex gap-2">
             Profile Overview
           </h2>
         </CardHeader>
@@ -232,15 +231,16 @@ const ProfileComponent: React.FC = () => {
           </div>
         </CardContent>
       </Card>
+
       
       
       {/* All profile information */}
       <div className="space-y-8 animate-fadeIn">
-        <div className="flex items-center justify-between border-b border-gray-200 pb-4 mb-6">
+        {/* <div className="flex items-center justify-between border-b border-gray-200 pb-4 mb-6">
           <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
             Profile Information
           </h2>
-        </div>
+        </div> */}
         
         {/* Personal Information Section */}
         {isLoading ? (

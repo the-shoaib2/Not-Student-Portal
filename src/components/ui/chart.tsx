@@ -82,7 +82,7 @@ ${colorConfig
   .map(([key, itemConfig]) => {
     const color =
       (itemConfig as any).theme?.[theme as keyof typeof THEMES] ||
-      itemConfig.color
+      (itemConfig as any).color
     return color ? `  --color-${key}: ${color};` : null
   })
   .join("\n")}
