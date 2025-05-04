@@ -1,6 +1,6 @@
 import React, { memo } from 'react';
-import { Card, CardHeader, CardContent } from '../../components/ui/card';
-import { Table, TableBody, TableCell, TableRow } from '../../components/ui/table';
+import { Card, CardHeader, CardContent } from '../ui/card';
+import { Table, TableBody, TableCell, TableRow } from '../ui/table';
 import { StudentInfo } from '../../services/api';
 
 interface GuardianInfoTabProps {

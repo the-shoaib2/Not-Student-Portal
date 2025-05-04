@@ -609,12 +609,19 @@ export const dashboardService = {
           Authorization: `Bearer ${token}`,
           accessToken: token,
           'Accept': 'application/json'
-        }
+        },
+        timeout: 45000,  // 45 seconds timeout
+        maxRetries: 3,   // 3 retries
+        retryDelay: 2000 // 2 seconds between retries
       });
       return response;
     } catch (error) {
       console.error('Error fetching payment ledger summary:', error);
-      throw error;
+      return {
+        totalCredit: 0,
+        totalDebit: 0,
+        totalOther: 0
+      };
     }
   },
 
@@ -628,12 +635,15 @@ export const dashboardService = {
           Authorization: `Bearer ${token}`,
           accessToken: token,
           'Accept': 'application/json'
-        }
+        },
+        timeout: 45000,  // 45 seconds timeout
+        maxRetries: 3,   // 3 retries
+        retryDelay: 2000 // 2 seconds between retries
       });
       return response;
     } catch (error) {
       console.error('Error fetching drop semester list:', error);
-      throw error;
+      return [];
     }
   },
 
@@ -647,7 +657,10 @@ export const dashboardService = {
           Authorization: `Bearer ${token}`,
           accessToken: token,
           'Accept': 'application/json'
-        }
+        },
+        timeout: 45000,  // 45 seconds timeout
+        maxRetries: 3,   // 3 retries
+        retryDelay: 2000 // 2 seconds between retries
       });
       if (!response || typeof response !== 'object') {
         throw new Error('Invalid response format');

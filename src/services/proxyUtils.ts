@@ -78,44 +78,72 @@ export const proxyRequest = async ({
   url,
   data,
   headers = {},
-  responseType
+  responseType,
+  timeout = 30000,  // Default 30 seconds
+  maxRetries = 3,   // Maximum number of retries
+  retryDelay = 1000 // Initial retry delay in milliseconds
 }: {
   method: string;
   url: string;
   data?: any;
   headers?: Record<string, string>;
   responseType?: 'arraybuffer' | 'blob' | 'document' | 'json' | 'text';
+  timeout?: number;
+  maxRetries?: number;
+  retryDelay?: number;
 }) => {
-  try {
-    const response = await proxyClient.request({
-      method,
-      url,
-      data,
-      responseType,
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        ...headers  // This will override the default Accept header if provided
+  const makeRequest = async (retryCount: number = 0): Promise<any> => {
+    try {
+      const response = await proxyClient.request({
+        method,
+        url,
+        data,
+        responseType,
+        timeout,
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          ...headers
+        }
+      });
+      
+      // If responseType is blob or arraybuffer, return the data as an ArrayBuffer
+      if (responseType === 'blob' || responseType === 'arraybuffer') {
+        console.group('Proxy Request ArrayBuffer');
+        console.log('Response type:', responseType);
+        console.log('Response data:', response.data);
+        console.log('Response data type:', typeof response.data);
+        console.log('Response data instanceof ArrayBuffer:', response.data instanceof ArrayBuffer);
+        console.groupEnd();
+        return response.data;
       }
-    });
-    // If responseType is blob or arraybuffer, return the data as an ArrayBuffer
-    if (responseType === 'blob' || responseType === 'arraybuffer') {
-      console.group('Proxy Request ArrayBuffer');
-      console.log('Response type:', responseType);
-      console.log('Response data:', response.data);
-      console.log('Response data type:', typeof response.data);
-      console.log('Response data instanceof ArrayBuffer:', response.data instanceof ArrayBuffer);
-      console.groupEnd();
+      // Otherwise just return the data
       return response.data;
+    } catch (error: any) {
+      // If it's a network error or timeout, retry
+      if (
+        axios.isAxiosError(error) && 
+        (error.code === 'ECONNABORTED' || error.code === 'ERR_NETWORK')
+      ) {
+        if (retryCount < maxRetries) {
+          // Exponential backoff
+          const delay = retryDelay * Math.pow(2, retryCount);
+          console.warn(`[Proxy] Request failed. Retrying in ${delay}ms...`, error.message);
+          
+          await new Promise(resolve => setTimeout(resolve, delay));
+          return makeRequest(retryCount + 1);
+        }
+      }
+      
+      // If max retries reached or different error, throw
+      if (axios.isAxiosError(error) && error.response) {
+        throw new Error(error.response.data?.message || error.message);
+      }
+      throw error;
     }
-    // Otherwise just return the data
-    return response.data;
-  } catch (error) {
-    if (axios.isAxiosError(error) && error.response) {
-      throw new Error(error.response.data?.message || error.message);
-    }
-    throw error;
-  }
+  };
+
+  return makeRequest();
 };
 
 /**

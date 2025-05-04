@@ -4,11 +4,11 @@ import { Card, CardContent, CardHeader } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 
 // Import components directly
-import { PersonalInfoTab } from './ProfileTabs/PersonalInfoTab';
-import { GuardianInfoTab } from './ProfileTabs/GuardianInfoTab';
-import { PresentAddressTab } from './ProfileTabs/PresentAddressTab';
-import { PermanentAddressTab } from './ProfileTabs/PermanentAddressTab';
-import { EducationTab } from './ProfileTabs/EducationTab';
+import { PersonalInfoTab } from '../components/ProfileTabs/PersonalInfoTab';
+import { GuardianInfoTab } from '../components/ProfileTabs/GuardianInfoTab';
+import { PresentAddressTab } from '../components/ProfileTabs/PresentAddressTab';
+import { PermanentAddressTab } from '../components/ProfileTabs/PermanentAddressTab';
+import { EducationTab } from '../components/ProfileTabs/EducationTab';
 
 // Skeleton component for profile header
 const ProfileHeaderSkeleton = () => (

@@ -1,15 +1,15 @@
 import React, { memo } from 'react';
-import { Card, CardHeader, CardContent } from '../../components/ui/card';
-import { Table, TableBody, TableCell, TableRow } from '../../components/ui/table';
-import { StudentInfo, PermanentAddressInfo } from '../../services/api';
+import { Card, CardHeader, CardContent } from '../ui/card';
+import { Table, TableBody, TableRow, TableCell } from '../ui/table';
+import { StudentInfo, PresentAddressInfo } from '../../services/api';
 
-interface PermanentAddressTabProps {
+interface PresentAddressTabProps {
   studentInfo: StudentInfo | null;
-  permanentAddress: PermanentAddressInfo | null;
+  presentAddress: PresentAddressInfo | null;
   loading: boolean;
 }
 
-const PermanentAddressTabComponent: React.FC<PermanentAddressTabProps> = ({ studentInfo, permanentAddress, loading }) => {
+const PresentAddressTabComponent: React.FC<PresentAddressTabProps> = ({ studentInfo, presentAddress, loading }) => {
   if (loading || !studentInfo) {
     return (
       <Card className="shadow-sm overflow-hidden animate-in fade-in-50 duration-500">
@@ -44,61 +44,83 @@ const PermanentAddressTabComponent: React.FC<PermanentAddressTabProps> = ({ stud
         <Table>
           <TableBody>
             <TableRow>
-              <TableCell className="text-xs text-gray-500 font-semibold bg-gray-50" colSpan={2}>Permanent Address</TableCell>
+              <TableCell className="text-xs text-gray-500 font-semibold bg-gray-50" colSpan={2}>Present Address</TableCell>
             </TableRow>
             <TableRow>
               <TableCell className="text-xs text-gray-500 w-1/3">House/Building</TableCell>
-              <TableCell className="text-sm font-medium text-gray-800">{studentInfo.permanentHouse || 'Not provided'}</TableCell>
+              <TableCell className="text-sm font-medium text-gray-800">{studentInfo.presentHouse || 'Not provided'}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell className="text-xs text-gray-500">Street</TableCell>
-              <TableCell className="text-sm font-medium text-gray-800">{studentInfo.permanentStreet || 'Not provided'}</TableCell>
+              <TableCell className="text-sm font-medium text-gray-800">{studentInfo.presentStreet || 'Not provided'}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell className="text-xs text-gray-500">City</TableCell>
-              <TableCell className="text-sm font-medium text-gray-800">{studentInfo.permanentCity || 'Not provided'}</TableCell>
+              <TableCell className="text-sm font-medium text-gray-800">{studentInfo.presentCity || 'Not provided'}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell className="text-xs text-gray-500">District</TableCell>
               <TableCell className="text-sm font-medium text-gray-800">
-                {permanentAddress?.permanentDistrictName && permanentAddress.permanentDistrictName !== 'null' 
-                  ? permanentAddress.permanentDistrictName 
-                  : studentInfo.permanentDistrict || 'Not provided'}
+                {presentAddress?.presentDistrictName && presentAddress.presentDistrictName !== 'null' 
+                  ? presentAddress.presentDistrictName 
+                  : studentInfo.presentDistrict || 'Not provided'}
               </TableCell>
             </TableRow>
             <TableRow>
               <TableCell className="text-xs text-gray-500">Division</TableCell>
               <TableCell className="text-sm font-medium text-gray-800">
-                {permanentAddress?.permanentDivisionName && permanentAddress.permanentDivisionName !== 'null' 
-                  ? permanentAddress.permanentDivisionName 
+                {presentAddress?.presentDivisionName && presentAddress.presentDivisionName !== 'null' 
+                  ? presentAddress.presentDivisionName 
                   : 'Not provided'}
               </TableCell>
             </TableRow>
             <TableRow>
               <TableCell className="text-xs text-gray-500">Country</TableCell>
               <TableCell className="text-sm font-medium text-gray-800">
-                {permanentAddress?.permanentCountryName && permanentAddress.permanentCountryName !== 'null' 
-                  ? permanentAddress.permanentCountryName 
-                  : studentInfo.permanentCountry || 'Bangladesh'}
+                {presentAddress?.presentCountryName || studentInfo.presentCountry || 'Not provided'}
               </TableCell>
             </TableRow>
             <TableRow>
               <TableCell className="text-xs text-gray-500">Phone</TableCell>
-              <TableCell className="text-sm font-medium text-gray-800">{studentInfo.permanentPhone || studentInfo.mobile || 'Not provided'}</TableCell>
+              <TableCell className="text-sm font-medium text-gray-800">{studentInfo.presentPhone || studentInfo.mobile || 'Not provided'}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell className="text-xs text-gray-500">Zip Code</TableCell>
-              <TableCell className="text-sm font-medium text-gray-800">{studentInfo.permanentZipCode || 'Not provided'}</TableCell>
+              <TableCell className="text-sm font-medium text-gray-800">{studentInfo.presentZipCode || 'Not provided'}</TableCell>
             </TableRow>
 
-            {studentInfo.parentAddress && (
+            {studentInfo.hostelAddress && (
               <>
                 <TableRow>
-                  <TableCell className="text-xs text-gray-500 font-semibold bg-gray-50" colSpan={2}>Parent Address</TableCell>
+                  <TableCell className="text-xs text-gray-500 font-semibold bg-gray-50" colSpan={2}>Hostel Address</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell className="text-xs text-gray-500">Address</TableCell>
-                  <TableCell className="text-sm font-medium text-gray-800">{studentInfo.parentAddress}</TableCell>
+                  <TableCell className="text-sm font-medium text-gray-800">{studentInfo.hostelAddress}</TableCell>
+                </TableRow>
+              </>
+            )}
+
+            {studentInfo.messAddress && (
+              <>
+                <TableRow>
+                  <TableCell className="text-xs text-gray-500 font-semibold bg-gray-50" colSpan={2}>Mess Address</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell className="text-xs text-gray-500">Address</TableCell>
+                  <TableCell className="text-sm font-medium text-gray-800">{studentInfo.messAddress}</TableCell>
+                </TableRow>
+              </>
+            )}
+
+            {studentInfo.otherAddress && (
+              <>
+                <TableRow>
+                  <TableCell className="text-xs text-gray-500 font-semibold bg-gray-50" colSpan={2}>Other Address</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell className="text-xs text-gray-500">Address</TableCell>
+                  <TableCell className="text-sm font-medium text-gray-800">{studentInfo.otherAddress}</TableCell>
                 </TableRow>
               </>
             )}
@@ -109,5 +131,5 @@ const PermanentAddressTabComponent: React.FC<PermanentAddressTabProps> = ({ stud
   );
 };
 
-export const PermanentAddressTab = memo(PermanentAddressTabComponent);
-export default memo(PermanentAddressTabComponent);
+export const PresentAddressTab = memo(PresentAddressTabComponent);
+export default memo(PresentAddressTabComponent);

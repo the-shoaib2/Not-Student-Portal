@@ -1,6 +1,6 @@
 import React, { memo } from 'react';
-import { Card, CardContent, CardHeader } from '../../components/ui/card';
-import { Table, TableBody, TableCell, TableRow } from '../../components/ui/table';
+import { Card, CardContent, CardHeader } from '../ui/card';
+import { Table, TableBody, TableCell, TableRow } from '../ui/table';
 import { StudentInfo, PhotographInfo } from '../../services/api';
 
 interface PersonalInfoTabProps {

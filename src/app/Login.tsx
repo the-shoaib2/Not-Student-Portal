@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate,useLocation  } from 'react-router-dom';
 import { Dialog, Transition } from '@headlessui/react';
 import * as Tabs from '@radix-ui/react-tabs';
 import { cn } from '../lib/utils';
@@ -10,6 +10,7 @@ import { useAuth } from '../contexts/AuthContext';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { login } = useAuth();
   const [studentId, setStudentId] = useState('');
   const [password, setPassword] = useState('');
@@ -45,7 +46,7 @@ const Login: React.FC = () => {
       login(response);
       
       toast.success(`Welcome back, ${response.name}!`);
-      navigate('/');
+      navigate(location.state?.from?.pathname || '/');
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Login failed';
       setError(errorMessage);
@@ -298,4 +299,4 @@ const Login: React.FC = () => {
   );
 };
 
-export default Login; 
+export default Login;
