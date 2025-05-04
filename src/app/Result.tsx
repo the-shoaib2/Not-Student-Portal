@@ -454,7 +454,7 @@ const Result: React.FC<ResultProps> = () => {
                   ) : (
                     resultData.map((course, index) => (
                       <tr key={index} className={index % 2 === 0 ? 'bg-teal-50' : 'bg-white'}>
-                        <td className="px-1 sm:px-2 py-0.5 sm:py-1 border border-teal-200 whitespace-nowrap">{course.customCourseId}</td>
+                        <td className="px-1 sm:px-2 py-0.5 sm:py-1 border border-teal-200 whitespace-nowrap text-center">{course.customCourseId}</td>
                         <td className="px-1 sm:px-2 py-0.5 sm:py-1 border border-teal-200">{course.courseTitle}</td>
                         <td className="px-1 sm:px-2 py-0.5 sm:py-1 border border-teal-200 whitespace-nowrap text-center">{course.totalCredit}</td>
                         <td className="px-1 sm:px-2 py-0.5 sm:py-1 border border-teal-200 font-medium whitespace-nowrap text-center">{course.gradeLetter}</td>
