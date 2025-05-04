@@ -1,17 +1,9 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Line } from 'react-chartjs-2';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend
-} from 'chart.js';
-import StatCards from '../components/StatCards';
+import React, { useState, useEffect } from 'react';
+import PageTitle from '../components/PageTitle';
+import StatCards from '../components/dashboard/StatCards';
+import CGPAProgressionCard from '../components/dashboard/CGPAProgressionCard';
+import DropSemesterCard from '../components/dashboard/DropSemesterCard';
+import StudentProfileSummaryCard from '../components/dashboard/StudentProfileSummaryCard';
 import {
   dashboardService,
   calculatePaymentSummary,
@@ -21,25 +13,11 @@ import {
   StudentInfo
 } from '../services/api';
 
-// Icons
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSpinner, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
-import PageTitle from '../components/PageTitle';
-
-// Shadcn UI Components
-import { Button } from '../components/ui/button';
-import { Card, CardContent, CardHeader } from '../components/ui/card';
-import { Table, TableBody, TableRow, TableCell } from '../components/ui/table';
-
-// Register Chart.js components
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
-
 // Dashboard Component
 const Dashboard = () => {
   const pageTitle = 'Student Dashboard';
   const pageIcon = 'LayoutDashboard';
-  const navigate = useNavigate();
-  // State management
+
   const [paymentSummary, setPaymentSummary] = useState<PaymentSummary | null>(null);
   const [cgpaData, setCgpaData] = useState<CGPAData | null>(null);
   const [studentInfo, setStudentInfo] = useState<StudentInfo | null>(null);
@@ -47,154 +25,89 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch dashboard data
   const fetchDashboardData = React.useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const [paymentLedger, cgpaGraph, studentProfile, dropSemesterList] = await Promise.all([
-        dashboardService.getPaymentLedgerSummary(),
-        dashboardService.getCGPAData(),
-        profileService.getStudentInfo(),
-        dashboardService.getDropSemesterList()
-      ]);
+    setLoading(true);
+    setError(null);
 
-      setPaymentSummary(calculatePaymentSummary(paymentLedger));
-      setCgpaData(cgpaGraph);
-      setStudentInfo(studentProfile);
-      setDropSemesters(dropSemesterList);
-    } catch (err) {
-      console.error('Dashboard data fetch error:', err);
-      setError('Failed to load dashboard data. Please try again later.');
+    const errors: string[] = [];
+
+    try {
+      // 1. Payment Ledger Summary
+      try {
+        const paymentLedger = await dashboardService.getPaymentLedgerSummary();
+        console.log('Payment Ledger:', paymentLedger);
+        setPaymentSummary(calculatePaymentSummary(paymentLedger));
+      } catch (err) {
+        console.error('Payment summary fetch error:', err);
+        errors.push('Failed to load payment summary');
+      }
+
+      // 2. CGPA Data
+      try {
+        const cgpaGraph = await dashboardService.getCGPAData();
+        console.log('CGPA Graph:', cgpaGraph);
+        setCgpaData(cgpaGraph);
+      } catch (err) {
+        console.error('CGPA data fetch error:', err);
+        errors.push('Failed to load CGPA data');
+      }
+
+      // 3. Student Profile
+      try {
+        const studentProfile = await profileService.getStudentInfo();
+        console.log('Student Profile:', studentProfile);
+        setStudentInfo(studentProfile);
+      } catch (err) {
+        console.error('Student profile fetch error:', err);
+        errors.push('Failed to load student profile');
+      }
+
+      // 4. Drop Semester List
+      try {
+        const dropSemesterList = await dashboardService.getDropSemesterList();
+        console.log('Drop Semester List:', dropSemesterList);
+        setDropSemesters(dropSemesterList);
+      } catch (err) {
+        console.error('Drop semester list fetch error:', err);
+        errors.push('Failed to load drop semester list');
+      }
+
+      // Set error if any errors occurred
+      if (errors.length > 0) {
+        setError(errors.join(', '));
+      }
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // Initial data fetch
-  React.useEffect(() => {
+  useEffect(() => {
     fetchDashboardData();
   }, [fetchDashboardData]);
 
-  // CGPA Chart Configuration
-  const cgpaChartData = useMemo(() => ({
-    labels: cgpaData?.labels || [],
-    datasets: [{
-      label: 'CGPA Progression',
-      data: cgpaData?.data || [],
-      borderColor: 'rgb(75, 192, 192)',
-      tension: 0.1
-    }]
-  }), [cgpaData]);
-
-  const cgpaChartOptions = {
-    responsive: true,
-    plugins: {
-      legend: { position: 'top' as const },
-      title: { display: true, text: 'CGPA Progression' }
-    }
-  };
-
   return (
     <>
-
       <PageTitle
         title={pageTitle}
         icon={pageIcon}
-        // subtitle='Overview of your academic and financial status'
       />
 
       <div className="p-6 bg-gray-50 min-h-screen">
         <div className="container mx-auto">
-
-          {/* Payment Statistics */}
           <StatCards
             onRetry={() => {
               fetchDashboardData();
             }}
           />
 
-          {/* CGPA Chart */}
-          <div className="bg-white shadow-lg rounded-lg p-6 mb-6">
-            <h3 className="text-xl font-semibold mb-4 text-gray-700">CGPA Progression</h3>
-            {cgpaData && cgpaData.data.length > 0 ? (
-              <Line data={cgpaChartData} options={cgpaChartOptions} />
-            ) : (
-              <p className="text-center text-gray-500">No CGPA data available</p>
-            )}
-          </div>
-
-          {/* Additional Dashboard Sections */}
-          <div className="grid md:grid-cols-2 gap-6">
-            {/* Drop Semester Information */}
-            <div className="bg-white shadow-lg rounded-lg p-6">
-              <h3 className="text-xl font-semibold mb-4 text-gray-700">Drop Semester Information</h3>
-              {dropSemesters && dropSemesters.length > 0 ? (
-                <ul className="list-disc pl-5">
-                  {dropSemesters.map((semester, index) => (
-                    <li key={index} className="mb-2">{semester.name}</li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-center text-gray-500">No drop semester information</p>
-              )}
-            </div>
-
-            {/* Student Profile Summary */}
-            <Card className="shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300">
-              <CardHeader className="p-2 sm:p-3 bg-gradient-to-r from-teal-50 to-cyan-50 border-b flex justify-between items-center">
-                <h2 className="text-base font-semibold text-teal-800">Basic Information</h2>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => navigate('/profile')}
-                >
-                  More Details
-                </Button>
-              </CardHeader>
-              <CardContent className="p-2 sm:p-3">
-                <Table>
-                  <TableBody>
-                    <TableRow>
-                      <TableCell className="text-xs text-gray-500 w-1/3">Name</TableCell>
-                      <TableCell className="text-sm font-medium text-gray-800">
-                        {studentInfo?.firstName} {studentInfo?.lastName}
-                      </TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="text-xs text-gray-500">Birth Date</TableCell>
-                      <TableCell className="text-sm font-medium text-gray-800">
-                        {studentInfo?.birthDate ? new Date(studentInfo.birthDate).toLocaleDateString() : 'Not provided'}
-                      </TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="text-xs text-gray-500">Mobile</TableCell>
-                      <TableCell className="text-sm font-medium text-gray-800">
-                        {studentInfo?.mobile || 'Not provided'}
-                      </TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="text-xs text-gray-500">Blood Group</TableCell>
-                      <TableCell className="text-sm font-medium text-gray-800">
-                        {studentInfo?.bloodGroup || 'Not provided'}
-                      </TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="text-xs text-gray-500">Father's Name</TableCell>
-                      <TableCell className="text-sm font-medium text-gray-800">
-                        {studentInfo?.fatherName || 'Not provided'}
-                      </TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="text-xs text-gray-500">Mother's Name</TableCell>
-                      <TableCell className="text-sm font-medium text-gray-800">
-                        {studentInfo?.motherName || 'Not provided'}
-                      </TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
+          <div className="grid md:grid-cols-2 gap-6 mb-6">
+            <CGPAProgressionCard 
+              cgpaData={cgpaData?.sgpaData} 
+              loading={loading}
+              error={error}
+            />
+            <DropSemesterCard dropSemesters={dropSemesters} />
+            <StudentProfileSummaryCard studentInfo={studentInfo} loading={loading} />
           </div>
         </div>
       </div>

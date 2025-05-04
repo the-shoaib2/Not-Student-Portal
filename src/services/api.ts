@@ -292,9 +292,16 @@ export interface PaymentLedger {
 }
 
 // Dashboard Interfaces
+// SGPA Data Interface
+export interface SGPAData {
+  semester: string;
+  sgpa: number;
+};
+
 export interface CGPAData {
   labels: string[];
   data: number[];
+  sgpaData: SGPAData[];
   // Add other CGPA graph related fields
 }
 
@@ -376,10 +383,9 @@ export const profileService = {
   },
 
   // Get basic student information
-  getStudentInfo: async (): Promise<StudentInfo> => {
+  getStudentInfo: async (): Promise<StudentInfo | null> => {
     try {
       const token = profileService.getAuthToken();
-      
       const response = await proxyRequest({
         method: 'GET',
         url: '/profile/studentInfo',
@@ -390,17 +396,13 @@ export const profileService = {
         }
       });
       
-      
-      // if (!response) {
-      //   console.warn('API returned empty response for student info');
-      //   return {} as StudentInfo;
-      // }
-      
+      console.log('Student Info Response:', response);
+
       return response;
     } catch (error) {
       // console.error('Error fetching student info:', error);
-      // Return a default object with empty values to prevent UI errors
-      return {} as StudentInfo;
+      // Throw a more descriptive error
+      throw new Error(`Failed to fetch student info: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   },
 
@@ -625,8 +627,8 @@ export const dashboardService = {
     // }
   },
 
-  getDropSemesterList: async (): Promise<any> => {
-    // try {
+  getDropSemesterList: async (): Promise<any[]> => {
+    try {
       const token = profileService.getAuthToken();
       const response = await proxyRequest({
         method: 'GET',
@@ -640,11 +642,11 @@ export const dashboardService = {
         maxRetries: 3,   // 3 retries
         retryDelay: 2000 // 2 seconds between retries
       });
-      return response;
-    // } catch (error) {
-    //   console.error('Error fetching drop semester list:', error);
-    //   return [];
-    // }
+      return response || [];
+    } catch (error) {
+      console.error('Error fetching drop semester list:', error);
+      return [];
+    }
   },
 
   getCGPAData: async (): Promise<CGPAData> => {

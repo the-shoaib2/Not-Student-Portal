@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Skeleton } from "./ui/skeleton"; 
+import { Skeleton } from "../ui/skeleton"; 
 import { 
   faMoneyBillAlt, 
 } from "@fortawesome/free-solid-svg-icons";
@@ -8,7 +8,7 @@ import {
   dashboardService, 
   calculatePaymentSummary, 
   PaymentSummary 
-} from "../services/api";
+} from "../../services/api";
 
 // Props Interface
 interface StatCardsProps {
@@ -21,21 +21,24 @@ interface StatCardsProps {
 export default function StatCards({ onRetry }: StatCardsProps) {
   const [summary, setSummary] = useState<PaymentSummary | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchPaymentSummary = useCallback(async () => {
     try {
       setLoading(true);
+      setError(null);
       const data = await dashboardService.getPaymentLedgerSummary();
       setSummary(calculatePaymentSummary(data));
     } catch (err) {
       console.error('Failed to fetch payment summary:', err);
+      setError('Failed to load payment summary');
     } finally {
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    fetchPaymentSummary();
+      fetchPaymentSummary();
   }, [fetchPaymentSummary]);
 
   // Dashboard stats configuration
@@ -70,12 +73,28 @@ export default function StatCards({ onRetry }: StatCardsProps) {
     },
   ];
 
+  // if (error) {
+  //   return (
+  //     <div className="bg-red-100 p-4 rounded-lg text-center">
+  //       <p className="text-red-600 mb-2">{error}</p>
+  //       {onRetry && (
+  //         <button
+  //           onClick={onRetry}
+  //           className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition"
+  //         >
+  //           Retry
+  //         </button>
+  //       )}
+  //     </div>
+  //   );
+  // }
+
   return (
-    <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
+    <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mb-6 ">
       {dashboardStats.map((stat) => (
         <div
           key={stat.id}
-          className={`${stat.color} hover:shadow-xl transition-shadow duration-300 rounded-md p-3 min-h-[100px] flex items-center`}
+          className={`p-3 py-2 rounded-lg shadow-md flex items-center justify-between ${stat.color}`}
         >
           <div className="flex flex-col justify-between w-full h-full">
             <div className="text-right">
@@ -86,7 +105,7 @@ export default function StatCards({ onRetry }: StatCardsProps) {
               )}
               <div className="text-white text-sm">{stat.title}</div>
             </div>
-            <div className="self-start opacity-30 mt-2">
+            <div className="self-start opacity-30">
               <FontAwesomeIcon icon={stat.icon} className="text-5xl p-0 text-white" />
             </div>
           </div>

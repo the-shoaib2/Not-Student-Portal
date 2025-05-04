@@ -2,13 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { profileService, StudentInfo, PresentAddressInfo, PermanentAddressInfo, PhotographInfo, EducationInfo } from '../services/api';
 import { Card, CardContent, CardHeader } from '../components/ui/card';
 import { Button } from '../components/ui/button';
+import ProfilePictureCard from '../components/profile/ProfilePictureCard';
+import PageTitle from '../components/PageTitle';
 
 // Import components directly
-import { PersonalInfoTab } from '../components/ProfileTabs/PersonalInfoTab';
-import { GuardianInfoTab } from '../components/ProfileTabs/GuardianInfoTab';
-import { PresentAddressTab } from '../components/ProfileTabs/PresentAddressTab';
-import { PermanentAddressTab } from '../components/ProfileTabs/PermanentAddressTab';
-import { EducationTab } from '../components/ProfileTabs/EducationTab';
+import { PersonalInfoTab } from '../components/profile/PersonalInfoTab';
+import { GuardianInfoTab } from '../components/profile/GuardianInfoTab';
+import { PresentAddressTab } from '../components/profile/PresentAddressTab';
+import { PermanentAddressTab } from '../components/profile/PermanentAddressTab';
+import { EducationTab } from '../components/profile/EducationTab';
 
 // Skeleton component for profile header
 const ProfileHeaderSkeleton = () => (
@@ -64,24 +66,6 @@ const ProfileComponent: React.FC = () => {
   
   // We'll remove this duplicate definition since it's defined below
   const [errors, setErrors] = useState<Record<string, string>>({});
-
-  // Add debugging to see what data is being passed to the components
-  useEffect(() => {
-    if (studentInfo) {
-      console.log('Profile component studentInfo state:', studentInfo);
-    }
-    if (photograph) {
-      console.log('Profile component photograph state:', photograph);
-    }
-    if (presentAddress) {
-      console.log('Profile component presentAddress state:', presentAddress);
-    }
-    if (permanentAddress) {
-      console.log('Profile component permanentAddress state:', permanentAddress);
-    }
-  }, [studentInfo, photograph, presentAddress, permanentAddress]);
-  
-  // Force loading state to false after 3 seconds to ensure data is displayed
   // This is a fallback in case the API calls don't properly set loading state
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -182,30 +166,16 @@ const ProfileComponent: React.FC = () => {
   // Check if all data is loading
   const isLoading = loading.studentInfo || loading.photograph || loading.educationList || loading.presentAddress || loading.permanentAddress;
 
-  // Display a full-page error if there are critical errors
-  const hasCriticalErrors = errors.studentInfo && Object.keys(errors).length > 2;
-  if (hasCriticalErrors) {
-    return (
-      <div className="p-6 text-red-500 text-center">
-        <h2 className="text-xl font-bold mb-2">Error</h2>
-        <p>{errors.studentInfo}</p>
-        <Button 
-          onClick={() => window.location.reload()} 
-          className="mt-4"
-        >
-          Retry
-        </Button>
-      </div>
-    );
-  }
+
 
   return (
     <div className="p-3 sm:p-5 max-w-6xl mx-auto  from-gray-50 to-white min-h-screen">
       {/* Page Title */}
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">Student Profile</h1>
-        <p className="text-gray-600">View and manage your academic information</p>
-      </div>
+      <PageTitle 
+        title="Student Profile" 
+        icon="UserCircle2" 
+        subtitle="View and manage your academic information" 
+      />
       {/* Profile Header */}
       <Card className="mb-8 overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 transform hover:-translate-y-1">
         <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-700 p-4 sm:p-6 text-white">
@@ -216,69 +186,11 @@ const ProfileComponent: React.FC = () => {
         </CardHeader>
         <CardContent className="p-4 sm:p-5">
           <div className="flex flex-col md:flex-row items-center md:items-start gap-4 sm:gap-6">
-            <div className="w-32 h-40 md:w-40 md:h-48 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0 border-4 border-white shadow-lg relative group">
-              {/* Photo container with 4:3 aspect ratio */}
-              {loading.photograph ? (
-                <div className="w-full h-full bg-gray-200 animate-pulse" />
-              ) : photograph?.photoUrl ? (
-                <img 
-                  src={photograph.photoUrl}
-                  alt={studentInfo?.studentName || 'Student Photo'} 
-                  className="w-full h-full object-cover"
-                  crossOrigin="anonymous"
-                  loading="lazy" /* Add lazy loading */
-                  decoding="async" /* Optimize image decoding */
-                  onError={(e) => {
-                    // Extensive logging for image loading
-                    console.group('Image Loading Error');
-                    console.log('Original photoUrl:', photograph.photoUrl);
-                    console.log('Original photoData:', photograph.photoData);
-                    console.log('Current event target:', e.currentTarget);
-                    
-                    // Try with a different approach - create a new Image and set source
-                    try {
-                      const imgElement = e.currentTarget;
-                      if (!imgElement) {
-                        console.error('Image element not found');
-                        console.groupEnd();
-                        return;
-                      }
-
-                      const img = new Image();
-                      img.onload = () => {
-                        console.log('Image loaded via alternative method');
-                        console.log('Alternative image src:', img.src);
-                        imgElement.src = img.src;
-                        console.groupEnd();
-                      };
-                      img.onerror = () => {
-                        console.log('Alternative method also failed, using default');
-                        imgElement.src = '/default-avatar.png';
-                        console.groupEnd();
-                      };
-                      
-                      // Validate photoData before setting
-                      const photoDataToUse = photograph.photoData || '/default-avatar.png';
-                      console.log('Attempting to load:', photoDataToUse);
-                      img.src = photoDataToUse;
-                    } catch (err) {
-                      console.error('Error in alternative loading:', err);
-                      const imgElement = e.currentTarget;
-                      if (imgElement) {
-                        imgElement.src = '/default-avatar.png';
-                      }
-                      console.groupEnd();
-                    }
-                  }}
-                />
-              ) : (
-                <img 
-                  src="/default-avatar.png"
-                  alt="Default avatar" 
-                  className="w-full h-full object-cover"
-                />
-              )}
-            </div>
+            <ProfilePictureCard 
+              studentInfo={studentInfo} 
+              photograph={photograph}
+              loading={loading}
+            />
             <div className="flex-grow text-center md:text-left">
               {loading.studentInfo ? (
                 <ProfileHeaderSkeleton />
@@ -294,19 +206,6 @@ const ProfileComponent: React.FC = () => {
         </CardContent>
       </Card>
       
-      {/* Error messages */}
-      {Object.keys(errors).length > 0 && (
-        <Card className="mb-8 border-2 border-red-200 shadow-lg rounded-xl overflow-hidden">
-          <CardContent className="bg-red-50 text-red-700 p-4">
-            <h3 className="font-semibold mb-2">There were some errors loading your profile data:</h3>
-            <ul className="list-disc pl-5">
-              {Object.entries(errors).map(([key, message]) => (
-                <li key={key}>{message}</li>
-              ))}
-            </ul>
-          </CardContent>
-        </Card>
-      )}
       
       {/* All profile information */}
       <div className="space-y-8 animate-fadeIn">
@@ -334,13 +233,13 @@ const ProfileComponent: React.FC = () => {
             
             <PresentAddressTab 
               studentInfo={studentInfo} 
-              presentAddress={presentAddress || { presentDistrictName: 'Not Available', presentDivisionName: 'Not Available', presentCountryName: 'Not Available' }}
+              presentAddress={presentAddress} 
               loading={loading.studentInfo || loading.presentAddress} 
             />
             
             <PermanentAddressTab 
               studentInfo={studentInfo} 
-              permanentAddress={permanentAddress || { permanentDistrictName: 'Not Available', permanentDivisionName: 'Not Available', permanentCountryName: 'Not Available' }}
+              permanentAddress={permanentAddress} 
               loading={loading.studentInfo || loading.permanentAddress} 
             />
 
