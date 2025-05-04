@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { profileService, StudentInfo, PresentAddressInfo, PermanentAddressInfo, PhotographInfo, EducationInfo } from '../services/api';
 import { Card, CardContent, CardHeader } from '../components/ui/card';
-import { Button } from '../components/ui/button';
+// Removed unused Button import
 import ProfilePictureCard from '../components/profile/ProfilePictureCard';
 import PageTitle from '../components/PageTitle';
 
@@ -64,8 +64,15 @@ const ProfileComponent: React.FC = () => {
     permanentAddress: true
   });
   
-  // We'll remove this duplicate definition since it's defined below
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [errors, setErrors] = useState<Partial<Record<keyof typeof loading, string>>>({});
+
+  // Log errors for debugging
+  useEffect(() => {
+    if (Object.keys(errors).length > 0) {
+      console.warn('Profile page errors:', errors);
+    }
+  }, [errors]);
+
   // This is a fallback in case the API calls don't properly set loading state
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -90,10 +97,10 @@ const ProfileComponent: React.FC = () => {
         // Fetch student info
         try {
           const studentData = await profileService.getStudentInfo();
-          console.log('Student info received:', studentData);
+          // console.log('Student info received:', studentData);
           setStudentInfo(studentData);
         } catch (error: any) {
-          console.error('Error fetching student info:', error);
+          // console.error('Error fetching student info:', error);
           setErrors(prev => ({ ...prev, studentInfo: `Failed to load student information: ${error.message}` }));
         } finally {
           setLoading(prev => ({ ...prev, studentInfo: false }));
@@ -102,18 +109,38 @@ const ProfileComponent: React.FC = () => {
         // Fetch photograph
         try {
           const photoData = await profileService.getPhotograph();
-          if (photoData && photoData.photoUrl) {
-            console.log('Photo data received:', {
-              photoUrlLength: photoData.photoUrl.length,
-              photoUrlStart: photoData.photoUrl.substring(0, 50) + '...'
-            });
-            setPhotograph(photoData);
+          // console.log('Raw photo data received:', photoData);
+          // console.log('Photo data type:', typeof photoData);
+          // console.log('Photo data keys:', Object.keys(photoData));
+          
+          // More robust validation
+          const isValidPhotoData = photoData && 
+            (typeof photoData === 'object') && 
+            (photoData.photoUrl || photoData.image);
+          
+          if (isValidPhotoData) {
+            const validPhotoUrl = photoData.photoUrl || 
+              (photoData.image ? `data:image/jpeg;base64,${photoData.image}` : '');
+            
+            // console.log('Processed photo URL:', validPhotoUrl);
+            
+            if (validPhotoUrl) {
+              setPhotograph({ photoUrl: validPhotoUrl, photoData: validPhotoUrl });
+            } else {
+              console.warn('No valid photo URL could be constructed');
+              setErrors(prev => ({ ...prev, photograph: 'Unable to process photograph data' }));
+            }
           } else {
-            console.error('No valid photograph data available');
+            console.warn('Invalid or empty photograph data');
             setErrors(prev => ({ ...prev, photograph: 'No valid photograph data available' }));
           }
         } catch (error: any) {
-          console.error('Error fetching photograph:', error);
+          console.error('Comprehensive error fetching photograph:', {
+            message: error.message,
+            name: error.name,
+            stack: error.stack,
+            responseData: error.response?.data
+          });
           setErrors(prev => ({ ...prev, photograph: `Failed to load photograph: ${error.message}` }));
         } finally {
           setLoading(prev => ({ ...prev, photograph: false }));

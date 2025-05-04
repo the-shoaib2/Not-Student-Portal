@@ -23,9 +23,8 @@ interface CGPAProgressionCardProps {
 
 const chartConfig: ChartConfig = {
   sgpa: {
-    label: 'SGPA',
-    color: '#3b82f6',
-  },
+    label: 'SGPA'
+  }
 };
 
 const getBarColor = (sgpa: number) => {
@@ -97,11 +96,14 @@ const CGPAProgressionCard: React.FC<CGPAProgressionCardProps> = ({ cgpaData, loa
                 />
                 <Bar 
                   dataKey="sgpa"
-                  fill={chartConfig.sgpa.color}
                   label={{ position: 'top', formatter: (value: number) => value.toFixed(2) }}
                   radius={[4, 4, 0, 0]} 
-                  activeBar={false} 
-                />
+                  activeBar={false}
+                >
+                  {chartData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Bar>
               </BarChart>
             </ResponsiveContainer>
           </ChartContainer>
