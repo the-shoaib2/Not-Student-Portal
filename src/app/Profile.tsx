@@ -200,7 +200,7 @@ const ProfileComponent: React.FC = () => {
   }
 
   return (
-    <div className="p-3 sm:p-5 max-w-6xl mx-auto bg-gradient-to-b from-gray-50 to-white min-h-screen">
+    <div className="p-3 sm:p-5 max-w-6xl mx-auto  from-gray-50 to-white min-h-screen">
       {/* Page Title */}
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-gray-800 mb-2">Student Profile</h1>
