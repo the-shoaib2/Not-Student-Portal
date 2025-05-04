@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { profileService, StudentInfo, PresentAddressInfo, PermanentAddressInfo, PhotographInfo } from '../services/api';
+import { profileService, StudentInfo, PresentAddressInfo, PermanentAddressInfo, PhotographInfo, EducationInfo } from '../services/api';
 import { Card, CardContent, CardHeader } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 
@@ -8,6 +8,7 @@ import { PersonalInfoTab } from './ProfileTabs/PersonalInfoTab';
 import { GuardianInfoTab } from './ProfileTabs/GuardianInfoTab';
 import { PresentAddressTab } from './ProfileTabs/PresentAddressTab';
 import { PermanentAddressTab } from './ProfileTabs/PermanentAddressTab';
+import { EducationTab } from './ProfileTabs/EducationTab';
 
 // Skeleton component for profile header
 const ProfileHeaderSkeleton = () => (
@@ -52,6 +53,7 @@ const ProfileComponent: React.FC = () => {
   const [photograph, setPhotograph] = useState<PhotographInfo | null>(null);
   const [presentAddress, setPresentAddress] = useState<PresentAddressInfo | null>(null);
   const [permanentAddress, setPermanentAddress] = useState<PermanentAddressInfo | null>(null);
+  const [educationInfo, setEducationInfo] = useState<EducationInfo[] | null>(null);
   const [loading, setLoading] = useState({
     studentInfo: true,
     photograph: true,
@@ -156,6 +158,18 @@ const ProfileComponent: React.FC = () => {
         } finally {
           setLoading(prev => ({ ...prev, permanentAddress: false }));
         }
+
+        // Fetch education info
+        try {
+          const educationData = await profileService.getEducationList();
+          console.log('Education info received:', educationData);
+          setEducationInfo(educationData);
+        } catch (error: any) {
+          console.error('Error fetching education info:', error);
+          setErrors(prev => ({ ...prev, educationList: `Failed to load education information: ${error.message}` }));
+        } finally {
+          setLoading(prev => ({ ...prev, educationList: false }));
+        }
       } catch (error) {
         console.error('General error in data fetching:', error);
       }
@@ -186,15 +200,23 @@ const ProfileComponent: React.FC = () => {
   }
 
   return (
-    <div className="p-3 sm:p-5 max-w-6xl mx-auto bg-gray-50 min-h-screen">
+    <div className="p-3 sm:p-5 max-w-6xl mx-auto bg-gradient-to-b from-gray-50 to-white min-h-screen">
+      {/* Page Title */}
+      <div className="text-center mb-8">
+        <h1 className="text-3xl font-bold text-gray-800 mb-2">Student Profile</h1>
+        <p className="text-gray-600">View and manage your academic information</p>
+      </div>
       {/* Profile Header */}
-      <Card className="mb-6 overflow-hidden shadow-md">
-        <CardHeader className="bg-gradient-to-r from-teal-600 to-cyan-700 p-3 sm:p-4 text-white">
-          <h1 className="text-xl sm:text-2xl font-bold">Student Profile</h1>
+      <Card className="mb-8 overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 transform hover:-translate-y-1">
+        <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-700 p-4 sm:p-6 text-white">
+          <h2 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
+            <span className="inline-block w-2 h-8 bg-white rounded-full mr-2"></span>
+            Profile Overview
+          </h2>
         </CardHeader>
         <CardContent className="p-4 sm:p-5">
           <div className="flex flex-col md:flex-row items-center md:items-start gap-4 sm:gap-6">
-            <div className="w-24 h-30 md:w-28 md:h-35 rounded-sm overflow-hidden bg-gray-100 flex-shrink-0 border-1 border-white shadow-sm">
+            <div className="w-32 h-40 md:w-40 md:h-48 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0 border-4 border-white shadow-lg relative group">
               {/* Photo container with 4:3 aspect ratio */}
               {loading.photograph ? (
                 <div className="w-full h-full bg-gray-200 animate-pulse" />
@@ -207,21 +229,45 @@ const ProfileComponent: React.FC = () => {
                   loading="lazy" /* Add lazy loading */
                   decoding="async" /* Optimize image decoding */
                   onError={(e) => {
+                    // Extensive logging for image loading
+                    console.group('Image Loading Error');
+                    console.log('Original photoUrl:', photograph.photoUrl);
+                    console.log('Original photoData:', photograph.photoData);
+                    console.log('Current event target:', e.currentTarget);
+                    
                     // Try with a different approach - create a new Image and set source
                     try {
+                      const imgElement = e.currentTarget;
+                      if (!imgElement) {
+                        console.error('Image element not found');
+                        console.groupEnd();
+                        return;
+                      }
+
                       const img = new Image();
                       img.onload = () => {
                         console.log('Image loaded via alternative method');
-                        e.currentTarget.src = img.src;
+                        console.log('Alternative image src:', img.src);
+                        imgElement.src = img.src;
+                        console.groupEnd();
                       };
                       img.onerror = () => {
                         console.log('Alternative method also failed, using default');
-                        e.currentTarget.src = '/default-avatar.png';
+                        imgElement.src = '/default-avatar.png';
+                        console.groupEnd();
                       };
-                      img.src = photograph.photoData; // Try with photoData instead
+                      
+                      // Validate photoData before setting
+                      const photoDataToUse = photograph.photoData || '/default-avatar.png';
+                      console.log('Attempting to load:', photoDataToUse);
+                      img.src = photoDataToUse;
                     } catch (err) {
                       console.error('Error in alternative loading:', err);
-                      e.currentTarget.src = '/default-avatar.png';
+                      const imgElement = e.currentTarget;
+                      if (imgElement) {
+                        imgElement.src = '/default-avatar.png';
+                      }
+                      console.groupEnd();
                     }
                   }}
                 />
@@ -250,7 +296,7 @@ const ProfileComponent: React.FC = () => {
       
       {/* Error messages */}
       {Object.keys(errors).length > 0 && (
-        <Card className="mb-6 border-red-200 shadow-sm">
+        <Card className="mb-8 border-2 border-red-200 shadow-lg rounded-xl overflow-hidden">
           <CardContent className="bg-red-50 text-red-700 p-4">
             <h3 className="font-semibold mb-2">There were some errors loading your profile data:</h3>
             <ul className="list-disc pl-5">
@@ -263,14 +309,19 @@ const ProfileComponent: React.FC = () => {
       )}
       
       {/* All profile information */}
-      <div className="space-y-6">
-        <h2 className="text-lg sm:text-xl font-semibold text-gray-800 border-b pb-2">Profile Information</h2>
+      <div className="space-y-8 animate-fadeIn">
+        <div className="flex items-center justify-between border-b border-gray-200 pb-4 mb-6">
+          <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+            <span className="inline-block w-1 h-6 bg-blue-600 rounded-full"></span>
+            Profile Information
+          </h2>
+        </div>
         
         {/* Personal Information Section */}
         {isLoading ? (
           <ContentSkeleton />
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5 animate-in fade-in-50 duration-300">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 animate-in fade-in-50 duration-500">
             <PersonalInfoTab 
               studentInfo={studentInfo} 
               photograph={photograph} 
@@ -292,6 +343,12 @@ const ProfileComponent: React.FC = () => {
               studentInfo={studentInfo} 
               permanentAddress={permanentAddress || { permanentDistrictName: 'Not Available', permanentDivisionName: 'Not Available', permanentCountryName: 'Not Available' }}
               loading={loading.studentInfo || loading.permanentAddress} 
+            />
+
+            <EducationTab
+              studentInfo={studentInfo}
+              educationInfo={educationInfo}
+              loading={loading.studentInfo || loading.educationList}
             />
           </div>
         )}

@@ -1,5 +1,6 @@
 import React, { memo } from 'react';
 import { Card, CardContent, CardHeader } from '../../components/ui/card';
+import { Table, TableBody, TableCell, TableRow } from '../../components/ui/table';
 import { StudentInfo, PhotographInfo } from '../../services/api';
 
 interface PersonalInfoTabProps {
@@ -8,142 +9,137 @@ interface PersonalInfoTabProps {
   loading: boolean;
 }
 
-
 const PersonalInfoTabComponent: React.FC<PersonalInfoTabProps> = ({ studentInfo, loading }) => {
   if (loading || !studentInfo) {
     return (
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5">
-        {[...Array(2)].map((_, i) => (
-          <Card key={i} className="shadow-sm overflow-hidden">
-            <CardHeader className="p-3 sm:p-4 bg-gray-50 border-b">
-              <div className="h-5 w-36 bg-gray-200 rounded animate-pulse" />
-            </CardHeader>
-            <CardContent className="p-3 sm:p-4 space-y-3">
-              {[...Array(4)].map((_, j) => (
-                <div key={j} className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-2">
-                  <div className="h-4 w-24 bg-gray-200 rounded animate-pulse" />
-                  <div className="h-4 w-full sm:w-3/5 bg-gray-200 rounded animate-pulse" />
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      <Card className="shadow-sm overflow-hidden animate-in fade-in-50 duration-500">
+        <CardHeader className="p-2 sm:p-3 bg-gradient-to-r from-gray-50 to-gray-100 border-b">
+          <div className="h-6 w-48 bg-gray-200 rounded-md animate-pulse" />
+        </CardHeader>
+        <CardContent className="p-2 sm:p-3">
+          <div className="space-y-4">
+            {[...Array(4)].map((_, sectionIndex) => (
+              <div key={sectionIndex} className="space-y-3">
+                <div className="h-5 w-40 bg-gray-100 rounded-md animate-pulse mb-2" />
+                {[...Array(sectionIndex === 0 ? 6 : 4)].map((_, rowIndex) => (
+                  <div key={rowIndex} className="flex justify-between items-center py-2 border-b border-gray-50">
+                    <div className="h-4 w-24 bg-gray-200 rounded-md animate-pulse" />
+                    <div className="h-4 w-48 bg-gray-200 rounded-md animate-pulse" />
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5">
-      <Card className="shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300">
-        <CardHeader className="p-3 sm:p-4 bg-gradient-to-r from-teal-50 to-cyan-50 border-b">
-          <h2 className="text-lg font-bold text-teal-800">Personal Information</h2>
-        </CardHeader>
-        <CardContent className="p-3 sm:p-4 space-y-2 sm:space-y-3">
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 py-1 border-b border-gray-100">
-            <span className="text-sm text-gray-500">Full Name:</span> 
-            <span className="font-medium text-gray-800">{studentInfo.firstName} {studentInfo.lastName}</span>
-          </div>
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 py-1 border-b border-gray-100">
-            <span className="text-sm text-gray-500">Gender:</span> 
-            <span className="font-medium text-gray-800">{studentInfo.sex || 'Not provided'}</span>
-          </div>
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 py-1 border-b border-gray-100">
-            <span className="text-sm text-gray-500">Date of Birth:</span> 
-            <span className="font-medium text-gray-800">
-              {studentInfo.birthDate ? new Date(studentInfo.birthDate).toLocaleDateString() : 'Not provided'}
-            </span>
-          </div>
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 py-1 border-b border-gray-100">
-            <span className="text-sm text-gray-500">Blood Group:</span> 
-            <span className="font-medium text-gray-800">{studentInfo.bloodGroup || 'Not provided'}</span>
-          </div>
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 py-1 border-b border-gray-100">
-            <span className="text-sm text-gray-500">Religion:</span> 
-            <span className="font-medium text-gray-800">{studentInfo.religion || 'Not provided'}</span>
-          </div>
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 py-1 border-b border-gray-100">
-            <span className="text-sm text-gray-500">Nationality:</span> 
-            <span className="font-medium text-gray-800">{studentInfo.nationality || 'Not provided'}</span>
-          </div>
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 py-1">
-            <span className="text-sm text-gray-500">Marital Status:</span> 
-            <span className="font-medium text-gray-800">{studentInfo.maritalStatus || 'Not provided'}</span>
-          </div>
-        </CardContent>
-      </Card>
+    <Card className="shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300">
+      <CardHeader className="p-2 sm:p-3 bg-gradient-to-r from-teal-50 to-cyan-50 border-b">
+        <h2 className="text-base font-semibold text-teal-800">Student Information</h2>
+      </CardHeader>
+      <CardContent className="p-2 sm:p-3">
+        <Table>
+          <TableBody>
+            <TableRow>
+              <TableCell className="text-xs text-gray-500 font-semibold bg-gray-50" colSpan={2}>Personal Information</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell className="text-xs text-gray-500 w-1/3">Full Name</TableCell>
+              <TableCell className="text-sm font-medium text-gray-800">{studentInfo.firstName} {studentInfo.lastName}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell className="text-xs text-gray-500">Gender</TableCell>
+              <TableCell className="text-sm font-medium text-gray-800">{studentInfo.sex || 'Not provided'}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell className="text-xs text-gray-500">Date of Birth</TableCell>
+              <TableCell className="text-sm font-medium text-gray-800">
+                {studentInfo.birthDate ? new Date(studentInfo.birthDate).toLocaleDateString() : 'Not provided'}
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell className="text-xs text-gray-500">Blood Group</TableCell>
+              <TableCell className="text-sm font-medium text-gray-800">{studentInfo.bloodGroup || 'Not provided'}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell className="text-xs text-gray-500">Religion</TableCell>
+              <TableCell className="text-sm font-medium text-gray-800">{studentInfo.religion || 'Not provided'}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell className="text-xs text-gray-500">Nationality</TableCell>
+              <TableCell className="text-sm font-medium text-gray-800">{studentInfo.nationality || 'Not provided'}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell className="text-xs text-gray-500">Marital Status</TableCell>
+              <TableCell className="text-sm font-medium text-gray-800">{studentInfo.maritalStatus || 'Not provided'}</TableCell>
+            </TableRow>
 
-      <Card className="shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300">
-        <CardHeader className="p-3 sm:p-4 bg-gradient-to-r from-teal-50 to-cyan-50 border-b">
-          <h2 className="text-lg font-bold text-teal-800">Contact Information</h2>
-        </CardHeader>
-        <CardContent className="p-3 sm:p-4 space-y-2 sm:space-y-3">
-          <div className="flex flex-col gap-1 py-1 border-b border-gray-100">
-            <span className="text-sm text-gray-500">Email:</span> 
-            <span className="font-medium text-gray-800 break-all">{studentInfo.email || 'Not provided'}</span>
-          </div>
-          <div className="flex flex-col gap-1 py-1 border-b border-gray-100">
-            <span className="text-sm text-gray-500">Alternative Email:</span> 
-            <span className="font-medium text-gray-800 break-all">{studentInfo.emailAlternative || 'Not provided'}</span>
-          </div>
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 py-1 border-b border-gray-100">
-            <span className="text-sm text-gray-500">Mobile:</span> 
-            <span className="font-medium text-gray-800">{studentInfo.mobile || 'Not provided'}</span>
-          </div>
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 py-1">
-            <span className="text-sm text-gray-500">Phone:</span> 
-            <span className="font-medium text-gray-800">{studentInfo.workPhone || 'Not provided'}</span>
-          </div>
-        </CardContent>
-      </Card>
+            <TableRow>
+              <TableCell className="text-xs text-gray-500 font-semibold bg-gray-50" colSpan={2}>Contact Information</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell className="text-xs text-gray-500">Email</TableCell>
+              <TableCell className="font-medium text-gray-800 break-all">{studentInfo.email || 'Not provided'}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell className="text-xs text-gray-500">Alternative Email</TableCell>
+              <TableCell className="font-medium text-gray-800 break-all">{studentInfo.emailAlternative || 'Not provided'}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell className="text-xs text-gray-500">Mobile</TableCell>
+              <TableCell className="text-sm font-medium text-gray-800">{studentInfo.mobile || 'Not provided'}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell className="text-xs text-gray-500">Phone</TableCell>
+              <TableCell className="text-sm font-medium text-gray-800">{studentInfo.workPhone || 'Not provided'}</TableCell>
+            </TableRow>
 
-      <Card className="shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300">
-        <CardHeader className="p-3 sm:p-4 bg-gradient-to-r from-teal-50 to-cyan-50 border-b">
-          <h2 className="text-lg font-bold text-teal-800">Academic Information</h2>
-        </CardHeader>
-        <CardContent className="p-3 sm:p-4 space-y-2 sm:space-y-3">
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 py-1 border-b border-gray-100">
-            <span className="text-sm text-gray-500">Department:</span> 
-            <span className="font-medium text-gray-800">{studentInfo.departmentName || 'Not provided'}</span>
-          </div>
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 py-1 border-b border-gray-100">
-            <span className="text-sm text-gray-500">Program:</span> 
-            <span className="font-medium text-gray-800">{studentInfo.programName || 'Not provided'}</span>
-          </div>
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 py-1 border-b border-gray-100">
-            <span className="text-sm text-gray-500">Batch:</span> 
-            <span className="font-medium text-gray-800">{studentInfo.batchNo || 'Not provided'}</span>
-          </div>
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 py-1 border-b border-gray-100">
-            <span className="text-sm text-gray-500">Semester:</span> 
-            <span className="font-medium text-gray-800">{studentInfo.semesterName || 'Not provided'}</span>
-          </div>
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 py-1">
-            <span className="text-sm text-gray-500">Credits Completed:</span> 
-            <span className="font-medium text-gray-800">{studentInfo.completedCredits || 'Not provided'}</span>
-          </div>
-        </CardContent>
-      </Card>
+            <TableRow>
+              <TableCell className="text-xs text-gray-500 font-semibold bg-gray-50" colSpan={2}>Academic Information</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell className="text-xs text-gray-500">Department</TableCell>
+              <TableCell className="text-sm font-medium text-gray-800">{studentInfo.departmentName || 'Not provided'}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell className="text-xs text-gray-500">Program</TableCell>
+              <TableCell className="text-sm font-medium text-gray-800">{studentInfo.programName || 'Not provided'}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell className="text-xs text-gray-500">Batch</TableCell>
+              <TableCell className="text-sm font-medium text-gray-800">{studentInfo.batchNo || 'Not provided'}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell className="text-xs text-gray-500">Semester</TableCell>
+              <TableCell className="text-sm font-medium text-gray-800">{studentInfo.semesterName || 'Not provided'}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell className="text-xs text-gray-500">Credits Completed</TableCell>
+              <TableCell className="text-sm font-medium text-gray-800">{studentInfo.completedCredits || 'Not provided'}</TableCell>
+            </TableRow>
 
-      <Card className="shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300">
-        <CardHeader className="p-3 sm:p-4 bg-gradient-to-r from-teal-50 to-cyan-50 border-b">
-          <h2 className="text-lg font-bold text-teal-800">Additional Information</h2>
-        </CardHeader>
-        <CardContent className="p-3 sm:p-4 space-y-2 sm:space-y-3">
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 py-1 border-b border-gray-100">
-            <span className="text-sm text-gray-500">Passport No:</span> 
-            <span className="font-medium text-gray-800">{studentInfo.passportNo || 'Not provided'}</span>
-          </div>
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 py-1 border-b border-gray-100">
-            <span className="text-sm text-gray-500">National ID:</span> 
-            <span className="font-medium text-gray-800">{studentInfo.nationality ? studentInfo.nationality + ' ID' : 'Not provided'}</span>
-          </div>
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 py-1">
-            <span className="text-sm text-gray-500">Birth Certificate No:</span> 
-            <span className="font-medium text-gray-800">Not provided</span>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+            <TableRow>
+              <TableCell className="text-xs text-gray-500 font-semibold bg-gray-50" colSpan={2}>Additional Information</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell className="text-xs text-gray-500">Passport No</TableCell>
+              <TableCell className="text-sm font-medium text-gray-800">{studentInfo.passportNo || 'Not provided'}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell className="text-xs text-gray-500">National ID</TableCell>
+              <TableCell className="text-sm font-medium text-gray-800">{studentInfo.nationality ? studentInfo.nationality + ' ID' : 'Not provided'}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell className="text-xs text-gray-500">Birth Certificate No</TableCell>
+              <TableCell className="text-sm font-medium text-gray-800">Not provided</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
   );
 };
 

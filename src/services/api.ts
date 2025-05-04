@@ -145,6 +145,7 @@ export interface StudentInfo {
   semesterName: string;
   shift: string;
   completedCredits: string;
+  cgpa?: string | number; // Added cgpa property
   photoUrl?: string;
   // Additional fields from the detailed profile
   photoFile?: string;
@@ -378,7 +379,6 @@ export const profileService = {
   getStudentInfo: async (): Promise<StudentInfo> => {
     try {
       const token = profileService.getAuthToken();
-      console.log('Auth token for student info:', token ? 'Token exists' : 'No token');
       
       const response = await proxyRequest({
         method: 'GET',
@@ -390,7 +390,6 @@ export const profileService = {
         }
       });
       
-      console.log('Raw student info API response:', response);
       
       if (!response) {
         console.warn('API returned empty response for student info');
@@ -399,7 +398,7 @@ export const profileService = {
       
       return response;
     } catch (error) {
-      console.error('Error fetching student info:', error);
+      // console.error('Error fetching student info:', error);
       // Return a default object with empty values to prevent UI errors
       return {} as StudentInfo;
     }
@@ -407,26 +406,36 @@ export const profileService = {
 
   // Get student photograph
   getPhotograph: async (): Promise<PhotographInfo> => {
-    try {
-      const token = profileService.getAuthToken();
 
-      const base64Data = await proxyRequest({
+      const token = profileService.getAuthToken();
+      const arrayBuffer = await proxyRequest({
         method: 'GET',
         url: '/profileUpdate/photograph',
         headers: {
           Authorization: `Bearer ${token}`,
           accessToken: token,
-          Accept: 'application/json',
+          Accept: 'image/jpeg', 
         },
+        responseType: 'arraybuffer', 
       });
-
-      const photoUrl = `data:image/jpeg;base64,${base64Data}`;
-
+      // Validate ArrayBuffer
+      if (!arrayBuffer || arrayBuffer.byteLength === 0) {
+        return { photoUrl: '', photoData: '' };
+      }
+      // Convert ArrayBuffer to base64 string in browser environment
+      const uint8Array = new Uint8Array(arrayBuffer);
+      let binaryString = '';
+      for (let i = 0; i < uint8Array.byteLength; i++) {
+        binaryString += String.fromCharCode(uint8Array[i]);
+      }
+      const photoBase64 = btoa(binaryString);
+      // Validate base64 string
+      if (!photoBase64 || photoBase64.length === 0) {
+        return { photoUrl: '', photoData: '' };
+      }
+      const photoUrl = `data:image/jpeg;base64,${photoBase64}`;
       return { photoUrl, photoData: photoUrl };
-    } catch (error) {
-      console.error('Failed to fetch photograph:', error);
-      return { photoUrl: '', photoData: '' };
-    }
+    
   },
 
 
@@ -554,12 +563,74 @@ export const paymentService = {
   },
 };
 
+// Payment Data Interfaces
+export interface PaymentData {
+  totalCredit: number;
+  totalDebit: number;
+  totalOther: number;
+}
+
+export interface PaymentSummary {
+  totalPaid: string;
+  totalPayable: string;
+  totalDue: string;
+  totalOthers: string;
+}
+
+// Utility function for BDT formatting
+export const formatBDT = (amount: number): string =>
+  '৳' + amount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+// Calculate payment summary
+export const calculatePaymentSummary = (data: PaymentData): PaymentSummary => {
+  const totalPaid = data.totalCredit;
+  const totalPayable = data.totalDebit;
+  const totalDue = totalPayable - totalPaid;
+  const totalOthers = data.totalOther;
+
+  return {
+    totalPaid: formatBDT(totalPaid),
+    totalPayable: formatBDT(totalPayable),
+    totalDue: formatBDT(totalDue),
+    totalOthers: formatBDT(totalOthers),
+  };
+};
+
 // Dashboard Service
 export const dashboardService = {
+
+  getPaymentLedgerSummary: async (): Promise<PaymentData> => {
+    try {
+      const token = profileService.getAuthToken();
+      const response = await proxyRequest({
+        method: 'GET',
+        url: '/paymentLedger/paymentLedgerSummery',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          accessToken: token,
+          'Accept': 'application/json'
+        }
+      });
+      return response;
+    } catch (error) {
+      console.error('Error fetching payment ledger summary:', error);
+      throw error;
+    }
+  },
+
   getDropSemesterList: async (): Promise<any> => {
     try {
-      const response = await api.get('/dropSemester/dropSemesterList');
-      return response.data;
+      const token = profileService.getAuthToken();
+      const response = await proxyRequest({
+        method: 'GET',
+        url: '/dropSemester/dropSemesterList',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          accessToken: token,
+          'Accept': 'application/json'
+        }
+      });
+      return response;
     } catch (error) {
       console.error('Error fetching drop semester list:', error);
       throw error;
@@ -568,11 +639,20 @@ export const dashboardService = {
 
   getCGPAData: async (): Promise<CGPAData> => {
     try {
-      const response = await api.get('/dashboard/studentSGPAGraph');
-      if (!response.data || typeof response.data !== 'object') {
+      const token = profileService.getAuthToken();
+      const response = await proxyRequest({
+        method: 'GET',
+        url: '/dashboard/studentSGPAGraph',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          accessToken: token,
+          'Accept': 'application/json'
+        }
+      });
+      if (!response || typeof response !== 'object') {
         throw new Error('Invalid response format');
       }
-      return response.data;
+      return response;
     } catch (error) {
       console.error('Error fetching CGPA data:', error);
       throw error;

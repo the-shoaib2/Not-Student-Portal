@@ -98,10 +98,15 @@ export const proxyRequest = async ({
         ...headers  // This will override the default Accept header if provided
       }
     });
-    // If responseType is blob or arraybuffer, return the whole response
-    // This allows the caller to access response.data as a Blob or ArrayBuffer
+    // If responseType is blob or arraybuffer, return the data as an ArrayBuffer
     if (responseType === 'blob' || responseType === 'arraybuffer') {
-      return response;
+      console.group('Proxy Request ArrayBuffer');
+      console.log('Response type:', responseType);
+      console.log('Response data:', response.data);
+      console.log('Response data type:', typeof response.data);
+      console.log('Response data instanceof ArrayBuffer:', response.data instanceof ArrayBuffer);
+      console.groupEnd();
+      return response.data;
     }
     // Otherwise just return the data
     return response.data;
