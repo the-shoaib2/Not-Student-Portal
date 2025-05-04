@@ -1,7 +1,19 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
+import { 
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "../ui/chart";
 import { CGPAData, SGPAData } from "../../services/api";
 
+interface SGPAChartDataItem {
+  semester: string;
+  sgpa: number;
+  color: string;
+}
 
 interface CGPAProgressionCardProps {
   cgpaData?: CGPAData | SGPAData[] | null;
@@ -9,18 +21,93 @@ interface CGPAProgressionCardProps {
   error?: string | null;
 }
 
+const chartConfig: ChartConfig = {
+  sgpa: {
+    label: 'SGPA',
+    color: '#3b82f6',
+  },
+};
+
+const getBarColor = (sgpa: number) => {
+  if (sgpa >= 3.75) return '#10b981';  // Emerald Green for Excellent
+  if (sgpa >= 3.50) return '#22c55e';  // Green for Very Good
+  if (sgpa >= 3.00) return '#84cc16';  // Lime Green for Good
+  if (sgpa >= 2.50) return '#eab308';  // Yellow for Satisfactory
+  if (sgpa >= 2.00) return '#f97316';  // Orange for Acceptable
+  return '#ef4444';                    // Red for Poor
+};
+
 const CGPAProgressionCard: React.FC<CGPAProgressionCardProps> = ({ cgpaData, loading, error }) => {
-  // Log the data for debugging
-  console.log('CGPAProgressionCard - cgpaData:', cgpaData, 'loading:', loading, 'error:', error);
+  // Prepare data for the chart using useMemo for performance optimization
+  const chartData: SGPAChartDataItem[] = useMemo(() => {
+    if (Array.isArray(cgpaData)) {
+      return cgpaData.map((item: SGPAData) => ({
+        semester: item.semester.replace(',', ''),
+        sgpa: item.sgpa,
+        color: getBarColor(item.sgpa)
+      }));
+    } 
+    
+    return cgpaData?.sgpaData?.map((item: SGPAData) => ({
+      semester: item.semester.replace(',', ''),
+      sgpa: item.sgpa,
+      color: getBarColor(item.sgpa)
+    })) || [];
+  }, [cgpaData]);
 
-  // Prepare data for the chart
-  const semesters = Array.isArray(cgpaData) 
-    ? cgpaData.map((item: SGPAData) => item.semester)
-    : cgpaData?.sgpaData?.map((item: SGPAData) => item.semester) || [];
+  // Determine the chart state
+  const chartState = useMemo(() => {
+    if (loading) return 'loading';
+    if (error) return 'error';
+    return chartData.length > 0 ? 'data' : 'no-data';
+  }, [loading, error, chartData]);
 
-  const sgpas = Array.isArray(cgpaData)
-    ? cgpaData.map((item: SGPAData) => item.sgpa)
-    : cgpaData?.sgpaData?.map((item: SGPAData) => item.sgpa) || [];
+  // Render different states
+  const renderChartState = () => {
+    switch (chartState) {
+      case 'loading':
+        return <div className="w-full h-40 flex items-center justify-center text-gray-400">Loading...</div>;
+      case 'error':
+        return <div className="w-full h-40 flex items-center justify-center text-red-500">{error}</div>;
+      case 'no-data':
+        return <div className="w-full h-40 flex items-center justify-center text-gray-400">No data available</div>;
+      default:
+        return (
+          <ChartContainer config={chartConfig}>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis 
+                    dataKey="semester"
+                    tick={{ fontSize: 10 }}
+                    angle={-45}
+                    textAnchor="end"
+                    height={50}
+                    interval={0}
+                />
+                <YAxis domain={[0, 4]} />
+                <ChartTooltip 
+                  content={
+                    <ChartTooltipContent 
+                      nameKey="semester"
+                      formatter={(value) => Number(value).toFixed(2)} 
+                      labelFormatter={(label) => `Semester: ${label}`}
+                    />
+                  } 
+                />
+                <Bar 
+                  dataKey="sgpa"
+                  fill={chartConfig.sgpa.color}
+                  label={{ position: 'top', formatter: (value: number) => value.toFixed(2) }}
+                  radius={[4, 4, 0, 0]} 
+                  activeBar={false} 
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </ChartContainer>
+        );
+    }
+  };
 
   return (
     <Card className="shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300">
@@ -28,73 +115,7 @@ const CGPAProgressionCard: React.FC<CGPAProgressionCardProps> = ({ cgpaData, loa
         <CardTitle>SGPA Progression</CardTitle>
       </CardHeader>
       <CardContent>
-        {loading ? (
-          <div className="w-full h-40 flex items-center justify-center text-gray-400">Loading...</div>
-        ) : error ? (
-          <div className="w-full h-40 flex items-center justify-center text-red-500">{error}</div>
-        ) : (Array.isArray(cgpaData) ? cgpaData.length > 0 : cgpaData?.sgpaData && cgpaData.sgpaData.length > 0) ? (
-          <div className="w-full overflow-x-auto">
-            <svg width={Math.max(semesters.length * 70, 350)} height="220" style={{ minWidth: 350 }}>
-              {/* Y Axis */}
-              <line x1="40" y1="20" x2="40" y2="180" stroke="#ccc" strokeWidth="2" />
-              {/* X Axis */}
-              <line x1="40" y1="180" x2={40 + semesters.length * 60} y2="180" stroke="#ccc" strokeWidth="2" />
-              {/* Bars */}
-              {sgpas.map((sgpa: number, idx: number) => {
-                const barHeight = Math.max(0, (sgpa / 4.0) * 140); // Assuming max SGPA is 4.0
-                return (
-                  <g key={idx}>
-                    <rect
-                      x={50 + idx * 60}
-                      y={180 - barHeight}
-                      width="40"
-                      height={barHeight}
-                      fill="#06b6d4"
-                      rx="6"
-                    />
-                    {/* SGPA Value */}
-                    <text
-                      x={70 + idx * 60}
-                      y={180 - barHeight - 8}
-                      textAnchor="middle"
-                      fontSize="12"
-                      fill="#0f172a"
-                      fontWeight="bold"
-                    >
-                      {sgpa.toFixed(2)}
-                    </text>
-                    {/* Semester Label Rotated */}
-                    <g transform={`translate(${70 + idx * 60},200) rotate(-45)`}>
-                      <text
-                        textAnchor="end"
-                        fontSize="12"
-                        fill="#334155"
-                        style={{ userSelect: "none" }}
-                      >
-                        {semesters[idx]}
-                      </text>
-                    </g>
-                  </g>
-                );
-              })}
-              {/* Y Axis Labels */}
-              {[0, 1, 2, 3, 4].map((val) => (
-                <text
-                  key={val}
-                  x="30"
-                  y={180 - (val / 4.0) * 140}
-                  textAnchor="end"
-                  fontSize="11"
-                  fill="#64748b"
-                >
-                  {val}
-                </text>
-              ))}
-            </svg>
-          </div>
-        ) : (
-          <div className="w-full h-40 flex items-center justify-center text-gray-400">No SGPA data available</div>
-        )}
+        {renderChartState()}
       </CardContent>
     </Card>
   );
