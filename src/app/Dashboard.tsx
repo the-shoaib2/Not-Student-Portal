@@ -86,28 +86,28 @@ const DashboardContent: React.FC = () => {
           title: 'Total Payable', 
           value: paymentResponse ? formatBDT(paymentResponse.totalDebit) : 'N/A', 
           icon: faMoneyBill, 
-          color: 'bg-[#3498db] text-white hover:bg-[#2980b9] transition-colors duration-300' 
+          color: 'bg-blue-100 text-blue-800' 
         },
         { 
           id: 2, 
           title: 'Total Paid', 
           value: paymentResponse ? formatBDT(paymentResponse.totalCredit) : 'N/A', 
           icon: faMoneyBill, 
-          color: 'bg-[#9b59b6] text-white hover:bg-[#8e44ad] transition-colors duration-300' 
+          color: 'bg-green-100 text-green-800' 
         },
         { 
           id: 3, 
           title: 'Total Due', 
           value: paymentResponse ? formatBDT(paymentResponse.totalDebit - paymentResponse.totalCredit) : 'N/A', 
           icon: faMoneyBill, 
-          color: 'bg-[#e74c3c] text-white hover:bg-[#c0392b] transition-colors duration-300' 
+          color: 'bg-red-100 text-red-800' 
         },
         { 
           id: 4, 
           title: 'Total Others', 
           value: paymentResponse ? formatBDT(paymentResponse.totalOther) : 'N/A', 
           icon: faMoneyBill, 
-          color: 'bg-[#00bcd4] text-white hover:bg-[#0097a7] transition-colors duration-300' 
+          color: 'bg-purple-100 text-purple-800' 
         },
       ];
 
@@ -200,13 +200,16 @@ const DashboardContent: React.FC = () => {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {stats.map((stat) => (
-          <div key={stat.id} className={`rounded-lg shadow-lg p-4 ${stat.color} transform hover:scale-105 transition-all duration-300`}>
+          <div key={stat.id} className={`rounded-lg shadow p-4 ${stat.color}`}>
             <div className="flex justify-between items-center">
               <div>
-                <p className="text-sm font-medium opacity-90">{stat.title}</p>
-                <p className="text-2xl font-bold mt-1">{stat.value}</p>
+                <p className="text-sm font-medium">{stat.title}</p>
+                <p className="text-2xl font-bold">{stat.value}</p>
               </div>
-              <FontAwesomeIcon icon={stat.icon} className="text-3xl opacity-90" />
+              <FontAwesomeIcon 
+                icon={stat.icon} 
+                className="fa fa-money fa-5x text-4xl opacity-80"
+              />
             </div>
           </div>
         ))}

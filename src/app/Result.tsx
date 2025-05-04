@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { resultService } from '../services/api';
-import { Search, Loader, BookOpen } from 'lucide-react';
+import { Search, Loader, BookOpen, Award } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import { Confetti } from '../components/magicui/confetti';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../components/ui/dialog';
+import { Button } from '../components/ui/button';
 
 interface ResultProps {}
 
@@ -49,6 +52,12 @@ const Result: React.FC<ResultProps> = () => {
   const [semester, setSemester] = useState('');
   const [selectedSemesterName, setSelectedSemesterName] = useState('');
   const [semesters, setSemesters] = useState<any[]>([]);
+  const [showCongratulations, setShowCongratulations] = useState(false);
+  const [congratsDetails, setCongratsDetails] = useState({
+    sgpa: 0,
+    perfectGrades: false,
+    message: ''
+  });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [resultData, setResultData] = useState<ResultData[]>([]);
