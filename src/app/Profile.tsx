@@ -312,7 +312,6 @@ const ProfileComponent: React.FC = () => {
       <div className="space-y-8 animate-fadeIn">
         <div className="flex items-center justify-between border-b border-gray-200 pb-4 mb-6">
           <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-            <span className="inline-block w-1 h-6 bg-blue-600 rounded-full"></span>
             Profile Information
           </h2>
         </div>

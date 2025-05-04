@@ -6,7 +6,7 @@
   directory = "api"
 
 [[redirects]]
-  from = "/proxy/*"
+  from = "/api"
   to = "/.netlify/functions/[...path]/:splat"
   status = 200
   force = true

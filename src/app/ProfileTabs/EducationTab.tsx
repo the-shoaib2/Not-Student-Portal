@@ -38,7 +38,6 @@ const EducationTabComponent: React.FC<EducationTabProps> = ({ studentInfo, educa
     <Card className="shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300 col-span-1 lg:col-span-2">
       <CardHeader className="p-2 sm:p-3 bg-gradient-to-r from-teal-50 to-cyan-50 border-b">
         <h2 className="text-base font-semibold text-teal-800 flex items-center gap-2">
-          <span className="inline-block w-1 h-6 bg-teal-600 rounded-full"></span>
           Education and Training
         </h2>
       </CardHeader>

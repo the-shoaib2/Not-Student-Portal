@@ -1,40 +1,71 @@
-import React from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
+import { useEffect, useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faMoneyBillAlt } from "@fortawesome/free-solid-svg-icons";
+import { Skeleton } from "../components/ui/skeleton"; 
+import { Card } from "./ui/card";
 
-interface DashboardStat {
-  id: number;
-  title: string;
-  value: string;
-  icon: IconDefinition;
-  color: string;
-}
+const dashboardStats = [
+  {
+    id: 1,
+    value: "",
+    title: "Total Payable",
+    icon: faMoneyBillAlt,
+    color: "bg-blue-500",
+  },
+  {
+    id: 2,
+    value: "",
+    title: "Total Paid",
+    icon: faMoneyBillAlt,
+    color: "bg-purple-500",
+  },
+  {
+    id: 3,
+    value: "",
+    title: "Total Due",
+    icon: faMoneyBillAlt,
+    color: "bg-red-500",
+  },
+  {
+    id: 4,
+    value: "",
+    title: "Total Others",
+    icon: faMoneyBillAlt,
+    color: "bg-cyan-400",
+  },
+];
 
-interface DashboardStatsProps {
-  stats: DashboardStat[];
-}
+export default function StatCards() {
+  const [loading, setLoading] = useState(true);
 
-const DashboardStats: React.FC<DashboardStatsProps> = ({ stats }) => {
+  useEffect(() => {
+    // Simulate loading delay
+    const timer = setTimeout(() => setLoading(false), 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 px-2 sm:px-0">
-      {stats.map((stat) => (
+    <Card className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+      {dashboardStats.map((stat) => (
         <div
           key={stat.id}
-          className={`${stat.color} rounded-lg shadow p-4 transform transition-transform duration-200 hover:scale-105`}
+          className={`${stat.color} hover:shadow-xl transition-shadow duration-300 rounded-md p-4`}
         >
-          <div className="flex justify-between items-center">
-            <div>
-              <p className="text-sm font-medium">{stat.title}</p>
-              <p className="text-2xl font-bold">{stat.value}</p>
+          <div className="flex items-center h-full">
+            <div className="flex-shrink-0 opacity-30 mr-4">
+              <FontAwesomeIcon icon={stat.icon} className="text-6xl text-white" />
             </div>
-            <div className="text-3xl">
-              <FontAwesomeIcon icon={stat.icon} size="lg" className="fa fa-money fa-5x" />
+            <div className="text-right flex-grow">
+              {loading ? (
+                <Skeleton className="h-8 w-24 mb-1 bg-white/50 rounded" />
+              ) : (
+                <div className="text-white text-2xl font-semibold">{stat.value}</div>
+              )}
+              <div className="text-white text-sm">{stat.title}</div>
             </div>
           </div>
         </div>
       ))}
-    </div>
+    </Card>
   );
-};
-
-export default DashboardStats;
+}
