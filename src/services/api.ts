@@ -612,6 +612,17 @@ export const calculatePaymentSummary = (data: PaymentData): PaymentSummary => {
   };
 };
 
+// Registered Course Service
+export const registeredCourseService = {
+  /**
+   * Get semester list for registered courses
+   */
+  async getSemesterList(): Promise<Array<{ semesterId: string; semesterYear: number; semesterName: string }>> {
+    const response = await api.get('/registeredCourse/semesterList');
+    return response.data;
+  }
+};
+
 // Exam Service
 export const examService = {
   /**
