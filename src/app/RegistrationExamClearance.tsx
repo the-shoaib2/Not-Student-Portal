@@ -24,7 +24,7 @@ const RegistrationExamClearance: React.FC = () => {
   }, []);
 
   return (
-    <div className="w-full flex flex-col items-center justify-center">
+    <div className="w-full p-0 m-0 bg-white flex flex-col items-center justify-center">
       <div className="w-full">
         <PageTitle 
           title="Registration/Exam Clearance" 
