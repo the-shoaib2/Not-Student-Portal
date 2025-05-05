@@ -32,7 +32,7 @@ const RegistrationExamClearance: React.FC = () => {
           //  subtitle="Check your semester-wise clearance status"
         />
       </div>
-      <div className="mt-6 flex justify-center w-full">
+      <div className="p-3 sm:p-5 mt-6 flex justify-center w-full">
         <div style={{ maxWidth: 700, width: '100%' }}>
           <SemesterExamClearanceTab data={data} loading={loading} />
         </div>
