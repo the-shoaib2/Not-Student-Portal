@@ -398,7 +398,7 @@ export const profileService = {
         }
       });
 
-      console.log('Student Info Response:', response);
+      // console.log('Student Info Response:', response);
 
       return response;
     } catch (error) {

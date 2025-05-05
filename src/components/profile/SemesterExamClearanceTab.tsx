@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, CardHeader, CardContent } from '../ui/card';
+import { Card, CardTitle, CardHeader, CardContent } from '../ui/card';
 import { Table, TableHeader, TableBody, TableRow, TableCell, TableHead } from '../ui/table';
 
 export interface SemesterExamClearance {
@@ -27,7 +27,7 @@ const SemesterExamClearanceTab: React.FC<SemesterExamClearanceTabProps> = ({ dat
     return (
       <Card className="shadow-sm overflow-hidden animate-in fade-in-50 duration-500 max-w-3xl mx-auto">
         <CardHeader className="p-2 sm:p-3 bg-gradient-to-r from-gray-50 to-gray-100 border-b">
-          <div className="h-6 w-48 bg-gray-200 rounded-md animate-pulse" />
+          <CardTitle className="h-6 w-48 bg-gray-200 rounded-md animate-pulse" />
         </CardHeader>
         <CardContent >
           <div className="overflow-x-auto">
@@ -61,9 +61,9 @@ const SemesterExamClearanceTab: React.FC<SemesterExamClearanceTabProps> = ({ dat
   return (
     <Card className="shadow-sm overflow-hidden max-w-4xl mx-auto animate-in fade-in-50 duration-500">
       <CardHeader className="pb-0" >
-        <h2 className="text-sm sm:text-base font-medium  text-teal-700 border-b pb-1 sm:pb-2">Semester Exam Clearance Status</h2>
+        <CardTitle className="text-sm sm:text-base font-medium  text-teal-700 border-b pb-1 sm:pb-2">Semester Clearance Status</CardTitle>
       </CardHeader>
-      <CardContent className="p-2  sm:p-3">
+      <CardContent>
         <Table>
           <TableHeader>
             <TableRow>

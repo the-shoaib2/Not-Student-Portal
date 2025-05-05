@@ -36,7 +36,7 @@ const Dashboard = () => {
       // 1. Payment Ledger Summary
       try {
         const paymentLedger = await dashboardService.getPaymentLedgerSummary();
-        console.log('Payment Ledger:', paymentLedger);
+        // console.log('Payment Ledger:', paymentLedger);
         setPaymentSummary(calculatePaymentSummary(paymentLedger));
       } catch (err) {
         console.error('Payment summary fetch error:', err);
@@ -46,31 +46,31 @@ const Dashboard = () => {
       // 2. CGPA Data
       try {
         const cgpaGraph = await dashboardService.getCGPAData();
-        console.log('CGPA Graph:', cgpaGraph);
-        console.log('CGPA Graph Type:', typeof cgpaGraph, 'Keys:', Object.keys(cgpaGraph || {}));
+        // console.log('CGPA Graph:', cgpaGraph);
+        // console.log('CGPA Graph Type:', typeof cgpaGraph, 'Keys:', Object.keys(cgpaGraph || {}));
         setCgpaData(cgpaGraph);
       } catch (err) {
-        console.error('CGPA data fetch error:', err);
+        // console.error('CGPA data fetch error:', err);
         errors.push('Failed to load CGPA data');
       }
 
       // 3. Student Profile
       try {
         const studentProfile = await profileService.getStudentInfo();
-        console.log('Student Profile:', studentProfile);
+        // console.log('Student Profile:', studentProfile);
         setStudentInfo(studentProfile);
       } catch (err) {
-        console.error('Student profile fetch error:', err);
+        // console.error('Student profile fetch error:', err);
         errors.push('Failed to load student profile');
       }
 
       // 4. Drop Semester List
       try {
         const dropSemesterList = await dashboardService.getDropSemesterList();
-        console.log('Drop Semester List:', dropSemesterList);
+        // console.log('Drop Semester List:', dropSemesterList);
         setDropSemesters(dropSemesterList);
       } catch (err) {
-        console.error('Drop semester list fetch error:', err);
+        // console.error('Drop semester list fetch error:', err);
         errors.push('Failed to load drop semester list');
       }
 
