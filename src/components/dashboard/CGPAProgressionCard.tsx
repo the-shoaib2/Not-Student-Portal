@@ -1,7 +1,9 @@
 import React, { useMemo } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
-import { BarChart, Bar,Cell, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
-import { 
+import { Skeleton } from "../ui/skeleton";
+import { Table, TableBody, TableRow, TableCell } from "../ui/table";
+import { BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
+import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
@@ -40,7 +42,7 @@ const getBarColor = (sgpa: number) => {
   return '#d8a6a6';                    // Light Red (Fail)
 
 }
-;
+  ;
 
 
 const CGPAProgressionCard: React.FC<CGPAProgressionCardProps> = ({ cgpaData, loading, error }) => {
@@ -52,8 +54,8 @@ const CGPAProgressionCard: React.FC<CGPAProgressionCardProps> = ({ cgpaData, loa
         sgpa: item.sgpa,
         color: getBarColor(item.sgpa)
       }));
-    } 
-    
+    }
+
     return cgpaData?.sgpaData?.map((item: SGPAData) => ({
       semester: item.semester.replace(',', ''),
       sgpa: item.sgpa,
@@ -72,7 +74,22 @@ const CGPAProgressionCard: React.FC<CGPAProgressionCardProps> = ({ cgpaData, loa
   const renderChartState = () => {
     switch (chartState) {
       case 'loading':
-        return <div className="w-full h-40 flex items-center justify-center text-gray-400">Loading...</div>;
+        return (
+          <Table>
+            <TableBody>
+              {[1, 2, 3, 4, 5, 6].map((_, index) => (
+                <TableRow key={index}>
+                  <TableCell className="text-xs text-gray-500 w-1/3">
+                    <Skeleton className="h-4 w-3/4" />
+                  </TableCell>
+                  <TableCell className="text-sm font-medium text-gray-800 w-2/3">
+                    <Skeleton className="h-4 w-full" />
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        );
       case 'error':
         return <div className="w-full h-40 flex items-center justify-center text-red-500">{error}</div>;
       case 'no-data':
@@ -83,28 +100,34 @@ const CGPAProgressionCard: React.FC<CGPAProgressionCardProps> = ({ cgpaData, loa
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={chartData}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis 
-                    dataKey="semester"
-                    tick={{ fontSize: 10 }}
-                    angle={-45}
-                    textAnchor="end"
-                    height={50}
-                    interval={0}
+                <XAxis
+                  dataKey="semester"
+                  tick={{ fontSize: 10 }}
+                  angle={-45}
+                  textAnchor="end"
+                  height={50}
+                  interval={0}
+                  className="text-xs sm:text-sm"
                 />
-                <YAxis domain={[0, 4]} />
-                <ChartTooltip 
+                <YAxis 
+                  domain={[0, 4]} 
+                  tickCount={5}
+                  ticks={[0, 1, 2, 3, 4]}
+                  tick={{ fontSize: 10 }}
+                />
+                <ChartTooltip
                   content={
-                    <ChartTooltipContent 
+                    <ChartTooltipContent
                       nameKey="semester"
-                      formatter={(value) => Number(value).toFixed(2)} 
+                      formatter={(value) => Number(value).toFixed(2)}
                       labelFormatter={(label) => `Semester: ${label}`}
                     />
-                  } 
+                  }
                 />
-                <Bar 
+                <Bar
                   dataKey="sgpa"
                   label={{ position: 'top', formatter: (value: number) => value.toFixed(2) }}
-                  radius={[4, 4, 0, 0]} 
+                  radius={[4, 4, 0, 0]}
                   activeBar={false}
                 >
                   {chartData.map((entry, index) => (
@@ -120,8 +143,8 @@ const CGPAProgressionCard: React.FC<CGPAProgressionCardProps> = ({ cgpaData, loa
 
   return (
     <Card className="shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300">
-      <CardHeader>
-        <CardTitle>SGPA Progression</CardTitle>
+      <CardHeader className="p-2 sm:p-3 bg-gradient-to-r from-teal-50 to-cyan-50 border-b">
+        <CardTitle className="text-base font-semibold text-teal-800 ">SGPA Progression</CardTitle>
       </CardHeader>
       <CardContent>
         {renderChartState()}

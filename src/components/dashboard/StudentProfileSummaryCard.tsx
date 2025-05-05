@@ -1,12 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardFooter } from '../ui/card';
+import { Card, CardContent,CardTitle, CardHeader, CardFooter } from '../ui/card';
 import { Table, TableBody, TableRow, TableCell } from '../ui/table';
 import { Skeleton } from '../ui/skeleton';
 import { Button } from '../ui/button';
 import { StudentInfo } from '../../services/api';
 import { ArrowRightIcon } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 
 interface StudentProfileSummaryCardProps {
   studentInfo: StudentInfo | null;
@@ -22,14 +21,13 @@ const StudentProfileSummaryCard: React.FC<StudentProfileSummaryCardProps> = ({
   if (loading) {
     return (
       <Card className="shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300">
-        <CardHeader className="p-2 sm:p-3 bg-gradient-to-r from-teal-50 to-cyan-50 border-b flex justify-between items-center">
-          <h2 className="text-base font-semibold text-teal-800">Loading Profile</h2>
-          <Skeleton className="w-16 h-16 rounded-full" />
+        <CardHeader className="p-2 sm:p-3 bg-gradient-to-r from-teal-50 to-cyan-50 border-b">
+          <Skeleton className="w-1/2 h-6" />
         </CardHeader>
         <CardContent className="p-2 sm:p-3">
           <Table>
             <TableBody>
-              {[1, 2, 3, 4].map((_, index) => (
+              {[1, 2, 3, 4, 5, 6, 7].map((_, index) => (
                 <TableRow key={index}>
                   <TableCell className="text-xs text-gray-500 w-1/3">
                     <Skeleton className="h-4 w-3/4" />
@@ -42,6 +40,9 @@ const StudentProfileSummaryCard: React.FC<StudentProfileSummaryCardProps> = ({
             </TableBody>
           </Table>
         </CardContent>
+        <CardFooter className="p-2 sm:p-3 border-t flex justify-end">
+          <Skeleton className="h-9 w-28 rounded-md" />
+        </CardFooter>
       </Card>
     );
   }
@@ -51,7 +52,7 @@ const StudentProfileSummaryCard: React.FC<StudentProfileSummaryCardProps> = ({
   return (
     <Card className="shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300">
       <CardHeader className="p-2 sm:p-3 bg-gradient-to-r from-teal-50 to-cyan-50 border-b">
-        <h2 className="text-base font-semibold text-teal-800 ">Personal Information</h2>
+        <CardTitle className="text-base font-semibold text-teal-800 ">Personal Information</CardTitle>
       </CardHeader>
       <CardContent className="p-2 sm:p-3">
         <Table>
@@ -102,9 +103,9 @@ const StudentProfileSummaryCard: React.FC<StudentProfileSummaryCardProps> = ({
         </Table>
       </CardContent>
       <CardFooter className="p-2 sm:p-3 border-t flex justify-end">
-        <Button 
-          variant="default" 
-          size="sm" 
+        <Button
+          variant="default"
+          size="sm"
           onClick={() => navigate('/profile')}
           className="bg-teal-600 hover:bg-teal-800 text-white group"
         >
