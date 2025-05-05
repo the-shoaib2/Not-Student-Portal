@@ -19,7 +19,7 @@ interface SemesterExamClearanceTabProps {
 import { Check, X } from "lucide-react";
 
 const statusIcon = (ok: boolean) => (
-  ok ? <Check className="text-green-600 w-5 h-5 mx-auto" /> : <X className="text-gray-400 w-5 h-5 mx-auto" />
+  ok ? <Check className="text-green-600 w-5 h-5 mx-auto" /> : <X className="text-red-500 w-5 h-5 mx-auto" />
 );
 
 const SemesterExamClearanceTab: React.FC<SemesterExamClearanceTabProps> = ({ data, loading }) => {
@@ -29,15 +29,16 @@ const SemesterExamClearanceTab: React.FC<SemesterExamClearanceTabProps> = ({ dat
         <CardHeader className="p-2 sm:p-3 bg-gradient-to-r from-gray-50 to-gray-100 border-b">
           <CardTitle className="h-6 w-48 bg-gray-200 rounded-md animate-pulse" />
         </CardHeader>
-        <CardContent >
-          <div className="overflow-x-auto">
+        <CardContent>
+          <div className="overflow-x-auto rounded-md border border-teal-100 bg-white">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="h-8 sm:h-7 bg-teal-600 text-white text-center border border-teal-200 px-2 sm:px-1 text-sm sm:text-xs">Semester</TableHead>
-                  <TableHead className="h-8 sm:h-7 bg-teal-600 text-white text-center border border-teal-200 px-2 sm:px-1 text-sm sm:text-xs">Registration</TableHead>
-                  <TableHead className="h-8 sm:h-7 bg-teal-600 text-white text-center border border-teal-200 px-2 sm:px-1 text-sm sm:text-xs">Midterm Exam</TableHead>
-                  <TableHead className="h-8 sm:h-7 bg-teal-600 text-white text-center border border-teal-200 px-2 sm:px-1 text-sm sm:text-xs">Final Exam</TableHead>
+                  <TableHead className="h-5 sm:h-7 bg-teal-600 text-white text-center border border-teal-200 px-0.5 sm:px-1 text-xs sm:text-xs whitespace-nowrap">Semester</TableHead>
+                  <TableHead className="h-5 sm:h-7 bg-teal-600 text-white text-center border border-teal-200 px-0.5 sm:px-1 text-xs sm:text-xs whitespace-nowrap">Registration</TableHead>
+                  <TableHead className="h-5 sm:h-7 bg-teal-600 text-white text-center border border-teal-200 px-0.5 sm:px-1 text-xs sm:text-xs whitespace-nowrap">Midterm</TableHead>
+                  <TableHead className="h-5 sm:h-7 bg-teal-600 text-white text-center border border-teal-200 px-0.5 sm:px-1 text-xs sm:text-xs whitespace-nowrap">Final</TableHead>
+                  <TableHead className="h-7 sm:h-7 bg-teal-600 text-white text-center border border-teal-200 px-1 sm:px-1 text-xs sm:text-xs whitespace-nowrap">Final</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -51,7 +52,7 @@ const SemesterExamClearanceTab: React.FC<SemesterExamClearanceTabProps> = ({ dat
                 ))}
               </TableBody>
             </Table>
-          </div>
+            </div>
         </CardContent>
       </Card>
     );
@@ -64,13 +65,13 @@ const SemesterExamClearanceTab: React.FC<SemesterExamClearanceTabProps> = ({ dat
         <CardTitle className="text-sm sm:text-base font-medium  text-teal-700 border-b pb-1 sm:pb-2">Semester Clearance Status</CardTitle>
       </CardHeader>
       <CardContent>
-        <Table>
+          <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="h-8 sm:h-7 bg-teal-600 text-white text-center border border-teal-200 px-2 sm:px-1 text-sm sm:text-xs">Semester</TableHead>
-              <TableHead className="h-8 sm:h-7 bg-teal-600 text-white text-center border border-teal-200 px-2 sm:px-1 text-sm sm:text-xs">Registration</TableHead>
-              <TableHead className="h-8 sm:h-7 bg-teal-600 text-white text-center border border-teal-200 px-2 sm:px-1 text-sm sm:text-xs">Midterm Exam</TableHead>
-              <TableHead className="h-8 sm:h-7 bg-teal-600 text-white text-center border border-teal-200 px-2 sm:px-1 text-sm sm:text-xs">Final Exam</TableHead>
+              <TableHead className="h-7 sm:h-7 bg-teal-600 text-white text-center border border-teal-200 px-1 sm:px-1 text-xs sm:text-xs whitespace-nowrap">Semester</TableHead>
+              <TableHead className="h-7 sm:h-7 bg-teal-600 text-white text-center border border-teal-200 px-1 sm:px-1 text-xs sm:text-xs whitespace-nowrap">Registration</TableHead>
+              <TableHead className="h-7 sm:h-7 bg-teal-600 text-white text-center border border-teal-200 px-1 sm:px-1 text-xs sm:text-xs whitespace-nowrap">Midterm</TableHead>
+              <TableHead className="h-7 sm:h-7 bg-teal-600 text-white text-center border border-teal-200 px-1 sm:px-1 text-xs sm:text-xs whitespace-nowrap">Final</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -79,10 +80,10 @@ const SemesterExamClearanceTab: React.FC<SemesterExamClearanceTabProps> = ({ dat
                 .sort((a, b) => (b.semesterId > a.semesterId ? 1 : b.semesterId < a.semesterId ? -1 : 0))
                 .map((row, idx) => (
                   <TableRow key={row.semesterId || idx} className={idx % 2 === 0 ? "bg-teal-50 hover:bg-teal-100 transition" : "bg-white hover:bg-teal-100 transition"}>
-                    <TableCell className="font-medium text-teal-700 border border-teal-100 px-2 sm:px-1 py-1 sm:py-0.5 whitespace-nowrap text-sm sm:text-xs">{row.semesterName}</TableCell>
-                    <TableCell className="text-center border border-teal-100 px-2 sm:px-1 py-1 sm:py-0.5 text-sm sm:text-xs">{statusIcon(row.registration)}</TableCell>
-                    <TableCell className="text-center border border-teal-100 px-2 sm:px-1 py-1 sm:py-0.5 text-sm sm:text-xs">{statusIcon(row.midTermExam)}</TableCell>
-                    <TableCell className="text-center border border-teal-100 px-2 sm:px-1 py-1 sm:py-0.5 text-sm sm:text-xs">{statusIcon(row.finalExam)}</TableCell>
+                    <TableCell className="font-medium text-teal-700 border border-teal-100 px-1 sm:px-1 py-0.5 sm:py-0.5 whitespace-nowrap text-xs sm:text-xs">{row.semesterName}</TableCell>
+                    <TableCell className="text-center border border-teal-100 px-1 sm:px-1 py-0.5 sm:py-0.5 text-xs sm:text-xs">{statusIcon(row.registration)}</TableCell>
+                    <TableCell className="text-center border border-teal-100 px-1 sm:px-1 py-0.5 sm:py-0.5 text-xs sm:text-xs">{statusIcon(row.midTermExam)}</TableCell>
+                    <TableCell className="text-center border border-teal-100 px-1 sm:px-1 py-0.5 sm:py-0.5 text-xs sm:text-xs">{statusIcon(row.finalExam)}</TableCell>
                   </TableRow>
                 ))
             ) : (
