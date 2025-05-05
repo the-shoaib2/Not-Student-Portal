@@ -27,7 +27,7 @@ const SemesterExamClearanceTab: React.FC<SemesterExamClearanceTabProps> = ({ dat
     return (
       <Card className="shadow-sm overflow-hidden animate-in fade-in-50 duration-500 max-w-3xl mx-auto">
         <CardHeader className="p-2 sm:p-3 bg-gradient-to-r from-gray-50 to-gray-100 border-b">
-          <CardTitle className="h-6 w-48 bg-gray-200 rounded-md animate-pulse" />
+          <CardTitle className="h-5 w-32 sm:h-6 sm:w-48 bg-gray-200 rounded-md animate-pulse mx-auto" />
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto rounded-md border border-teal-100 bg-white">
@@ -38,21 +38,20 @@ const SemesterExamClearanceTab: React.FC<SemesterExamClearanceTabProps> = ({ dat
                   <TableHead className="h-5 sm:h-7 bg-teal-600 text-white text-center border border-teal-200 px-0.5 sm:px-1 text-xs sm:text-xs whitespace-nowrap">Registration</TableHead>
                   <TableHead className="h-5 sm:h-7 bg-teal-600 text-white text-center border border-teal-200 px-0.5 sm:px-1 text-xs sm:text-xs whitespace-nowrap">Midterm</TableHead>
                   <TableHead className="h-5 sm:h-7 bg-teal-600 text-white text-center border border-teal-200 px-0.5 sm:px-1 text-xs sm:text-xs whitespace-nowrap">Final</TableHead>
-                  <TableHead className="h-7 sm:h-7 bg-teal-600 text-white text-center border border-teal-200 px-1 sm:px-1 text-xs sm:text-xs whitespace-nowrap">Final</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {[...Array(5)].map((_, idx) => (
                   <TableRow key={idx}>
-                    <TableCell className="w-36"><div className="h-4 w-24 bg-gray-200 rounded-md animate-pulse mx-auto" /></TableCell>
-                    <TableCell><div className="h-4 w-16 bg-gray-200 rounded-md animate-pulse mx-auto" /></TableCell>
-                    <TableCell><div className="h-4 w-16 bg-gray-200 rounded-md animate-pulse mx-auto" /></TableCell>
-                    <TableCell><div className="h-4 w-16 bg-gray-200 rounded-md animate-pulse mx-auto" /></TableCell>
+                    <TableCell className="w-24 sm:w-36"><div className="h-3 w-16 sm:h-4 sm:w-24 bg-gray-200 rounded-md animate-pulse mx-auto" /></TableCell>
+                    <TableCell><div className="h-3 w-10 sm:h-4 sm:w-16 bg-gray-200 rounded-md animate-pulse mx-auto" /></TableCell>
+                    <TableCell><div className="h-3 w-10 sm:h-4 sm:w-16 bg-gray-200 rounded-md animate-pulse mx-auto" /></TableCell>
+                    <TableCell><div className="h-3 w-10 sm:h-4 sm:w-16 bg-gray-200 rounded-md animate-pulse mx-auto" /></TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
-            </div>
+          </div>
         </CardContent>
       </Card>
     );
