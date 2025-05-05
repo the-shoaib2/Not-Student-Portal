@@ -1,4 +1,5 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
+import { SemesterExamClearance } from '../components/profile/SemesterExamClearanceTab';
 
 declare module 'axios' {
   interface InternalAxiosRequestConfig {
@@ -609,6 +610,32 @@ export const calculatePaymentSummary = (data: PaymentData): PaymentSummary => {
     totalDue: formatBDT(totalDue),
     totalOthers: formatBDT(totalOthers),
   };
+};
+
+// Exam Service
+export const examService = {
+  /**
+   * Get semester exam clearance info
+   */
+  getSemesterExamClearance: async (): Promise<SemesterExamClearance[]> => {
+    try {
+      const token = await profileService.getAuthToken();
+      const response = await proxyRequest({
+        method: 'GET',
+        url: '/accounts/semester-exam-clearance',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          accessToken: token,
+          'Accept': 'application/json'
+        }
+      });
+      return Array.isArray(response) ? response : [];
+    } catch (error) {
+      console.error('Error fetching semester exam clearance:', error);
+      return [];
+    }
+  },
+
 };
 
 // Dashboard Service
