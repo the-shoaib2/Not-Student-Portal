@@ -24,7 +24,7 @@ const RegistrationExamClearance: React.FC = () => {
   }, []);
 
   return (
-    <div className="w-full p-0 m-0 bg-white flex flex-col items-center justify-center">
+    <div className="w-full flex flex-col items-center justify-center">
       <div className="w-full">
         <PageTitle 
           title="Registration/Exam Clearance" 
@@ -32,8 +32,10 @@ const RegistrationExamClearance: React.FC = () => {
           //  subtitle="Check your semester-wise clearance status"
         />
       </div>
-      <div className="mt-6">
-        <SemesterExamClearanceTab data={data} loading={loading} />
+      <div className="mt-6 flex justify-center w-full">
+        <div style={{ maxWidth: 700, width: '100%' }}>
+          <SemesterExamClearanceTab data={data} loading={loading} />
+        </div>
       </div>
     </div>
   );
