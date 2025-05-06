@@ -72,7 +72,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
       <Button 
         variant="default" 
         size="sm" 
-        className="bg-teal-600 hover:bg-teal-800 text-white group flex items-center justify-center w-full relative"
+        className="bg-teal-600 hover:bg-teal-800 text-white group flex items-center justify-center w-full max-w-[140px] mx-auto relative"
         onClick={handleEditProfile}
       >
         <span className="absolute left-4 transition-all duration-300 group-hover:translate-x-1">
