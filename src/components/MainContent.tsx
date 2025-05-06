@@ -1,7 +1,7 @@
 import React, { Suspense, lazy } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { PageSkeleton } from './Skeleton';
+import { Skeleton } from './Skeleton';
 
 // Lazy load all components
 const Home = lazy(() => import('../app/Home.tsx'));
@@ -46,7 +46,7 @@ const PublicRoute = ({ children }: { children: React.ReactNode }) => {
 
 // Wrap component with Suspense for lazy loading
 const LazyComponent = ({ component: Component }: { component: React.ComponentType }) => (
-  <Suspense fallback={<PageSkeleton />}>
+  <Suspense fallback={<Skeleton />}>
     <Component />
   </Suspense>
 );
