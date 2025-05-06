@@ -158,16 +158,29 @@ const RegisteredCourse: React.FC = () => {
         <CardContent>
           <div className="flex flex-col items-center my-4 space-y-4">
             <select
+              id="semester-select"
+              name="semester"
+              aria-label="Select Semester"
               value={selectedSemester?.semesterId || ''}
-              onChange={(e) => {
-                const selectedSem = semesters.find(sem => sem.semesterId === e.target.value);
-                if (selectedSem) setSelectedSemester(selectedSem);
+              onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                const selectedSemId = e.target.value;
+                const selectedSem = semesters.find(sem => sem.semesterId === selectedSemId);
+                if (selectedSem) {
+                  setSelectedSemester(selectedSem);
+                } else {
+                  console.error('Invalid semester selected');
+                }
               }}
               className="w-64 px-4 py-2 rounded border border-teal-300 text-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500"
+              required
             >
               <option value="" disabled>Select a Semester</option>
               {semesters.map(sem => (
-                <option key={sem.semesterId} value={sem.semesterId}>
+                <option 
+                  key={sem.semesterId} 
+                  value={sem.semesterId}
+                  aria-label={`${sem.semesterName} ${sem.semesterYear}`}
+                >
                   {sem.semesterName} {sem.semesterYear}
                 </option>
               ))}
