@@ -5,6 +5,7 @@ import { Table, TableBody, TableRow, TableCell } from '../components/ui/table';
 // Removed unused Button import
 import ProfileCard from '../components/profile/ProfileCard';
 import PageTitle from '../components/PageTitle';
+import { useAuth } from '../contexts/AuthContext';
 
 // Import components directly
 import { PersonalInfoTab } from '../components/profile/PersonalInfoTab';
@@ -51,6 +52,7 @@ const ContentSkeleton = () => (
 );
 
 const ProfileComponent: React.FC = () => {
+  const { user } = useAuth();
   const [studentInfo, setStudentInfo] = useState<StudentInfo | null>(null);
   const [photograph, setPhotograph] = useState<PhotographInfo | null>(null);
   const [presentAddress, setPresentAddress] = useState<PresentAddressInfo | null>(null);
@@ -97,25 +99,10 @@ const ProfileComponent: React.FC = () => {
         // Fetch student info
         try {
           const studentData = await profileService.getStudentInfo();
-          // Transform the data to match the expected format
-          if (studentData) {
-            const transformedData = {
-              ...studentData,
-              studentName: studentData.firstName || studentData.studentName,
-              studentId: studentData.personId?.toString() || studentData.studentId,
-              programName: studentData.programName || 'N/A',
-              // Add other required fields with fallbacks
-              campusName: studentData.campusName || 'N/A',
-              departmentName: studentData.departmentName || 'N/A',
-              facultyName: studentData.facultyName || 'N/A',
-              semesterName: studentData.semesterName || 'N/A',
-              shift: studentData.shift || 'N/A',
-              completedCredits: studentData.completedCredits || '0',
-              cgpa: studentData.cgpa || '0.00'
-            };
-            setStudentInfo(transformedData);
-          }
+          // console.log('Student info received:', studentData);
+          setStudentInfo(studentData);
         } catch (error: any) {
+          // console.error('Error fetching student info:', error);
           setErrors(prev => ({ ...prev, studentInfo: `Failed to load student information: ${error.message}` }));
         } finally {
           setLoading(prev => ({ ...prev, studentInfo: false }));
@@ -244,19 +231,19 @@ const ProfileComponent: React.FC = () => {
                     <TableRow>
                       <TableCell className="text-xs text-gray-500 w-1/3 py-3">Name</TableCell>
                       <TableCell className="text-sm font-medium text-gray-800 w-2/3 py-3">
-                        {studentInfo?.studentName || 'N/A'}
+                        {studentInfo?.firstName || 'N/A'}
                       </TableCell>
                     </TableRow>
                     <TableRow>
                       <TableCell className="text-xs text-gray-500 w-1/3 py-3">Student ID</TableCell>
                       <TableCell className="text-sm font-medium text-gray-800 w-2/3 py-3">
-                        {studentInfo?.studentId || 'N/A'}
+                        {user?.userName || 'N/A'}
                       </TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell className="text-xs text-gray-500 w-1/3 py-3">Program</TableCell>
+                      <TableCell className="text-xs text-gray-500 w-1/3 py-3">Email</TableCell>
                       <TableCell className="text-sm font-medium text-gray-800 w-2/3 py-3">
-                        {studentInfo?.programName || 'N/A'}
+                        {studentInfo?.email || 'N/A'}
                       </TableCell>
                     </TableRow>
                   </TableBody>

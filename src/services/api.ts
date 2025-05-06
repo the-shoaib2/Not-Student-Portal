@@ -107,6 +107,7 @@ export interface LoginResponse {
   accessToken: string;
   id: string;
   name: string;
+  userName: string;
   email: string;
   roles: string[];
   commaSeparatedRoles: string;
