@@ -195,102 +195,103 @@ const ProfileComponent: React.FC = () => {
   // Check if all data is loading
   const isLoading = loading.studentInfo || loading.photograph || loading.educationList || loading.presentAddress || loading.permanentAddress;
 
-
-
   return (
-    <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto from-gray-50 to-white min-h-screen">
+    <div className="w-full min-h-screen bg-gradient-to-b from-gray-50 to-white">
       {/* Page Title */}
-      <div className="w-screen relative left-1/2 right-1/2 -mx-[50vw] mb-6">
-        <PageTitle 
-          title="Student Profile" 
-          icon="UserCircle2" 
-        />
+      <div className="w-full bg-white border-b">
+          <PageTitle 
+            title="Student Profile" 
+            icon="UserCircle2" 
+          />
       </div>
 
-      {/* Profile Header */}
-      <Card className="overflow-hidden mb-8">
-        <CardHeader className="p-4 sm:p-5 bg-gradient-to-r from-teal-50 to-cyan-50 border-b">
-          <CardTitle className="text-base font-semibold text-teal-800 flex items-center justify-between">
-            <span>Profile Overview</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-4 sm:p-5">
-          <div className="flex items-center gap-6">
-            <ProfileCard 
-              studentInfo={studentInfo} 
-              photograph={photograph}
-              loading={loading}
-              className="w-1/4"
-            />
-            <div className="flex-grow">
-              {loading.studentInfo ? (
-                <ProfileHeaderSkeleton />
-              ) : (
-                <Table>
-                  <TableBody>
-                    <TableRow>
-                      <TableCell className="text-xs text-gray-500 w-1/3 py-3">Name</TableCell>
-                      <TableCell className="text-sm font-medium text-gray-800 w-2/3 py-3">
-                        {studentInfo?.firstName || 'N/A'}
-                      </TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="text-xs text-gray-500 w-1/3 py-3">Student ID</TableCell>
-                      <TableCell className="text-sm font-medium text-gray-800 w-2/3 py-3">
-                        {user?.userName || 'N/A'}
-                      </TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="text-xs text-gray-500 w-1/3 py-3">Email</TableCell>
-                      <TableCell className="text-sm font-medium text-gray-800 w-2/3 py-3">
-                        {studentInfo?.email || 'N/A'}
-                      </TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
-              )}
+      {/* Main Content */}
+      <div className="max-w-[2000px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {/* Profile Header */}
+        <Card className="overflow-hidden mb-8">
+          <CardHeader className="p-4 sm:p-5 bg-gradient-to-r from-teal-50 to-cyan-50 border-b">
+            <CardTitle className="text-base font-semibold text-teal-800 flex items-center justify-between">
+              <span>Profile Overview</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-4 sm:p-5">
+            <div className="flex items-center gap-6">
+              <ProfileCard 
+                studentInfo={studentInfo} 
+                photograph={photograph}
+                loading={loading}
+                className="w-1/4"
+              />
+              <div className="flex-grow">
+                {loading.studentInfo ? (
+                  <ProfileHeaderSkeleton />
+                ) : (
+                  <Table>
+                    <TableBody>
+                      <TableRow>
+                        <TableCell className="text-xs text-gray-500 w-1/3 py-3">Name</TableCell>
+                        <TableCell className="text-sm font-medium text-gray-800 w-2/3 py-3">
+                          {studentInfo?.firstName || 'N/A'}
+                        </TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell className="text-xs text-gray-500 w-1/3 py-3">Student ID</TableCell>
+                        <TableCell className="text-sm font-medium text-gray-800 w-2/3 py-3">
+                          {user?.userName || 'N/A'}
+                        </TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell className="text-xs text-gray-500 w-1/3 py-3">Email</TableCell>
+                        <TableCell className="text-sm font-medium text-gray-800 w-2/3 py-3">
+                          {studentInfo?.email || 'N/A'}
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                )}
+              </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
 
-      {/* All profile information */}
-      <div className="space-y-8 animate-fadeIn">
-        {/* Personal Information Section */}
-        {isLoading ? (
-          <ContentSkeleton />
-        ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 animate-in fade-in-50 duration-500">
-            <PersonalInfoTab 
-              studentInfo={studentInfo} 
-              photograph={photograph} 
-              loading={loading.studentInfo || loading.photograph} 
-            />
-            
-            <GuardianInfoTab 
-              studentInfo={studentInfo} 
-              loading={loading.studentInfo} 
-            />
-            
-            <PresentAddressTab 
-              studentInfo={studentInfo} 
-              presentAddress={presentAddress} 
-              loading={loading.studentInfo || loading.presentAddress} 
-            />
-            
-            <PermanentAddressTab 
-              studentInfo={studentInfo} 
-              permanentAddress={permanentAddress} 
-              loading={loading.studentInfo || loading.permanentAddress} 
-            />
+        {/* All profile information */}
+        <div className="space-y-8 animate-fadeIn">
+          {/* Personal Information Section */}
+          {isLoading ? (
+            <ContentSkeleton />
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 animate-in fade-in-50 duration-500">
+              <PersonalInfoTab 
+                studentInfo={studentInfo} 
+                photograph={photograph} 
+                loading={loading.studentInfo || loading.photograph} 
+              />
+              
+              <GuardianInfoTab 
+                studentInfo={studentInfo} 
+                loading={loading.studentInfo} 
+              />
+              
+              <PresentAddressTab 
+                studentInfo={studentInfo} 
+                presentAddress={presentAddress} 
+                loading={loading.studentInfo || loading.presentAddress} 
+              />
+              
+              <PermanentAddressTab 
+                studentInfo={studentInfo} 
+                permanentAddress={permanentAddress} 
+                loading={loading.studentInfo || loading.permanentAddress} 
+              />
 
-            <EducationTab
-              studentInfo={studentInfo}
-              educationInfo={educationInfo}
-              loading={loading.studentInfo || loading.educationList}
-            />
-          </div>
-        )}
+              <EducationTab
+                studentInfo={studentInfo}
+                educationInfo={educationInfo}
+                loading={loading.studentInfo || loading.educationList}
+              />
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
