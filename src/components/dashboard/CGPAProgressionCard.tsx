@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
 import { Skeleton } from "../ui/skeleton";
 import { Table, TableBody, TableRow, TableCell } from "../ui/table";
-import { BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid } from 'recharts';
 import {
   ChartConfig,
   ChartContainer,
@@ -97,8 +97,7 @@ const CGPAProgressionCard: React.FC<CGPAProgressionCardProps> = ({ cgpaData, loa
       default:
         return (
           <ChartContainer config={chartConfig}>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={chartData}>
+            <BarChart width={590} height={332} data={chartData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis
                   dataKey="semester"
@@ -135,7 +134,6 @@ const CGPAProgressionCard: React.FC<CGPAProgressionCardProps> = ({ cgpaData, loa
                   ))}
                 </Bar>
               </BarChart>
-            </ResponsiveContainer>
           </ChartContainer>
         );
     }

@@ -7,7 +7,6 @@ declare module 'axios' {
   }
 }
 import { proxyRequest } from './proxyUtils';
-import { url } from 'inspector';
 
 // Use proxy endpoint that will be handled by our Edge Function
 const BASE_URL = '/proxy';
@@ -17,7 +16,8 @@ const api = axios.create({
   baseURL: BASE_URL,
   headers: {
     'Content-Type': 'application/json',
-    'Accept': 'application/json',
+    'Accept': '*/*',
+    // 'Accept': 'application/json',
   },
   timeout: 100000, // 100 seconds timeout
   withCredentials: true, // Required for cookies, authorization headers with HTTPS
@@ -369,6 +369,49 @@ export const authService = {
 
 // Profile Service
 export const profileService = {
+  /**
+   * Get student photograph
+   */
+  getPhotograph: async (): Promise<PhotographInfo> => {
+    try {
+      const token = profileService.getAuthToken();
+      const response = await proxyRequest({
+        method: 'GET',
+        url: '/profileUpdate/photograph',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          accessToken: token,
+          'Accept': '*/*'
+        }
+      });
+      
+      // Validate and process response
+      if (!response) {
+        throw new Error('No photograph data received');
+      }
+
+      // If response is already a base64 image or has a photoUrl
+      if (response.image || response.photoUrl) {
+        return {
+          photoUrl: response.photoUrl || `data:image/jpeg;base64,${response.image}`,
+          photoData: response.photoUrl || response.image
+        };
+      }
+
+      // If response is a base64 string directly
+      if (typeof response === 'string') {
+        return {
+          photoUrl: `data:image/jpeg;base64,${response}`,
+          photoData: response
+        };
+      }
+
+      throw new Error('Invalid photograph data format');
+    } catch (error: any) {
+      console.error('Error fetching photograph:', error);
+      throw error;
+    }
+  },
   // Helper function to get auth token
   getAuthToken: () => {
     const userJson = localStorage.getItem('user');
@@ -394,7 +437,7 @@ export const profileService = {
         headers: {
           Authorization: `Bearer ${token}`,
           accessToken: token,
-          'Accept': 'application/json'
+          'Accept': '*/*'
         }
       });
 
@@ -408,52 +451,52 @@ export const profileService = {
     }
   },
 
-  getPhotograph: async (): Promise<PhotographInfo> => {
-    const token = profileService.getAuthToken();
+  // getPhotograph: async (): Promise<PhotographInfo> => {
+  //   const token = profileService.getAuthToken();
   
-    try {
-      const response = await proxyRequest({
-        method: 'GET',
-        url: '/profileUpdate/photograph',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          accessToken: token,
-          Accept: 'application/json',
-        },
-        responseType: 'json',
-      });
+  //   try {
+  //     const response = await proxyRequest({
+  //       method: 'GET',
+  //       url: '/profileUpdate/photograph',
+  //       headers: {
+  //         Authorization: `Bearer ${token}`,
+  //         accessToken: token,
+  //         Accept: 'application/json',
+  //       },
+  //       responseType: 'json',
+  //     });
   
-      // Handle base64 string response
-      let image = '';
-      if (typeof response === 'string') {
-        image = response;
-      } else if (typeof response === 'object') {
-        // Check multiple possible properties
-        const imageProperties = ['image', 'photoUrl', 'photo', 'base64Image'];
-        for (const prop of imageProperties) {
-          if (response[prop]) {
-            image = response[prop];
-            break;
-          }
-        }
-      }
+  //     // Handle base64 string response
+  //     let image = '';
+  //     if (typeof response === 'string') {
+  //       image = response;
+  //     } else if (typeof response === 'object') {
+  //       // Check multiple possible properties
+  //       const imageProperties = ['image', 'photoUrl', 'photo', 'base64Image'];
+  //       for (const prop of imageProperties) {
+  //         if (response[prop]) {
+  //           image = response[prop];
+  //           break;
+  //         }
+  //       }
+  //     }
   
-      if (!image || image.length === 0) {
-        return { photoUrl: '', photoData: '' };
-      }
+  //     if (!image || image.length === 0) {
+  //       return { photoUrl: '', photoData: '' };
+  //     }
   
-      // Ensure base64 data URL format
-      const formatMatch = image.match(/^data:image\/([\w]+);base64,/);
-      const format = formatMatch ? formatMatch[1] : 'jpeg';
+  //     // Ensure base64 data URL format
+  //     const formatMatch = image.match(/^data:image\/([\w]+);base64,/);
+  //     const format = formatMatch ? formatMatch[1] : 'jpeg';
   
-      const photoUrl = image.includes('data:image') ? image : 
-        `data:image/${format};base64,${image}`;
+  //     const photoUrl = image.includes('data:image') ? image : 
+  //       `data:image/${format};base64,${image}`;
   
-      return { photoUrl, photoData: photoUrl };
-    } catch (error: any) {
-      return { photoUrl: '', photoData: '' };
-    }
-  },
+  //     return { photoUrl, photoData: photoUrl };
+  //   } catch (error: any) {
+  //     return { photoUrl: '', photoData: '' };
+  //   }
+  // },
 
   // Get education list
   getEducationList: async (): Promise<EducationInfo[]> => {
@@ -466,7 +509,7 @@ export const profileService = {
       headers: {
         Authorization: `Bearer ${token}`,
         accessToken: token,
-        'Accept': 'application/json'
+        'Accept': '*/*'
       }
     });
 
@@ -488,7 +531,7 @@ export const profileService = {
       headers: {
         Authorization: `Bearer ${token}`,
         accessToken: token,
-        'Accept': 'application/json'
+        'Accept': '*/*'
       }
     });
 
@@ -510,7 +553,7 @@ export const profileService = {
       headers: {
         Authorization: `Bearer ${token}`,
         accessToken: token,
-        'Accept': 'application/json'
+        'Accept': '*/*'
       }
     });
 
@@ -618,8 +661,17 @@ export const registeredCourseService = {
    * Get semester list for registered courses
    */
   async getSemesterList(): Promise<Array<{ semesterId: string; semesterYear: number; semesterName: string }>> {
-    const response = await api.get('/registeredCourse/semesterList');
-    return response.data;
+    const token = await profileService.getAuthToken();
+    const response = await proxyRequest({
+      method: 'GET',
+      url: '/registeredCourse/semesterList',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        accessToken: token,
+        'Accept': '*/*',
+      },
+    });
+    return response || [];
   }
 };
 
@@ -637,7 +689,7 @@ export const examService = {
         headers: {
           Authorization: `Bearer ${token}`,
           accessToken: token,
-          'Accept': 'application/json'
+          'Accept': '*/*'
         }
       });
       return Array.isArray(response) ? response : [];
@@ -661,7 +713,7 @@ export const dashboardService = {
       headers: {
         Authorization: `Bearer ${token}`,
         accessToken: token,
-        'Accept': 'application/json'
+        'Accept': '*/*'
       },
       timeout: 45000,  // 45 seconds timeout
       maxRetries: 3,   // 3 retries
@@ -687,7 +739,7 @@ export const dashboardService = {
         headers: {
           Authorization: `Bearer ${token}`,
           accessToken: token,
-          'Accept': 'application/json'
+          'Accept': '*/*'
         },
         timeout: 45000,  // 45 seconds timeout
         maxRetries: 3,   // 3 retries
@@ -709,7 +761,7 @@ export const dashboardService = {
       headers: {
         Authorization: `Bearer ${token}`,
         accessToken: token,
-        'Accept': 'application/json'
+        'Accept': '*/*'
       },
       timeout: 45000,  // 45 seconds timeout
       maxRetries: 3,   // 3 retries

@@ -16,7 +16,6 @@ import { EducationTab } from '../components/profile/EducationTab';
 const ProfileHeaderSkeleton = () => (
   <div className="animate-pulse">
     <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
-      <div className="w-24 h-24 md:w-28 md:h-28 bg-gray-200 rounded-full flex-shrink-0" />
       <div className="space-y-3 flex-grow w-full max-w-md text-center md:text-left">
         <div className="h-7 md:h-8 w-3/4 bg-gray-200 rounded mx-auto md:mx-0" />
         <div className="h-4 md:h-5 w-1/2 bg-gray-200 rounded mx-auto md:mx-0" />
@@ -201,7 +200,6 @@ const ProfileComponent: React.FC = () => {
       <PageTitle 
         title="Student Profile" 
         icon="UserCircle2" 
-        subtitle="View and manage your academic information" 
       />
       {/* Profile Header */}
       <Card className="mb-8 overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 transform hover:-translate-y-1">
