@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { profileService, StudentInfo, PresentAddressInfo, PermanentAddressInfo, PhotographInfo, EducationInfo } from '../services/api';
-import { Card, CardContent, CardHeader } from '../components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { Table, TableBody, TableRow, TableCell } from '../components/ui/table';
 // Removed unused Button import
 import ProfileCard from '../components/profile/ProfileCard';
 import PageTitle from '../components/PageTitle';
@@ -195,35 +196,55 @@ const ProfileComponent: React.FC = () => {
 
 
   return (
-    <div className="p-3 sm:p-5 max-w-6xl mx-auto  from-gray-50 to-white min-h-screen">
+    <div className="p-4 sm:p-6 max-w-6xl mx-auto from-gray-50 to-white min-h-screen">
       {/* Page Title */}
-      <PageTitle 
-        title="Student Profile" 
-        icon="UserCircle2" 
-      />
+      <div className="w-screen relative left-1/2 right-1/2 -mx-[50vw]">
+        <PageTitle 
+          title="Student Profile" 
+          icon="UserCircle2" 
+        />
+      </div>
       {/* Profile Header */}
-      <Card className="mb-8 overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 transform hover:-translate-y-1">
-        <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-700 p-4 sm:p-6 text-white">
-          <h2 className="text-xl sm:text-xl font-bold flex gap-2">
-            Profile Overview
-          </h2>
+      <Card className="overflow-hidden">
+        <CardHeader className="p-3 sm:p-4 bg-gradient-to-r from-teal-50 to-cyan-50 border-b">
+          <CardTitle className="text-base font-semibold text-teal-800 flex items-center justify-between">
+            <span>Profile Overview</span>
+          </CardTitle>
         </CardHeader>
-        <CardContent className="p-4 sm:p-5">
-          <div className="flex flex-col md:flex-row items-center md:items-start gap-4 sm:gap-6">
+        <CardContent className="p-3 sm:p-4">
+          <div className="flex items-center gap-4">
             <ProfileCard 
               studentInfo={studentInfo} 
               photograph={photograph}
               loading={loading}
+              className="w-1/4"
             />
-            <div className="flex-grow text-center md:text-left">
+            <div className="flex-grow">
               {loading.studentInfo ? (
                 <ProfileHeaderSkeleton />
               ) : (
-                <>
-                  <h2 className="text-xl md:text-2xl font-bold mb-2 text-gray-800">{studentInfo?.studentName}</h2>
-                  <p className="text-sm sm:text-base text-gray-600 mb-1">Student ID: <span className="font-semibold text-gray-800">{studentInfo?.studentId}</span></p>
-                  <p className="text-sm sm:text-base text-gray-600">Program: <span className="font-semibold text-gray-800">{studentInfo?.programName}</span></p>
-                </>
+                <Table>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell className="text-xs text-gray-500 w-1/3">Name</TableCell>
+                      <TableCell className="text-sm font-medium text-gray-800 w-2/3">
+                        {studentInfo?.studentName || 'N/A'}
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="text-xs text-gray-500 w-1/3">Student ID</TableCell>
+                      <TableCell className="text-sm font-medium text-gray-800 w-2/3">
+                        {studentInfo?.studentId || 'N/A'}
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="text-xs text-gray-500 w-1/3">Program</TableCell>
+                      <TableCell className="text-sm font-medium text-gray-800 w-2/3">
+                        {studentInfo?.programName || 'N/A'}
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
               )}
             </div>
           </div>
@@ -234,12 +255,7 @@ const ProfileComponent: React.FC = () => {
       
       {/* All profile information */}
       <div className="space-y-8 animate-fadeIn">
-        {/* <div className="flex items-center justify-between border-b border-gray-200 pb-4 mb-6">
-          <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-            Profile Information
-          </h2>
-        </div> */}
-        
+
         {/* Personal Information Section */}
         {isLoading ? (
           <ContentSkeleton />

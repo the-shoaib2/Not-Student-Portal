@@ -13,13 +13,15 @@ interface ProfileCardProps {
     photograph: boolean;
   };
   useBase64Card?: boolean;
+  className?: string;
 }
 
 const ProfileCard: React.FC<ProfileCardProps> = ({ 
   studentInfo, 
   photograph, 
   loading = { photograph: false },
-  useBase64Card = false
+  useBase64Card = false,
+  className = ''
 }) => {
   const navigate = useNavigate();
 
@@ -40,7 +42,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
   };
 
   return (
-    <div className="flex flex-col items-center space-y-2">
+    <div className={`flex flex-col items-center space-y-2 ${className}`}>
       <div className="relative w-32 h-40 md:w-40 md:h-48 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0 border-4 border-white shadow-lg group">
         {loading.photograph ? (
           <div className="w-full h-full bg-gray-200 animate-pulse" />
