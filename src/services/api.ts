@@ -146,12 +146,13 @@ export interface StudentInfo {
   semesterName: string;
   shift: string;
   completedCredits: string;
-  cgpa?: string | number; // Added cgpa property
+  cgpa?: string | number;
   photoUrl?: string;
   // Additional fields from the detailed profile
   photoFile?: string;
   personId?: number;
   firstName?: string;
+  middleName?: string;
   lastName?: string;
   nickName?: string;
   sex?: string;
@@ -216,6 +217,8 @@ export interface StudentInfo {
   hostelAddress?: string;
   messAddress?: string;
   otherAddress?: string;
+  waverPercent?: string | null;
+  waverSemester?: string | null;
 }
 
 export interface PresentAddressInfo {

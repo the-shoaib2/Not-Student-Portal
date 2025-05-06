@@ -97,10 +97,25 @@ const ProfileComponent: React.FC = () => {
         // Fetch student info
         try {
           const studentData = await profileService.getStudentInfo();
-          // console.log('Student info received:', studentData);
-          setStudentInfo(studentData);
+          // Transform the data to match the expected format
+          if (studentData) {
+            const transformedData = {
+              ...studentData,
+              studentName: studentData.firstName || studentData.studentName,
+              studentId: studentData.personId?.toString() || studentData.studentId,
+              programName: studentData.programName || 'N/A',
+              // Add other required fields with fallbacks
+              campusName: studentData.campusName || 'N/A',
+              departmentName: studentData.departmentName || 'N/A',
+              facultyName: studentData.facultyName || 'N/A',
+              semesterName: studentData.semesterName || 'N/A',
+              shift: studentData.shift || 'N/A',
+              completedCredits: studentData.completedCredits || '0',
+              cgpa: studentData.cgpa || '0.00'
+            };
+            setStudentInfo(transformedData);
+          }
         } catch (error: any) {
-          // console.error('Error fetching student info:', error);
           setErrors(prev => ({ ...prev, studentInfo: `Failed to load student information: ${error.message}` }));
         } finally {
           setLoading(prev => ({ ...prev, studentInfo: false }));
@@ -196,23 +211,24 @@ const ProfileComponent: React.FC = () => {
 
 
   return (
-    <div className="p-4 sm:p-6 max-w-6xl mx-auto from-gray-50 to-white min-h-screen">
+    <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto from-gray-50 to-white min-h-screen">
       {/* Page Title */}
-      <div className="w-screen relative left-1/2 right-1/2 -mx-[50vw]">
+      <div className="w-screen relative left-1/2 right-1/2 -mx-[50vw] mb-6">
         <PageTitle 
           title="Student Profile" 
           icon="UserCircle2" 
         />
       </div>
+
       {/* Profile Header */}
-      <Card className="overflow-hidden">
-        <CardHeader className="p-3 sm:p-4 bg-gradient-to-r from-teal-50 to-cyan-50 border-b">
+      <Card className="overflow-hidden mb-8">
+        <CardHeader className="p-4 sm:p-5 bg-gradient-to-r from-teal-50 to-cyan-50 border-b">
           <CardTitle className="text-base font-semibold text-teal-800 flex items-center justify-between">
             <span>Profile Overview</span>
           </CardTitle>
         </CardHeader>
-        <CardContent className="p-3 sm:p-4">
-          <div className="flex items-center gap-4">
+        <CardContent className="p-4 sm:p-5">
+          <div className="flex items-center gap-6">
             <ProfileCard 
               studentInfo={studentInfo} 
               photograph={photograph}
@@ -226,20 +242,20 @@ const ProfileComponent: React.FC = () => {
                 <Table>
                   <TableBody>
                     <TableRow>
-                      <TableCell className="text-xs text-gray-500 w-1/3">Name</TableCell>
-                      <TableCell className="text-sm font-medium text-gray-800 w-2/3">
+                      <TableCell className="text-xs text-gray-500 w-1/3 py-3">Name</TableCell>
+                      <TableCell className="text-sm font-medium text-gray-800 w-2/3 py-3">
                         {studentInfo?.studentName || 'N/A'}
                       </TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell className="text-xs text-gray-500 w-1/3">Student ID</TableCell>
-                      <TableCell className="text-sm font-medium text-gray-800 w-2/3">
+                      <TableCell className="text-xs text-gray-500 w-1/3 py-3">Student ID</TableCell>
+                      <TableCell className="text-sm font-medium text-gray-800 w-2/3 py-3">
                         {studentInfo?.studentId || 'N/A'}
                       </TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell className="text-xs text-gray-500 w-1/3">Program</TableCell>
-                      <TableCell className="text-sm font-medium text-gray-800 w-2/3">
+                      <TableCell className="text-xs text-gray-500 w-1/3 py-3">Program</TableCell>
+                      <TableCell className="text-sm font-medium text-gray-800 w-2/3 py-3">
                         {studentInfo?.programName || 'N/A'}
                       </TableCell>
                     </TableRow>
@@ -251,11 +267,8 @@ const ProfileComponent: React.FC = () => {
         </CardContent>
       </Card>
 
-      
-      
       {/* All profile information */}
       <div className="space-y-8 animate-fadeIn">
-
         {/* Personal Information Section */}
         {isLoading ? (
           <ContentSkeleton />
