@@ -312,6 +312,20 @@ export interface CGPAData {
 }
 
 
+// Payment Data Interfaces
+export interface PaymentData {
+  totalCredit: number;
+  totalDebit: number;
+  totalOther: number;
+}
+
+export interface PaymentSummary {
+  totalPaid: string;
+  totalPayable: string;
+  totalDue: string;
+  totalOthers: string;
+}
+
 
 // Auth Service
 export const authService = {
@@ -363,7 +377,28 @@ export const authService = {
   },
 
   changePassword: async (data: PasswordChangeRequest): Promise<void> => {
-    await api.post('/passwordChange', data);
+    const token = profileService.getAuthToken();
+    try {
+      const response = await proxyRequest({
+        method: 'POST',
+        url: '/passwordChange',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          accessToken: token,
+          'Accept': '*/*'
+        },
+        data
+      });
+      return response;
+    } catch (error: any) {
+      let message = 'Failed to change password';
+      if (error.response?.data?.message) {
+        message = error.response.data.message;
+      } else if (error.message) {
+        message = error.message;
+      }
+      throw new Error(message);
+    }
   },
 
   forgotPassword: async (data: ForgotPasswordRequest): Promise<void> => {
@@ -388,7 +423,7 @@ export const profileService = {
           'Accept': '*/*'
         }
       });
-      
+
       // Validate and process response
       if (!response) {
         throw new Error('No photograph data received');
@@ -455,53 +490,6 @@ export const profileService = {
     }
   },
 
-  // getPhotograph: async (): Promise<PhotographInfo> => {
-  //   const token = profileService.getAuthToken();
-  
-  //   try {
-  //     const response = await proxyRequest({
-  //       method: 'GET',
-  //       url: '/profileUpdate/photograph',
-  //       headers: {
-  //         Authorization: `Bearer ${token}`,
-  //         accessToken: token,
-  //         Accept: 'application/json',
-  //       },
-  //       responseType: 'json',
-  //     });
-  
-  //     // Handle base64 string response
-  //     let image = '';
-  //     if (typeof response === 'string') {
-  //       image = response;
-  //     } else if (typeof response === 'object') {
-  //       // Check multiple possible properties
-  //       const imageProperties = ['image', 'photoUrl', 'photo', 'base64Image'];
-  //       for (const prop of imageProperties) {
-  //         if (response[prop]) {
-  //           image = response[prop];
-  //           break;
-  //         }
-  //       }
-  //     }
-  
-  //     if (!image || image.length === 0) {
-  //       return { photoUrl: '', photoData: '' };
-  //     }
-  
-  //     // Ensure base64 data URL format
-  //     const formatMatch = image.match(/^data:image\/([\w]+);base64,/);
-  //     const format = formatMatch ? formatMatch[1] : 'jpeg';
-  
-  //     const photoUrl = image.includes('data:image') ? image : 
-  //       `data:image/${format};base64,${image}`;
-  
-  //     return { photoUrl, photoData: photoUrl };
-  //   } catch (error: any) {
-  //     return { photoUrl: '', photoData: '' };
-  //   }
-  // },
-
   // Get education list
   getEducationList: async (): Promise<EducationInfo[]> => {
     // try {
@@ -566,7 +554,183 @@ export const profileService = {
     //   console.error('Error fetching permanent address:', error);
     //   return { permanentDistrictName: null, permanentDivisionName: null, permanentCountryName: null };
     // }
-  }
+  },
+
+  // Update student information
+  updateStudentInfo: async (data: Partial<StudentInfo>): Promise<StudentInfo> => {
+    try {
+      const token = profileService.getAuthToken();
+      const response = await proxyRequest({
+        method: 'PUT',
+        url: '/profile/updateStudentInfo',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          accessToken: token,
+          'Accept': '*/*'
+        },
+        data
+      });
+
+      return response;
+    } catch (error) {
+      throw new Error(`Failed to update student info: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  },
+
+  // Fetch guardian info
+  getGuardianInfo: async (): Promise<Partial<StudentInfo>> => {
+    const token = profileService.getAuthToken();
+    const response = await proxyRequest({
+      method: 'GET',
+      url: '/profileUpdate/guardian',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        accessToken: token,
+        'Accept': '*/*'
+      }
+    });
+    return response;
+  },
+
+  // Update guardian info
+  updateGuardianInfo: async (data: Partial<StudentInfo>): Promise<any> => {
+    const token = profileService.getAuthToken();
+    const response = await proxyRequest({
+      method: 'POST',
+      url: '/profileUpdate/guardian',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        accessToken: token,
+        'Accept': '*/*'
+      },
+      data
+    });
+    return response;
+  },
+
+  // Fetch photograph info
+  getPhotographInfo: async (): Promise<any> => {
+    const token = profileService.getAuthToken();
+    const response = await proxyRequest({
+      method: 'GET',
+      url: '/profileUpdate/photograph',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        accessToken: token,
+        'Accept': '*/*'
+      }
+    });
+    return response;
+  },
+
+  // Update photograph info
+  updatePhotographInfo: async (data: any): Promise<any> => {
+    const token = profileService.getAuthToken();
+    const response = await proxyRequest({
+      method: 'POST',
+      url: '/profileUpdate/photograph',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        accessToken: token,
+        'Accept': '*/*'
+      },
+      data
+    });
+    return response;
+  },
+
+  // Fetch insurance info
+  getInsuranceInfo: async (): Promise<any> => {
+    const token = profileService.getAuthToken();
+    const response = await proxyRequest({
+      method: 'GET',
+      url: '/profileUpdate/insurance',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        accessToken: token,
+        'Accept': '*/*'
+      }
+    });
+    return response;
+  },
+
+  // Update insurance info
+  updateInsuranceInfo: async (data: any): Promise<any> => {
+    const token = profileService.getAuthToken();
+    const response = await proxyRequest({
+      method: 'POST',
+      url: '/profileUpdate/insurance',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        accessToken: token,
+        'Accept': '*/*'
+      },
+      data
+    });
+    return response;
+  },
+
+  // Fetch degree list
+  getDegreeList: async (): Promise<any[]> => {
+    const token = profileService.getAuthToken();
+    const response = await proxyRequest({
+      method: 'GET',
+      url: '/profileUpdate/degreeList',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        accessToken: token,
+        'Accept': '*/*'
+      }
+    });
+    return response || [];
+  },
+
+  // Update degree list
+  updateDegreeList: async (data: any): Promise<any> => {
+    const token = profileService.getAuthToken();
+    const response = await proxyRequest({
+      method: 'POST',
+      url: '/profileUpdate/degreeList',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        accessToken: token,
+        'Accept': '*/*'
+      },
+      data
+    });
+    return response;
+  },
+
+  // Fetch education list
+  getEducationListUpdate: async (): Promise<any[]> => {
+    const token = profileService.getAuthToken();
+    const response = await proxyRequest({
+      method: 'GET',
+      url: '/profileUpdate/educationList',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        accessToken: token,
+        'Accept': '*/*'
+      }
+    });
+    return response || [];
+  },
+
+  // Update education list
+  updateEducationList: async (data: any): Promise<any> => {
+    const token = profileService.getAuthToken();
+    const response = await proxyRequest({
+      method: 'POST',
+      url: '/profileUpdate/educationList',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        accessToken: token,
+        'Accept': '*/*'
+      },
+      data
+    });
+    return response;
+  },
 };
 
 // Result Service
@@ -626,19 +790,7 @@ export const paymentService = {
   },
 };
 
-// Payment Data Interfaces
-export interface PaymentData {
-  totalCredit: number;
-  totalDebit: number;
-  totalOther: number;
-}
 
-export interface PaymentSummary {
-  totalPaid: string;
-  totalPayable: string;
-  totalDue: string;
-  totalOthers: string;
-}
 
 // Utility function for BDT formatting
 export const formatBDT = (amount: number): string =>
