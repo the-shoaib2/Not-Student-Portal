@@ -1,100 +1,115 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { dashboardService, calculatePaymentSummary } from '@/services/api';
-import SGPAGraph from '@/components/SGPAGraph';
-import RecentActivity from '@/components/RecentActivity';
-import UserCard from '@/components/UserCard';
+import React, { useState, useEffect } from 'react';
 import PageTitle from '@/components/PageTitle';
-
-// Import the correct CGPAData type from the API
-import { CGPAData } from '@/services/api';
+import StatCards from '@/components/dashboard/StatCards';
+import CGPAProgressionCard from '@/components/dashboard/CGPAProgressionCard';
+import DropSemesterCard from '@/components/dashboard/DropSemesterCard';
+import StudentProfileSummaryCard from '@/components/dashboard/StudentProfileSummaryCard';
+import { LayoutDashboard } from 'lucide-react';
+import {
+  dashboardService,
+  calculatePaymentSummary,
+  PaymentSummary,
+  CGPAData,
+  SGPAData,
+  profileService,
+  StudentInfo
+} from '@/services/api';
 
 export default function DashboardPage() {
-  const [paymentData, setPaymentData] = useState({
-    totalCredit: 0,
-    totalDebit: 0,
-    totalOther: 0
-  });
-  const [cgpaData, setCgpaData] = useState<CGPAData>({
-    labels: [],
-    data: [],
-    sgpaData: []
-  });
+  const pageTitle = 'Student Dashboard';
+  const pageIcon = <LayoutDashboard />;
+
+  const [paymentSummary, setPaymentSummary] = useState<PaymentSummary | null>(null);
+  const [cgpaData, setCgpaData] = useState<CGPAData | SGPAData[] | null>(null);
+  const [studentInfo, setStudentInfo] = useState<StudentInfo | null>(null);
+  const [dropSemesters, setDropSemesters] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchDashboardData = async () => {
+  const fetchDashboardData = React.useCallback(async () => {
+    setLoading(true);
+    setError(null);
+
+    const errors: string[] = [];
+
+    try {
+      // 1. Payment Ledger Summary
       try {
-        const [paymentResponse, cgpaResponse] = await Promise.all([
-          dashboardService.getPaymentLedgerSummary(),
-          dashboardService.getCGPAData()
-        ]);
-
-        setPaymentData(paymentResponse);
-        setCgpaData(cgpaResponse);
-      } catch (error) {
-        console.error('Error fetching dashboard data:', error);
-      } finally {
-        setLoading(false);
+        const paymentLedger = await dashboardService.getPaymentLedgerSummary();
+        setPaymentSummary(calculatePaymentSummary(paymentLedger));
+      } catch (err) {
+        console.error('Payment summary fetch error:', err);
+        errors.push('Failed to load payment summary');
       }
-    };
 
-    fetchDashboardData();
+      // 2. CGPA Data
+      try {
+        const cgpaGraph = await dashboardService.getCGPAData();
+        setCgpaData(cgpaGraph);
+      } catch (err) {
+        console.error('CGPA data fetch error:', err);
+        errors.push('Failed to load CGPA data');
+      }
+
+      // 3. Student Profile
+      try {
+        const studentProfile = await profileService.getStudentInfo();
+        setStudentInfo(studentProfile);
+      } catch (err) {
+        console.error('Student profile fetch error:', err);
+        errors.push('Failed to load student profile');
+      }
+
+      // 4. Drop Semester List
+      try {
+        const dropSemesterList = await dashboardService.getDropSemesterList();
+        setDropSemesters(dropSemesterList);
+      } catch (err) {
+        console.error('Drop semester list fetch error:', err);
+        errors.push('Failed to load drop semester list');
+      }
+
+      // Set error if any errors occurred
+      if (errors.length > 0) {
+        setError(errors.join(', '));
+      }
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  const paymentSummary = calculatePaymentSummary(paymentData);
+  useEffect(() => {
+    fetchDashboardData();
+  }, [fetchDashboardData]);
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <PageTitle title="Dashboard" />
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {/* User Card */}
-        <div className="col-span-1">
-          <UserCard />
-        </div>
+    <>
+      <PageTitle
+        title={pageTitle}
+        icon={pageIcon}
+      />
 
-        {/* Payment Summary */}
-        <div className="col-span-1 bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">Payment Summary</h2>
-          <div className="space-y-2">
-            <div className="flex justify-between">
-              <span>Total Paid:</span>
-              <span className="font-medium">{paymentSummary.totalPaid}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Total Payable:</span>
-              <span className="font-medium">{paymentSummary.totalPayable}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Total Due:</span>
-              <span className="font-medium">{paymentSummary.totalDue}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Others:</span>
-              <span className="font-medium">{paymentSummary.totalOthers}</span>
-            </div>
+      <div className="p-6 bg-gray-50 min-h-screen">
+        <div className="container mx-auto">
+          <StatCards
+            onRetry={() => {
+              fetchDashboardData();
+            }}
+          />
+
+          <div className="grid md:grid-cols-2 gap-6 mb-6">
+            <CGPAProgressionCard 
+              cgpaData={cgpaData} 
+              loading={loading}
+              error={error}
+            />
+            <DropSemesterCard dropSemesters={dropSemesters} />
+            <StudentProfileSummaryCard studentInfo={studentInfo} loading={loading} />
           </div>
         </div>
-
-        {/* Recent Activity */}
-        <div className="col-span-1">
-          <RecentActivity />
-        </div>
       </div>
-
-      {/* CGPA Graph */}
-      <div className="mt-8 bg-white rounded-lg shadow p-6">
-        <h2 className="text-xl font-semibold mb-4">Academic Performance</h2>
-        {loading ? (
-          <div className="flex items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-          </div>
-        ) : (
-          <SGPAGraph cgpaData={cgpaData} />
-        )}
-      </div>
-    </div>
+    </>
   );
 } 

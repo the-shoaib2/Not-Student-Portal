@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import PageTitle from '../components/PageTitle';
-import StatCards from '../components/dashboard/StatCards';
-import CGPAProgressionCard from '../components/dashboard/CGPAProgressionCard';
-import DropSemesterCard from '../components/dashboard/DropSemesterCard';
-import StudentProfileSummaryCard from '../components/dashboard/StudentProfileSummaryCard';
+import PageTitle from '@/components/PageTitle';
+import StatCards from '@/components/dashboard/StatCards';
+import CGPAProgressionCard from '@/components/dashboard/CGPAProgressionCard';
+import DropSemesterCard from '@/components/dashboard/DropSemesterCard';
+import StudentProfileSummaryCard from '@/components/dashboard/StudentProfileSummaryCard';
 import {
   dashboardService,
   calculatePaymentSummary,

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import Link from 'next/link';
 import { Card, CardContent,CardTitle, CardHeader, CardFooter } from '@/components/ui/card';
 import { Table, TableBody, TableRow, TableCell } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -16,7 +16,9 @@ const StudentProfileSummaryCard: React.FC<StudentProfileSummaryCardProps> = ({
   studentInfo,
   loading = false,
 }) => {
-  const navigate = useNavigate();
+  const handleViewProfile = () => {
+    window.location.href = '/profile';
+  };
 
   if (loading) {
     return (
@@ -106,7 +108,7 @@ const StudentProfileSummaryCard: React.FC<StudentProfileSummaryCardProps> = ({
         <Button
           variant="default"
           size="sm"
-          onClick={() => navigate('/profile')}
+          onClick={handleViewProfile}
           className="bg-teal-600 hover:bg-teal-800 text-white group"
         >
           More Details

@@ -1,11 +1,11 @@
 // import React from 'react';
 // import { useNavigate } from 'react-router-dom';
-// import { Button } from '../ui/button';
+// import { Button } from '@/components/ui/button';
 // import { Camera, ArrowRight as ArrowRightIcon, Edit, Car } from 'lucide-react';
-// import { StudentInfo } from '../../services/api';
-// import { PhotographInfo } from '../../services/api';
-// import Base64ImageCard from '../ImageView';
-// import { Card, CardContent,CardTitle, CardHeader, CardFooter } from '../ui/card';
+// import { StudentInfo } from '@/services/api';
+// import { PhotographInfo } from '@/services/api';
+// import Base64ImageCard from '@/components/ImageView';
+// import { Card, CardContent,CardTitle, CardHeader, CardFooter } from '@/components/ui/card';
 
 
 

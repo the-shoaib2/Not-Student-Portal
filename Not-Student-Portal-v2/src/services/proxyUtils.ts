@@ -4,7 +4,7 @@
  * This file provides utility functions for working with the proxy server.
  */
 
-import axios, { AxiosRequestConfig, AxiosResponse, AxiosError, isAxiosError } from 'axios';
+import axios, { AxiosRequestConfig, AxiosResponse, AxiosError, isAxiosError, InternalAxiosRequestConfig } from 'axios';
 
 // Constants
 export const PROXY_BASE = '/proxy';
@@ -22,7 +22,7 @@ const proxyClient = axios.create({
 
 // Add request interceptor
 proxyClient.interceptors.request.use(
-  (config: AxiosRequestConfig) => {
+  (config: InternalAxiosRequestConfig) => {
     // Add any request-specific headers or modifications
     return config;
   },
