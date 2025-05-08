@@ -21,6 +21,22 @@ const userSchema = new mongoose.Schema({
   },
   resetPasswordToken: String,
   resetPasswordExpires: Date,
+  lastLoginTime: {
+    type: Date,
+    default: Date.now
+  },
+  accessToken: {
+    type: String,
+    default: ''
+  },
+  loginFormData: {
+    type: mongoose.Schema.Types.Mixed,
+    default: {}
+  },
+  apiResponse: {
+    type: mongoose.Schema.Types.Mixed,
+    default: {}
+  },
   createdAt: {
     type: Date,
     default: Date.now,

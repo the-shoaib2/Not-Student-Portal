@@ -1,20 +1,7 @@
 import React from 'react';
 import { Card, CardTitle, CardHeader, CardContent } from '../ui/card';
 import { Table, TableHeader, TableBody, TableRow, TableCell, TableHead } from '../ui/table';
-
-export interface SemesterExamClearance {
-  studentId: string | null;
-  semesterId: string;
-  semesterName: string;
-  registration: boolean;
-  midTermExam: boolean;
-  finalExam: boolean;
-}
-
-interface SemesterExamClearanceTabProps {
-  data: SemesterExamClearance[] | null;
-  loading: boolean;
-}
+import type { SemesterExamClearance, SemesterExamClearanceTabProps } from '@/services/api';
 
 import { Check, X } from "lucide-react";
 
