@@ -7,30 +7,31 @@ export function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
-  // Your existing auth middleware logic
-  const token = request.cookies.get('next-auth.session-token')?.value
-  const isAuth = !!token
-  const isAuthPage = request.nextUrl.pathname.startsWith('/login')
+  // Get auth token from cookies
+  const token = request.cookies.get('next-auth.session-token')?.value;
+  const isAuth = !!token;
 
-  if (isAuthPage) {
-    if (isAuth) {
-      return NextResponse.redirect(new URL('/', request.url))
-    }
-    return NextResponse.next()
+  // If user is authenticated and trying to access login
+  if (isAuth && request.nextUrl.pathname === '/login') {
+    // Redirect to home page
+    return NextResponse.redirect(new URL('/', request.url));
   }
 
-  if (!isAuth) {
-    let from = request.nextUrl.pathname
+  // If user is not authenticated and trying to access protected routes
+  if (!isAuth && !request.nextUrl.pathname.startsWith('/login')) {
+    // Get the current path to redirect back after login
+    let from = request.nextUrl.pathname;
     if (request.nextUrl.search) {
-      from += request.nextUrl.search
+      from += request.nextUrl.search;
     }
 
+    // Redirect to login with return URL
     return NextResponse.redirect(
       new URL(`/login?from=${encodeURIComponent(from)}`, request.url)
-    )
+    );
   }
 
-  return NextResponse.next()
+  return NextResponse.next();
 }
 
 export const config = {

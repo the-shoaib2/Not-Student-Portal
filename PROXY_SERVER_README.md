@@ -19,7 +19,7 @@ The proxy server is implemented using Vite's built-in proxy functionality in `vi
 server: {
   proxy: {
     '/api': {
-      target: process.env.VITE_API_BASE_URL,
+      target: process.env.API_BASE_URL,
       changeOrigin: true,
       rewrite: (path) => path.replace(/^\/api/, ''),
       secure: false,
@@ -36,7 +36,7 @@ The `api.ts` file has been updated to use the proxy endpoint instead of directly
 
 ```typescript
 const api = axios.create({
-  baseURL: '/api', // This will be proxied to VITE_API_BASE_URL by Vite
+  baseURL: '/api', // This will be proxied to API_BASE_URL by Vite
   headers: {
     'Content-Type': 'application/json',
   },
@@ -106,6 +106,6 @@ Options include:
 If you encounter issues with the proxy:
 
 1. Check the browser console for error messages
-2. Verify that the `.env` file contains the correct `VITE_API_BASE_URL` value
+2. Verify that the `.env` file contains the correct `API_BASE_URL` value
 3. Ensure the backend server is running and accessible
 4. Check for CORS headers in the backend response

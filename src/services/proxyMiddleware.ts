@@ -11,7 +11,7 @@ import axios, { AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 
 // Create a custom axios instance for the proxy
 const proxyClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
+  baseURL: import.meta.env.API_BASE_URL,
   timeout: 100000, // 100 seconds timeout
 });
 

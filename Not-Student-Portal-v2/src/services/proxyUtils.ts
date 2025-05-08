@@ -8,7 +8,7 @@ import axios, { AxiosRequestConfig, AxiosResponse, AxiosError, isAxiosError } fr
 
 // Constants
 export const PROXY_BASE = '/proxy';
-export const API_BASE_URL = process.env.VITE_API_BASE_URL || 'http://peoplepulse.diu.edu.bd:8189';
+export const API_BASE_URL = process.env.API_BASE_URL || 'http://peoplepulse.diu.edu.bd:8189';
 
 // Create a proxy client instance
 const proxyClient = axios.create({
@@ -191,7 +191,7 @@ export const checkProxyStatus = async (): Promise<{ status: string; message: str
 export const getProxyConfig = () => {
   return {
     baseUrl: '/api',
-    targetUrl: process.env.VITE_API_BASE_URL,
+    targetUrl: process.env.API_BASE_URL,
     isProxyEnabled: true,
   };
 };

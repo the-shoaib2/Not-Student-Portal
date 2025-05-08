@@ -22,7 +22,7 @@ export default defineConfig(({ mode }) => {
     server: {
       proxy: {
         '/api': {
-          target: env.VITE_API_BASE_URL.trim(),
+          target: env.API_BASE_URL.trim(),
           changeOrigin: true,
           secure: false,
           rewrite: (path) => path.replace(/^\/api/, ''),
@@ -32,7 +32,7 @@ export default defineConfig(({ mode }) => {
             });
             proxy.on('proxyReq', (proxyReq, req) => {
               // Log the full URL being requested
-              const fullUrl = new URL(req.url || '', env.VITE_API_BASE_URL.trim()).href;
+              const fullUrl = new URL(req.url || '', env.API_BASE_URL.trim()).href;
               console.log('[Proxy Request]', req.method, fullUrl);
               
               // Set proper headers
@@ -45,7 +45,7 @@ export default defineConfig(({ mode }) => {
           },
         },
         '/proxy': {
-          target: env.VITE_API_BASE_URL.trim(),
+          target: env.API_BASE_URL.trim(),
           changeOrigin: true,
           secure: false,
           rewrite: (path) => path.replace(/^\/proxy/, ''),
@@ -55,7 +55,7 @@ export default defineConfig(({ mode }) => {
             });
             proxy.on('proxyReq', (proxyReq, req) => {
               // Log the full URL being requested
-              const fullUrl = new URL(req.url || '', env.VITE_API_BASE_URL.trim()).href;
+              const fullUrl = new URL(req.url || '', env.API_BASE_URL.trim()).href;
               console.log('[Proxy Request]', {
                 method: req.method,
                 url: fullUrl,
