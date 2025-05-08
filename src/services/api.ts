@@ -126,6 +126,30 @@ export interface ForgotPasswordRequest {
   email: string;
 }
 
+export interface FindUserRequest {
+  email: string;
+}
+
+export interface FindUserResponse {
+  userId: string;
+  maskedEmail: string;
+  maskedPhone: string;
+  name: string;
+  avatar?: string;
+  recoveryMethods: {
+    email?: {
+      options: ('code' | 'link')[];
+    };
+    sms?: boolean;
+  };
+}
+
+export interface SendResetCodeRequest {
+  userId: string;
+  method: 'email' | 'sms';
+  type: 'code' | 'link';
+}
+
 // Profile Interfaces
 export interface StudentInfo {
   studentId: string;
@@ -403,6 +427,44 @@ export const authService = {
 
   forgotPassword: async (data: ForgotPasswordRequest): Promise<void> => {
     await api.post('/resetForgotPassword/forgotPassword', data);
+  },
+
+  findUser: async (data: FindUserRequest): Promise<FindUserResponse> => {
+    try {
+      const response = await proxyRequest({
+        method: 'POST',
+        url: '/resetForgotPassword/findUser',
+        data
+      });
+      return response;
+    } catch (error: any) {
+      let message = 'Failed to find user';
+      if (error.response?.data?.message) {
+        message = error.response.data.message;
+      } else if (error.message) {
+        message = error.message;
+      }
+      throw new Error(message);
+    }
+  },
+
+  sendResetCode: async (data: SendResetCodeRequest): Promise<void> => {
+    try {
+      const response = await proxyRequest({
+        method: 'POST',
+        url: '/resetForgotPassword/sendResetCode',
+        data
+      });
+      return response;
+    } catch (error: any) {
+      let message = 'Failed to send reset code';
+      if (error.response?.data?.message) {
+        message = error.response.data.message;
+      } else if (error.message) {
+        message = error.message;
+      }
+      throw new Error(message);
+    }
   },
 };
 
@@ -828,7 +890,41 @@ export const registeredCourseService = {
       },
     });
     return response || [];
-  }
+  },
+
+  /**
+   * Get routine for a specific course section
+   */
+  async getCourseRoutine(courseSectionId: string): Promise<any> {
+    const token = await profileService.getAuthToken();
+    const response = await proxyRequest({
+      method: 'GET',
+      url: `/registeredCourse/routine?courseSectionId=${courseSectionId}`,
+      headers: {
+        Authorization: `Bearer ${token}`,
+        accessToken: token,
+        'Accept': '*/*',
+      },
+    });
+    return response || null;
+  },
+
+  /**
+   * Get registered courses for a semester
+   */
+  async getRegisteredCourses(semesterId: string): Promise<any[]> {
+    const token = await profileService.getAuthToken();
+    const response = await proxyRequest({
+      method: 'GET',
+      url: `/registeredCourse?semesterId=${semesterId}`,
+      headers: {
+        Authorization: `Bearer ${token}`,
+        accessToken: token,
+        'Accept': '*/*',
+      },
+    });
+    return response || [];
+  },
 };
 
 // Exam Service
@@ -931,5 +1027,62 @@ export const dashboardService = {
     //   console.error('Error fetching CGPA data:', error);
     //   throw error;
     // }
-  }
+  },
+
+  // --- Live Result APIs ---
+  async getLiveResultSemesterList(): Promise<any[]> {
+    const token = await profileService.getAuthToken();
+    const response = await proxyRequest({
+      method: 'GET',
+      url: '/liveResult/semesterList',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        accessToken: token,
+        'Accept': '*/*',
+      },
+    });
+    return response || [];
+  },
+
+  async getTevalSubmitCheck(courseSectionId: string): Promise<any> {
+    const token = await profileService.getAuthToken();
+    const response = await proxyRequest({
+      method: 'GET',
+      url: `/liveResult/tevalSubmitCheck?courseSectionId=${courseSectionId}`,
+      headers: {
+        Authorization: `Bearer ${token}`,
+        accessToken: token,
+        'Accept': '*/*',
+      },
+    });
+    return response || null;
+  },
+
+  async getLiveRegisteredCourseList(semesterId: string): Promise<any[]> {
+    const token = await profileService.getAuthToken();
+    const response = await proxyRequest({
+      method: 'GET',
+      url: `/liveResult/registeredCourseList?semesterId=${semesterId}`,
+      headers: {
+        Authorization: `Bearer ${token}`,
+        accessToken: token,
+        'Accept': '*/*',
+      },
+    });
+    return response || [];
+  },
+
+  async getLiveResult(courseSectionId: string): Promise<any> {
+    const token = await profileService.getAuthToken();
+    const response = await proxyRequest({
+      method: 'GET',
+      url: `/liveResult?courseSectionId=${courseSectionId}`,
+      headers: {
+        Authorization: `Bearer ${token}`,
+        accessToken: token,
+        'Accept': '*/*',
+      },
+    });
+    return response || null;
+  },
 };

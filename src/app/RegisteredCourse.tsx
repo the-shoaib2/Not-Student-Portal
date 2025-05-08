@@ -1,273 +1,599 @@
-import React, { useState, useEffect } from 'react';
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../components/ui/table';
-import { registeredCourseService } from '../services/api';
-import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card';
-import PageTitle from '../components/PageTitle';
+"use client"
 
+import React, { useEffect, useCallback, useState } from "react"
+import { registeredCourseService } from "../services/api"
+import { Card, CardHeader, CardTitle, CardContent } from "../components/ui/card"
+import PageTitle from "../components/PageTitle"
+import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "../components/ui/table"
+import { ArrowUpDown } from "lucide-react"
+import {
+  type ColumnDef,
+  type SortingState,
+  flexRender,
+  getCoreRowModel,
+  getSortedRowModel,
+  useReactTable,
+  createColumnHelper,
+  type OnChangeFn,
+} from "@tanstack/react-table"
+import { useRegisteredCourseStore } from "../store/registeredCourseStore"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../components/ui/dropdown-menu"
+import { ChevronDown } from "lucide-react"
+
+// Types
 export interface SemesterInfo {
-  semesterId: string;
-  semesterYear: number;
-  semesterName: string;
+  semesterId: string
+  semesterYear: number
+  semesterName: string
 }
 
 interface CourseRoutine {
-  roomNo: string;
-  day: string;
-  levelTerm: string;
-  timeSlot: string;
-  teacher: string;
+  roomNo: string
+  day: string
+  levelTerm: string
+  timeSlot: string
+  teacher: string
 }
 
-interface RegisteredCourse {
-  routine: CourseRoutine;
-  courseCode: string;
-  courseTitle: string;
-  credit: number;
-  section: string;
-  teacher: string;
-  advised: boolean;
-  regClearance: boolean;
+export interface RegisteredCourse {
+  customCourseId: string
+  courseTitle: string
+  totalCredit: number
+  sectionName: string
+  employeeName: string
+  advisedStatus: string
+  regClearenc: string
+  semesterId: string
+  studentId: string
+  designation: string
+  semesterYear: number
+  semesterName: string
 }
 
-const RegisteredCourse: React.FC = () => {
-  const [selectedSemester, setSelectedSemester] = useState<SemesterInfo | null>(null);
-  const [registeredCourses, setRegisteredCourses] = useState<RegisteredCourse[]>([]);
-  const [loading, setLoading] = useState(true);
+// Column Helpers
+const columnHelper = createColumnHelper<CourseRoutine>()
+const registeredCourseHelper = createColumnHelper<RegisteredCourse>()
 
-  const [semesters, setSemesters] = useState<SemesterInfo[]>([]);
-  const [semesterLoading, setSemesterLoading] = useState(true);
+// Column Definitions
+const routineColumns: ColumnDef<CourseRoutine>[] = [
+  {
+    accessorKey: "roomNo",
+    header: "Room No",
+  },
+  {
+    accessorKey: "day",
+    header: "Day",
+  },
+  {
+    accessorKey: "levelTerm",
+    header: "Level Term",
+  },
+  {
+    accessorKey: "timeSlot",
+    header: "Time Slot",
+  },
+  {
+    accessorKey: "teacher",
+    header: "Teacher",
+  },
+]
 
-  useEffect(() => {
-    const fetchSemesters = async () => {
+// Components
+const SemesterSelector = React.memo(
+  ({
+    selectedSemester,
+    semesters,
+    onChange,
+    loading,
+  }: {
+    selectedSemester: SemesterInfo | null
+    semesters: SemesterInfo[]
+    onChange: (semester: SemesterInfo) => void
+    loading: boolean
+  }) => {
+    const [isChanging, setIsChanging] = useState(false);
+
+    const handleSemesterChange = async (semester: SemesterInfo) => {
+      setIsChanging(true);
       try {
-        setSemesterLoading(true);
-        
-        const res = await registeredCourseService.getSemesterList();
-        
-        if (!res || res.length === 0) {
-          console.error('No semesters found.');
-          return;
-        }
-
-        // Sort semesters by year (descending) and then by semester name
-        const sortedSemesters = res.sort((a: SemesterInfo, b: SemesterInfo) => {
-          if (b.semesterYear !== a.semesterYear) {
-            return b.semesterYear - a.semesterYear;
-          }
-          // Custom semester order: Fall > Summer > Spring > Short
-          const semesterOrder: Record<string, number> = { 'Fall': 4, 'Summer': 3, 'Spring': 2, 'Short': 1 };
-          return (semesterOrder[b.semesterName] ?? 0) - (semesterOrder[a.semesterName] ?? 0);
-        });
-
-        setSemesters(sortedSemesters);
-      } catch (err) {
-        console.error('Error fetching semesters:', err);
+        await onChange(semester);
       } finally {
-        setSemesterLoading(false);
+        setIsChanging(false);
       }
     };
 
-    fetchSemesters();
-  }, []);
+    // Group semesters by year
+    const groupedSemesters = semesters.reduce((acc, semester) => {
+      const year = semester.semesterYear;
+      if (!acc[year]) {
+        acc[year] = [];
+      }
+      acc[year].push(semester);
+      return acc;
+    }, {} as Record<number, SemesterInfo[]>);
 
-  useEffect(() => {
-    const fetchRegisteredCourses = async () => {
-      if (!selectedSemester) return;
+    // Sort years in descending order
+    const sortedYears = Object.keys(groupedSemesters).sort((a, b) => Number(b) - Number(a));
 
+    return (
+      <div className="w-full sm:w-auto flex-shrink-0 mb-2 sm:mb-0">
+        {loading ? (
+          <div className="w-full max-w-xs min-w-[200px] px-4 py-2 rounded border border-teal-300 text-teal-700 bg-white flex items-center justify-center">
+            <div className="h-5 w-5 border-2 border-teal-500 border-t-transparent rounded-full animate-spin mr-2"></div>
+            <span>Loading...</span>
+          </div>
+        ) : semesters.length > 0 ? (
+          <DropdownMenu>
+            <DropdownMenuTrigger 
+              className="w-full max-w-xs min-w-[200px] px-4 py-2 rounded border border-teal-300 text-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 text-base bg-white flex items-center justify-between"
+              disabled={isChanging}
+            >
+              <div className="flex items-center">
+                {isChanging && (
+                  <div className="h-4 w-4 border-2 border-teal-500 border-t-transparent rounded-full animate-spin mr-2"></div>
+                )}
+                <span>{selectedSemester ? `${selectedSemester.semesterName} ${selectedSemester.semesterYear}` : 'Select semester'}</span>
+              </div>
+              <ChevronDown className="h-4 w-4" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-[200px] max-h-[300px] overflow-y-auto">
+              {sortedYears.map((year) => (
+                <React.Fragment key={year}>
+                  <div className="px-2 py-1.5 text-sm font-semibold text-teal-700 bg-teal-50">
+                    {year}
+                  </div>
+                  {groupedSemesters[Number(year)]
+                    .sort((a, b) => {
+                      const semesterOrder: Record<string, number> = { Fall: 4, Summer: 3, Spring: 2, Short: 1 };
+                      return (semesterOrder[b.semesterName] ?? 0) - (semesterOrder[a.semesterName] ?? 0);
+                    })
+                    .map((sem) => (
+                      <DropdownMenuItem
+                        key={sem.semesterId}
+                        onClick={() => handleSemesterChange(sem)}
+                        className="cursor-pointer pl-4"
+                        disabled={isChanging}
+                      >
+                        {sem.semesterName} {sem.semesterYear}
+                      </DropdownMenuItem>
+                    ))}
+                </React.Fragment>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ) : (
+          <div className="w-full max-w-xs min-w-[200px] px-4 py-2 rounded border border-teal-300 text-teal-700 bg-white text-center">
+            No semesters available
+          </div>
+        )}
+      </div>
+    );
+  }
+);
+
+const RoutineCard = React.memo(
+  ({
+    title,
+    data,
+    columns,
+    sortColumn,
+    sortDirection,
+    onSort,
+  }: {
+    title: string
+    data: CourseRoutine[] | null
+    columns: ColumnDef<CourseRoutine>[]
+    sortColumn: string | null
+    sortDirection: "asc" | "desc"
+    onSort: (column: string | null, direction: "asc" | "desc") => void
+  }) => {
+    const initialSorting: SortingState = sortColumn ? [{ id: sortColumn, desc: sortDirection === "desc" }] : []
+    const [routineSorting, setRoutineSorting] = useState<SortingState>(initialSorting)
+
+    useEffect(() => {
+      if (sortColumn) {
+        setRoutineSorting([{ id: sortColumn, desc: sortDirection === "desc" }])
+      } else {
+        setRoutineSorting([])
+      }
+    }, [sortColumn, sortDirection])
+
+    const handleSortingChange: OnChangeFn<SortingState> = useCallback(
+      (updaterOrValue) => {
+        const updatedSorting = typeof updaterOrValue === 'function' 
+          ? updaterOrValue(routineSorting)
+          : updaterOrValue
+
+        setRoutineSorting(updatedSorting)
+
+        if (updatedSorting.length > 0) {
+          const { id, desc } = updatedSorting[0]
+          onSort(id, desc ? "desc" : "asc")
+        } else {
+          onSort(null, "asc")
+        }
+      },
+      [onSort, routineSorting]
+    )
+
+    const table = useReactTable({
+      data: data || [],
+      columns,
+      getCoreRowModel: getCoreRowModel(),
+      getSortedRowModel: getSortedRowModel(),
+      onSortingChange: handleSortingChange,
+      state: {
+        sorting: routineSorting,
+      },
+    })
+
+    return (
+      <Card className="w-full">
+        <CardHeader className="pb-0 px-4 pt-4">
+          <CardTitle className="text-sm sm:text-base font-medium text-teal-700 border-b pb-2 sm:pb-3">
+            {title}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="px-2 sm:px-2 pb-4 pt-2">
+          <div className="w-full overflow-x-auto rounded-md">
+            <Table>
+              <TableHeader>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <TableHead 
+                        key={header.id}
+                        className="cursor-pointer whitespace-nowrap text-center"
+                        onClick={() => header.column.toggleSorting()}
+                      >
+                        <div className="flex items-center justify-center">
+                          {flexRender(header.column.columnDef.header, header.getContext())}
+                          {header.column.getIsSorted() && <ArrowUpDown className="ml-2 h-4 w-4" />}
+                        </div>
+                      </TableHead>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableHeader>
+              <TableBody>
+                {!data ? (
+                  Array.from({ length: 5 }).map((_, index) => (
+                    <TableRow key={index}>
+                      {Array.from({ length: columns.length }).map((_, colIndex) => (
+                        <TableCell key={colIndex} className="text-center">
+                          <div className="h-4 w-full bg-muted rounded animate-pulse" />
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                ) : table.getRowModel().rows?.length ? (
+                  table.getRowModel().rows.map((row) => (
+                    <TableRow 
+                      key={row.id}
+                      className={row.index % 2 === 0 ? "bg-teal-50 hover:bg-teal-100" : "bg-white hover:bg-teal-100"}
+                    >
+                      {row.getVisibleCells().map((cell) => {
+                        const isLeftAligned = ['roomNo', 'day', 'teacher'].includes(cell.column.id);
+                        return (
+                          <TableCell 
+                            key={cell.id} 
+                            className={`whitespace-nowrap ${isLeftAligned ? 'text-left' : 'text-center'}`}
+                          >
+                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                          </TableCell>
+                        );
+                      })}
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={columns.length} className="text-center py-6">
+                      No routine selected
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+)
+
+const RegisteredCourse: React.FC = () => {
+  const {
+    registeredCourses,
+    loading,
+    selectedSemester,
+    semesters,
+    semesterLoading,
+    selectedRoutine,
+    selectedRoutineCourseTitle,
+    sortColumn,
+    sortDirection,
+    routineSortColumn,
+    routineSortDirection,
+    setRegisteredCourses,
+    setLoading,
+    setSelectedSemester,
+    setSemesters,
+    setSemesterLoading,
+    setSelectedRoutine,
+    setSelectedRoutineCourseTitle,
+    setSorting,
+    setRoutineSorting,
+  } = useRegisteredCourseStore()
+
+  const [courseSorting, setCourseSorting] = useState<SortingState>([])
+  const [isInitialLoad, setIsInitialLoad] = useState(true)
+
+  // Function to fetch registered courses for a semester
+  const fetchRegisteredCourses = useCallback(
+    async (semesterId: string) => {
       try {
-        setLoading(true);
-        
-        const selectedSemId = selectedSemester.semesterId;
-        const res = await registeredCourseService.getRegisteredCourses(selectedSemId);
+        setLoading(true)
+        const res = await registeredCourseService.getRegisteredCourses(semesterId)
         
         if (!res || res.length === 0) {
-          console.error('No courses found for this semester.');
+          console.error("No courses found for this semester.")
+          setRegisteredCourses([])
+          return
+        }
+        
+        setRegisteredCourses(res)
+      } catch (err) {
+        console.error("Error fetching registered courses:", err)
+        setRegisteredCourses([])
+      } finally {
+        setLoading(false)
+      }
+    },
+    [setLoading, setRegisteredCourses]
+  )
+
+  const fetchSemesters = useCallback(async () => {
+    try {
+      setSemesterLoading(true)
+      const res = await registeredCourseService.getSemesterList()
+      
+      if (!res || res.length === 0) {
+        console.error("No semesters found.")
+        setSemesters([])
+        return
+      }
+
+      // Sort semesters by year and name
+      const sortedSemesters = res.sort((a, b) => {
+        if (a.semesterYear !== b.semesterYear) {
+          return b.semesterYear - a.semesterYear;
+        }
+        const semesterOrder: Record<string, number> = { Fall: 4, Summer: 3, Spring: 2, Short: 1 };
+        return (semesterOrder[b.semesterName] ?? 0) - (semesterOrder[a.semesterName] ?? 0);
+      });
+
+      setSemesters(sortedSemesters)
+      
+      // Don't auto-select the first semester, keep it as 'Select semester' by default
+      if (isInitialLoad) {
+        setIsInitialLoad(false)
+      }
+    } catch (err) {
+      console.error("Error fetching semesters:", err)
+      setSemesters([])
+    } finally {
+      setSemesterLoading(false)
+    }
+  }, [setSemesters, setSemesterLoading, isInitialLoad])
+
+  const handleSemesterChange = useCallback(
+    async (semester: SemesterInfo) => {
+      // Update UI immediately
+      setSelectedSemester(semester);
+      setSelectedRoutine(null);
+      setSelectedRoutineCourseTitle("");
+      
+      // Show loading state immediately
+      setLoading(true);
+      
+      try {
+        // Fetch courses in the background
+        const res = await registeredCourseService.getRegisteredCourses(semester.semesterId);
+        
+        if (!res || res.length === 0) {
+          console.error("No courses found for this semester.");
           setRegisteredCourses([]);
           return;
         }
         
         setRegisteredCourses(res);
       } catch (err) {
-        console.error('Error fetching registered courses:', err);
+        console.error("Error fetching registered courses:", err);
         setRegisteredCourses([]);
       } finally {
         setLoading(false);
       }
-    };
+    },
+    [setSelectedSemester, setSelectedRoutine, setSelectedRoutineCourseTitle, setRegisteredCourses]
+  );
 
-    fetchRegisteredCourses();
-  }, [selectedSemester]);
+  const registeredCourseColumns = React.useMemo(
+    () => [
+      registeredCourseHelper.accessor("customCourseId", {
+        header: "Course Code",
+        cell: (info) => <div className="text-left">{info.getValue()}</div>
+      }),
+      registeredCourseHelper.accessor("courseTitle", {
+        header: "Course Title",
+        cell: (info) => <div className="text-left">{info.getValue()}</div>
+      }),
+      registeredCourseHelper.accessor("totalCredit", {
+        header: "Credit",
+      }),
+      registeredCourseHelper.accessor("sectionName", {
+        header: "Section",
+      }),
+      registeredCourseHelper.accessor("employeeName", {
+        header: "Teacher",
+        cell: (info) => <div className="text-left">{info.getValue()}</div>
+      }),
+      registeredCourseHelper.accessor("advisedStatus", {
+        header: "Advised",
+      }),
+      registeredCourseHelper.accessor("regClearenc", {
+        header: "Reg. Clearance",
+      }),
+      registeredCourseHelper.display({
+        id: "actions",
+        header: "Actions",
+        cell: ({ row }) => (
+          <button
+            onClick={() => handleRoutineClick(row.original)}
+            className="px-3 py-1 text-xs bg-teal-500 text-white rounded hover:bg-teal-600 transition-colors"
+          >
+            Routine
+          </button>
+        ),
+      }),
+    ],
+    []
+  )
 
-  if (semesterLoading) {
-    return <div className="flex gap-2 animate-pulse my-4 justify-center">
-      {[...Array(3)].map((_, idx) => (
-        <div key={idx} className="h-8 w-24 bg-gray-200 rounded" />
-      ))}
-    </div>;
-  }
+  const table = useReactTable({
+    data: registeredCourses || [],
+    columns: registeredCourseColumns,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    onSortingChange: setCourseSorting,
+    state: {
+      sorting: courseSorting,
+    },
+  })
 
-  if (loading || !selectedSemester) {
-    return (
-      <Card className="shadow-sm overflow-hidden animate-in fade-in-50 duration-500 max-w-3xl mx-auto">
-        <CardHeader className="p-2 sm:p-3 bg-gradient-to-r from-gray-50 to-gray-100 border-b">
-          <CardTitle className="h-5 w-32 sm:h-6 sm:w-48 bg-gray-200 rounded-md animate-pulse mx-auto" />
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto rounded-md border border-teal-100 bg-white">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="h-5 sm:h-7 bg-teal-600 text-white text-center border border-teal-200 px-0.5 sm:px-1 text-xs sm:text-xs whitespace-nowrap">Routine</TableHead>
-                  <TableHead className="h-5 sm:h-7 bg-teal-600 text-white text-center border border-teal-200 px-0.5 sm:px-1 text-xs sm:text-xs whitespace-nowrap">Course Code</TableHead>
-                  <TableHead className="h-5 sm:h-7 bg-teal-600 text-white text-center border border-teal-200 px-0.5 sm:px-1 text-xs sm:text-xs whitespace-nowrap">Course Title</TableHead>
-                  <TableHead className="h-5 sm:h-7 bg-teal-600 text-white text-center border border-teal-200 px-0.5 sm:px-1 text-xs sm:text-xs whitespace-nowrap">Credit</TableHead>
-                  <TableHead className="h-5 sm:h-7 bg-teal-600 text-white text-center border border-teal-200 px-0.5 sm:px-1 text-xs sm:text-xs whitespace-nowrap">Section</TableHead>
-                  <TableHead className="h-5 sm:h-7 bg-teal-600 text-white text-center border border-teal-200 px-0.5 sm:px-1 text-xs sm:text-xs whitespace-nowrap">Teacher</TableHead>
-                  <TableHead className="h-5 sm:h-7 bg-teal-600 text-white text-center border border-teal-200 px-0.5 sm:px-1 text-xs sm:text-xs whitespace-nowrap">Advised</TableHead>
-                  <TableHead className="h-5 sm:h-7 bg-teal-600 text-white text-center border border-teal-200 px-0.5 sm:px-1 text-xs sm:text-xs whitespace-nowrap">Reg Clearance</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {[...Array(5)].map((_, idx) => (
-                  <TableRow key={idx}>
-                    <TableCell className="w-24 sm:w-36"><div className="h-3 w-16 sm:h-4 sm:w-24 bg-gray-200 rounded-md animate-pulse mx-auto" /></TableCell>
-                    <TableCell><div className="h-3 w-10 sm:h-4 sm:w-16 bg-gray-200 rounded-md animate-pulse mx-auto" /></TableCell>
-                    <TableCell><div className="h-3 w-10 sm:h-4 sm:w-16 bg-gray-200 rounded-md animate-pulse mx-auto" /></TableCell>
-                    <TableCell><div className="h-3 w-10 sm:h-4 sm:w-16 bg-gray-200 rounded-md animate-pulse mx-auto" /></TableCell>
-                    <TableCell><div className="h-3 w-10 sm:h-4 sm:w-16 bg-gray-200 rounded-md animate-pulse mx-auto" /></TableCell>
-                    <TableCell><div className="h-3 w-10 sm:h-4 sm:w-16 bg-gray-200 rounded-md animate-pulse mx-auto" /></TableCell>
-                    <TableCell><div className="h-3 w-10 sm:h-4 sm:w-16 bg-gray-200 rounded-md animate-pulse mx-auto" /></TableCell>
-                    <TableCell><div className="h-3 w-10 sm:h-4 sm:w-16 bg-gray-200 rounded-md animate-pulse mx-auto" /></TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
+  const handleRoutineClick = useCallback(
+    async (course: RegisteredCourse) => {
+      try {
+        setSelectedRoutine(null)
+        setSelectedRoutineCourseTitle("")
+        const routine = await registeredCourseService.getCourseRoutine(course.sectionName)
+        setSelectedRoutine(routine)
+        setSelectedRoutineCourseTitle(course.courseTitle)
+      } catch (err) {
+        setSelectedRoutine(null)
+        setSelectedRoutineCourseTitle("")
+      }
+    },
+    [setSelectedRoutine, setSelectedRoutineCourseTitle]
+  )
+
+  const handleRoutineSort = useCallback(
+    (column: string | null, direction: "asc" | "desc") => {
+      setRoutineSorting(column, direction)
+    },
+    [setRoutineSorting]
+  )
+
+  // Initial data fetch
+  useEffect(() => {
+    const loadData = async () => {
+      await fetchSemesters()
+    }
+    loadData()
+  }, [fetchSemesters])
 
   return (
-    <div>
+    <>
       <PageTitle title="Registered Courses" />
-      <Card className="shadow-sm overflow-hidden max-w-4xl mx-auto animate-in fade-in-50 duration-500">
-        <CardHeader className="pb-0">
-          <CardTitle className="text-sm sm:text-base font-medium text-teal-700 border-b pb-1 sm:pb-2">Registered Courses</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col items-center my-4 space-y-4">
-            <select
-              id="semester-select"
-              name="semester"
-              aria-label="Select Semester"
-              value={selectedSemester?.semesterId || ''}
-              onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-                const selectedSemId = e.target.value;
-                const selectedSem = semesters.find(sem => sem.semesterId === selectedSemId);
-                if (selectedSem) {
-                  setSelectedSemester(selectedSem);
-                } else {
-                  console.error('Invalid semester selected');
-                }
-              }}
-              className="w-64 px-4 py-2 rounded border border-teal-300 text-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500"
-              required
-            >
-              <option value="" disabled>Select a Semester</option>
-              {semesters.map(sem => (
-                <option 
-                  key={sem.semesterId} 
-                  value={sem.semesterId}
-                  aria-label={`${sem.semesterName} ${sem.semesterYear}`}
-                >
-                  {sem.semesterName} {sem.semesterYear}
-                </option>
-              ))}
-            </select>
+      <div className="px-4 py-4 w-full flex flex-col items-center">
+        <div className="flex flex-col sm:flex-row justify-between items-start gap-4 w-full max-w-5xl mb-6">
+          <SemesterSelector 
+            selectedSemester={selectedSemester}
+            semesters={semesters}
+            onChange={handleSemesterChange}
+            loading={semesterLoading}
+          />
+          <div className="w-full sm:w-3/4 flex-1 min-w-0">
+            <RoutineCard
+              title={`Routine : ${selectedRoutineCourseTitle || "No routine selected"}`}
+              data={selectedRoutine}
+              columns={routineColumns}
+              sortColumn={routineSortColumn}
+              sortDirection={routineSortDirection}
+              onSort={handleRoutineSort}
+            />
           </div>
-
-          {selectedSemester && (
-            <div>
-              <div className="mb-6">
-                <h3 className="text-md font-semibold mb-2">Course Routine</h3>
-                <div className="overflow-x-auto rounded-md border border-teal-100 bg-white">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="h-7 bg-teal-600 text-white text-center border border-teal-200 px-1 text-xs whitespace-nowrap">Room No</TableHead>
-                        <TableHead className="h-7 bg-teal-600 text-white text-center border border-teal-200 px-1 text-xs whitespace-nowrap">Day</TableHead>
-                        <TableHead className="h-7 bg-teal-600 text-white text-center border border-teal-200 px-1 text-xs whitespace-nowrap">Level Term</TableHead>
-                        <TableHead className="h-7 bg-teal-600 text-white text-center border border-teal-200 px-1 text-xs whitespace-nowrap">Time Slot</TableHead>
-                        <TableHead className="h-7 bg-teal-600 text-white text-center border border-teal-200 px-1 text-xs whitespace-nowrap">Teacher</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                    {registeredCourses.length > 0 ? (
-                      registeredCourses.map((course, index) => (
-                        <TableRow key={index} className={index % 2 === 0 ? "bg-teal-50 hover:bg-teal-100 transition" : "bg-white hover:bg-teal-100 transition"}>
-                          <TableCell className="text-center border border-teal-100 px-1 py-0.5 text-xs">{course.routine.roomNo || 'N/A'}</TableCell>
-                          <TableCell className="text-center border border-teal-100 px-1 py-0.5 text-xs">{course.routine.day || 'N/A'}</TableCell>
-                          <TableCell className="text-center border border-teal-100 px-1 py-0.5 text-xs">{course.routine.levelTerm || 'N/A'}</TableCell>
-                          <TableCell className="text-center border border-teal-100 px-1 py-0.5 text-xs">{course.routine.timeSlot || 'N/A'}</TableCell>
-                          <TableCell className="text-center border border-teal-100 px-1 py-0.5 text-xs">{course.routine.teacher || 'N/A'}</TableCell>
-                        </TableRow>
-                      ))
-                    ) : (
-                      <TableRow>
-                        <TableCell colSpan={5} className="text-center text-gray-400 py-6 text-sm">
-                          No course routine available
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </div>
-            </div>
-
-            <div className="mb-6">
-              <h3 className="text-md font-semibold mb-2">Registered Course List</h3>
-              <div className="overflow-x-auto rounded-md border border-teal-100 bg-white">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="text-center border border-teal-200 px-1 text-xs whitespace-nowrap bg-teal-600 text-white">Course Code</TableHead>
-                      <TableHead className="text-center border border-teal-200 px-1 text-xs whitespace-nowrap bg-teal-600 text-white">Course Title</TableHead>
-                      <TableHead className="text-center border border-teal-200 px-1 text-xs whitespace-nowrap bg-teal-600 text-white">Credit</TableHead>
-                      <TableHead className="text-center border border-teal-200 px-1 text-xs whitespace-nowrap bg-teal-600 text-white">Section</TableHead>
-                      <TableHead className="text-center border border-teal-200 px-1 text-xs whitespace-nowrap bg-teal-600 text-white">Teacher</TableHead>
-                      <TableHead className="text-center border border-teal-200 px-1 text-xs whitespace-nowrap bg-teal-600 text-white">Advised</TableHead>
-                      <TableHead className="text-center border border-teal-200 px-1 text-xs whitespace-nowrap bg-teal-600 text-white">Reg Clearance</TableHead>
+        </div>
+        <Card className="max-w-5xl w-full mx-auto">
+          <CardHeader className="pb-0 px-4 pt-4">
+            <CardTitle className="text-sm sm:text-base font-medium text-teal-700 border-b pb-2 sm:pb-3">
+              Registered Courses
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="px-2 sm:px-2 pb-4 pt-2">
+            <div className="w-full overflow-x-auto rounded-md">
+              <Table>
+                <TableHeader>
+                  {table.getHeaderGroups().map((headerGroup) => (
+                    <TableRow key={headerGroup.id}>
+                      {headerGroup.headers.map((header) => (
+                        <TableHead 
+                          key={header.id}
+                          className="cursor-pointer whitespace-nowrap sticky top-0 z-10 text-center"
+                          onClick={() => header.column.toggleSorting()}
+                        >
+                          <div className="flex items-center justify-center">
+                            {flexRender(header.column.columnDef.header, header.getContext())}
+                            {header.column.getIsSorted() && <ArrowUpDown className="ml-2 h-4 w-4" />}
+                          </div>
+                        </TableHead>
+                      ))}
                     </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {registeredCourses.length > 0 ? (
-                      registeredCourses.map((course, index) => (
-                        <TableRow key={index} className={index % 2 === 0 ? "bg-teal-50 hover:bg-teal-100 transition" : "bg-white hover:bg-teal-100 transition"}>
-                          <TableCell className="text-center border border-teal-100 px-1 py-0.5 text-xs">{course.courseCode}</TableCell>
-                          <TableCell className="text-center border border-teal-100 px-1 py-0.5 text-xs">{course.courseTitle}</TableCell>
-                          <TableCell className="text-center border border-teal-100 px-1 py-0.5 text-xs">{course.credit}</TableCell>
-                          <TableCell className="text-center border border-teal-100 px-1 py-0.5 text-xs">{course.section}</TableCell>
-                          <TableCell className="text-center border border-teal-100 px-1 py-0.5 text-xs">{course.teacher}</TableCell>
-                          <TableCell className="text-center border border-teal-100 px-1 py-0.5 text-xs">{course.advised ? 'Yes' : 'No'}</TableCell>
-                          <TableCell className="text-center border border-teal-100 px-1 py-0.5 text-xs">{course.regClearance ? 'Yes' : 'No'}</TableCell>
-                        </TableRow>
-                      ))
-                    ) : (
-                      <TableRow>
-                        <TableCell colSpan={7} className="text-center text-gray-400 py-6 text-sm">
-                          No registered courses available
-                        </TableCell>
+                  ))}
+                </TableHeader>
+                <TableBody>
+                  {loading || !table.getRowModel().rows?.length ? (
+                    Array.from({ length: 5 }).map((_, index) => (
+                      <TableRow key={index}>
+                        {Array.from({ length: registeredCourseColumns.length }).map((_, colIndex) => (
+                          <TableCell key={colIndex} className="text-center">
+                            <div className="h-4 w-full bg-muted rounded animate-pulse" />
+                          </TableCell>
+                        ))}
                       </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </div>
+                    ))
+                  ) : (
+                    table.getRowModel().rows.map((row) => (
+                      <TableRow 
+                        key={row.id}
+                        className={row.index % 2 === 0 ? "bg-teal-50 hover:bg-teal-100" : "bg-white hover:bg-teal-100"}
+                      >
+                        {row.getVisibleCells().map((cell) => {
+                          const isLeftAligned = ['customCourseId', 'courseTitle', 'employeeName'].includes(cell.column.id);
+                          return (
+                            <TableCell 
+                              key={cell.id} 
+                              className={`whitespace-nowrap ${isLeftAligned ? 'text-left' : 'text-center'}`}
+                            >
+                              {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                            </TableCell>
+                          );
+                        })}
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
             </div>
-            </div>
-        </CardContent>
-      </Card>
-    );
+          </CardContent>
+        </Card>
+      </div>
+    </>
+  )
 }
 
-export default RegisteredCourse;
+export default React.memo(RegisteredCourse)

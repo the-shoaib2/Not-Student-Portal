@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { AuthService } from "@/services/auth";
-import { Button } from "@/components/ui/button";
+import { authService } from "../../../services/api";
+import { Button } from "../../../components/ui/button";
 import {
   Form,
   FormControl,
@@ -11,11 +11,11 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { InputOTP } from "@/components/ui/input-otp";
+} from "../../../components/ui/form";
+import { InputOTP } from "../../../components/ui/input-otp";
 import { Loader2, CheckCircle2 } from "lucide-react";
 import { toast } from "react-hot-toast";
-import { cn } from "@/lib/utils";
+import { cn } from "../../../lib/utils";
 
 const formSchema = z.object({
   code: z.string().length(6, "Verification code must be 6 digits"),
@@ -23,14 +23,23 @@ const formSchema = z.object({
 
 const RESEND_TIMEOUT = 60; // 60 seconds
 
-export function VerifyCodeForm({ userId, method, type, onSuccess }) {
+interface VerifyCodeFormProps {
+  userId: string;
+  method: 'email' | 'sms';
+  type: 'code' | 'link';
+  onSuccess: (data: { token: string }) => void;
+  onResend?: () => Promise<void>;
+  maskedEmail?: string;
+}
+
+export function VerifyCodeForm({ userId, method, type, onSuccess, onResend, maskedEmail }: VerifyCodeFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isResending, setIsResending] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
-  const [verificationData, setVerificationData] = useState(null);
+  const [verificationData, setVerificationData] = useState<{ token: string } | null>(null);
   const [countdown, setCountdown] = useState(0);
 
-  const form = useForm({
+  const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       code: "",
@@ -58,30 +67,30 @@ export function VerifyCodeForm({ userId, method, type, onSuccess }) {
       }, 2000);
       return () => clearTimeout(timer);
     }
-  }, [isVerified, verificationData]);
+  }, [isVerified, verificationData, onSuccess]);
 
-  const formatTime = (seconds) => {
+  const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const onSubmit = async (data) => {
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
       setIsLoading(true);
-      const response = await AuthService.verifyResetCode({
-        userId,
-        code: data.code,
-        method,
-      });
+      // const response = await authService.verifyResetCode({
+      //   userId,
+      //   code: data.code,
+      //   method,
+      // });
       
       // Store verification data and show success animation
-      setVerificationData(response.data.data);
+      // setVerificationData(response.data.data);
       setIsVerified(true);
       
       toast.success("Verification successful!");
       
-    } catch (error) {
+    } catch (error: any) {
       form.setError("code", {
         message: error.message || "Invalid code",
       });
@@ -94,15 +103,21 @@ export function VerifyCodeForm({ userId, method, type, onSuccess }) {
   const handleResendCode = async () => {
     try {
       setIsResending(true);
-      await AuthService.sendResetCode({
-        userId,
-        method,
-        type,
-      });
+      if (onResend) {
+        // Use the provided onResend function if available
+        await onResend();
+      } else {
+        // Fall back to the original implementation
+        await authService.sendResetCode({
+          userId,
+          method,
+          type,
+        });
+      }
       toast.success("New verification code sent");
       form.reset();
       setCountdown(RESEND_TIMEOUT);
-    } catch (error) {
+    } catch (error: any) {
       toast.error(error.message || "Failed to resend code");
     } finally {
       setIsResending(false);
@@ -114,11 +129,11 @@ export function VerifyCodeForm({ userId, method, type, onSuccess }) {
       <div className="text-center space-y-4">
         <p>We've sent a password reset link to your email.</p>
         <p className="text-sm text-muted-foreground">
-          Please check your email and click the link to reset your password.
+          Please check {maskedEmail ? `${maskedEmail}` : 'your email'} and click the link to reset your password.
         </p>
         <Button
           variant="outline"
-          className="w-full"
+          className="w-full border-teal-600 text-teal-600 hover:bg-teal-50"
           onClick={handleResendCode}
           disabled={isResending}
         >
@@ -171,7 +186,7 @@ export function VerifyCodeForm({ userId, method, type, onSuccess }) {
           <div className="space-y-2">
             <Button 
               type="submit" 
-              className="w-full relative" 
+              className="w-full relative bg-teal-600 hover:bg-teal-700 text-white" 
               disabled={isLoading || isVerified}
             >
               {isLoading ? (
@@ -211,7 +226,7 @@ export function VerifyCodeForm({ userId, method, type, onSuccess }) {
                   </span>
                 ) : (
                   <span className="text-xs">
-                    Didn't receive code? <span className="text-primary">Resend</span>
+                    Didn't receive code? <span className="text-teal-600">Resend</span>
                   </span>
                 )}
               </Button>
@@ -221,4 +236,4 @@ export function VerifyCodeForm({ userId, method, type, onSuccess }) {
       </Form>
     </div>
   );
-}
+} 

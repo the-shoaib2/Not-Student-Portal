@@ -4,33 +4,33 @@ import { useAuth } from '../contexts/AuthContext';
 import { Skeleton } from './Skeleton';
 
 // Lazy load all components
-const Home = lazy(() => import('../app/Home.tsx'));
-const Login = lazy(() => import('../app/Login.tsx'));
-const Result = lazy(() => import('../app/Result.tsx'));
-const Notices = lazy(() => import('../app/Notices.tsx'));
-const CertificateVerify = lazy(() => import('../app/CertificateVerify.tsx'));
-const Internship = lazy(() => import('../app/Internship.tsx'));
-const Hall = lazy(() => import('../app/Hall.tsx'));
-const StudentApplication = lazy(() => import('../app/StudentApplication.tsx'));
-const Calendar = lazy(() => import('../app/Calendar.tsx'));
-const Library = lazy(() => import('../app/Library.tsx'));
-const SkillJobs = lazy(() => import('../app/SkillJobs.tsx'));
-const Dashboard = lazy(() => import('../app/Dashboard.tsx'));
-const Profile = lazy(() => import('../app/Profile.tsx'));
-const ProfileUpdate = lazy(() => import('../app/ProfileUpdate.tsx'));
-const PasswordChange = lazy(() => import('../app/PasswordChange.tsx'));
-const PaymentLedger = lazy(() => import('../app/PaymentLedger.tsx'));
-const PaymentScheme = lazy(() => import('../app/PaymentScheme.tsx'));
-const RegistrationExamClearance = lazy(() => import('../app/RegistrationExamClearance.tsx'));
-const RegisteredCourse = lazy(() => import('../app/RegisteredCourse.tsx'));
-const LiveResult = lazy(() => import('../app/LiveResult.tsx'));
-const TeachingEvaluation = lazy(() => import('../app/TeachingEvaluation.tsx'));
-const AlumniProfessional = lazy(() => import('../app/AlumniProfessional.tsx'));
-const ConvocationApply = lazy(() => import('../app/ConvocationApply.tsx'));
-const CertificateTranscriptApply = lazy(() => import('../app/CertificateTranscriptApply.tsx'));
-const OnlineExam = lazy(() => import('../app/OnlineExam.tsx'));
-const Laptop = lazy(() => import('../app/Laptop.tsx'));
-const Career = lazy(() => import('../app/Career.tsx'));
+const Home = lazy(() => import('../app/Home'));
+const Login = lazy(() => import('../app/Login'));
+const Result = lazy(() => import('../app/Result'));
+const Notices = lazy(() => import('../app/Notices'));
+const CertificateVerify = lazy(() => import('../app/CertificateVerify'));
+const Internship = lazy(() => import('../app/Internship'));
+const Hall = lazy(() => import('../app/Hall'));
+const StudentApplication = lazy(() => import('../app/StudentApplication'));
+const Calendar = lazy(() => import('../app/Calendar'));
+const Library = lazy(() => import('../app/Library'));
+const SkillJobs = lazy(() => import('../app/SkillJobs'));
+const Dashboard = lazy(() => import('../app/Dashboard'));
+const Profile = lazy(() => import('../app/Profile'));
+const ProfileUpdate = lazy(() => import('../app/ProfileUpdate'));
+const PasswordChange = lazy(() => import('../app/PasswordChange'));
+const PaymentLedger = lazy(() => import('../app/PaymentLedger'));
+const PaymentScheme = lazy(() => import('../app/PaymentScheme'));
+const RegistrationExamClearance = lazy(() => import('../app/RegistrationExamClearance'));
+const RegisteredCourse = lazy(() => import('../app/RegisteredCourse'));
+const LiveResult = lazy(() => import('../app/LiveResult'));
+const TeachingEvaluation = lazy(() => import('../app/TeachingEvaluation'));
+const AlumniProfessional = lazy(() => import('../app/AlumniProfessional'));
+const ConvocationApply = lazy(() => import('../app/ConvocationApply'));
+const CertificateTranscriptApply = lazy(() => import('../app/CertificateTranscriptApply'));
+const OnlineExam = lazy(() => import('../app/OnlineExam'));
+const Laptop = lazy(() => import('../app/Laptop'));
+const Career = lazy(() => import('../app/Career'));
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated } = useAuth();
@@ -53,7 +53,7 @@ const LazyComponent = ({ component: Component }: { component: React.ComponentTyp
 
 const MainContent: React.FC = () => {
   return (
-    <div className="flex-grow">
+    <div className="w-full">
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<LazyComponent component={Home} />} />

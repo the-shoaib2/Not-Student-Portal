@@ -11,7 +11,13 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [react()],
     optimizeDeps: {
-      exclude: ['lucide-react'],
+      include: ['@tanstack/react-table', 'lucide-react'],
+      exclude: [],
+    },
+    build: {
+      commonjsOptions: {
+        include: [/node_modules/],
+      },
     },
     server: {
       proxy: {

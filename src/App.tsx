@@ -34,7 +34,9 @@ function App() {
             <Navbar toggleSidebar={toggleSidebar} />
             <div className="flex flex-grow relative pt-16">
               <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
-              <MainContent />
+              <main className="flex-1 w-full mx-auto ">
+                <MainContent />
+              </main>
             </div>
             <Footer />
           </div>

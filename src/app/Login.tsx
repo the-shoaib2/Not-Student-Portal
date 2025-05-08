@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate,useLocation  } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Dialog, Transition } from '@headlessui/react';
 import * as Tabs from '@radix-ui/react-tabs';
 import { cn } from '../lib/utils';
@@ -45,7 +45,7 @@ const Login: React.FC = () => {
 
       // Store user data and token
       login(response);
-      
+
       toast.success(`Welcome back, ${response.name}!`);
       navigate(location.state?.from?.pathname || '/');
     } catch (error) {
@@ -60,26 +60,7 @@ const Login: React.FC = () => {
     }
   };
 
-  const handleForgotPassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email) {
-      setForgotPasswordError('Please enter your email address');
-      toast.error('Please enter your email address');
-      return;
-    }
-    setForgotPasswordError('');
-    setForgotPasswordSuccess('');
-    try {
-      await authService.forgotPassword({ email });
-      setForgotPasswordSuccess('Password reset link has been sent to your email. Please check your inbox and spam folder.');
-      toast.success('Password reset link sent!');
-      setIsForgotPasswordOpen(false);
-      setEmail('');
-    } catch (err: any) {
-      setForgotPasswordError(err?.message || 'Failed to send reset link');
-      toast.error(err?.message || 'Failed to send reset link');
-    }
-  };
+
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center ">
@@ -122,8 +103,8 @@ const Login: React.FC = () => {
                 </button>
               </div>
               {error && <div className="text-red-500 text-xs mb-2">{error}</div>}
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 className="w-full bg-teal-600 text-white py-2 rounded hover:bg-teal-700 transition mb-4 text-xs flex items-center justify-center gap-2"
                 disabled={isLoading}
               >
@@ -136,13 +117,15 @@ const Login: React.FC = () => {
                   'LOGIN'
                 )}
               </button>
-              <button
+              <div className="flex justify-end">              
+                <button
                 type="button"
                 onClick={() => setIsForgotPasswordOpen(true)}
                 className="text-teal-600 text-xs hover:text-teal-700"
               >
                 Forgot Password?
               </button>
+              </div>
             </form>
           </div>
 
@@ -182,8 +165,8 @@ const Login: React.FC = () => {
                 </Tabs.Trigger>
               </Tabs.List>
 
-              <Tabs.Content 
-                value="new-student" 
+              <Tabs.Content
+                value="new-student"
                 className="mt-4 data-[state=inactive]:hidden data-[state=active]:animate-fadeIn"
               >
                 <div className="space-y-4">
@@ -194,8 +177,8 @@ const Login: React.FC = () => {
                 </div>
               </Tabs.Content>
 
-              <Tabs.Content 
-                value="what-is-portal" 
+              <Tabs.Content
+                value="what-is-portal"
                 className="mt-4 data-[state=inactive]:hidden data-[state=active]:animate-fadeIn"
               >
                 <div className="space-y-4">
@@ -213,8 +196,8 @@ const Login: React.FC = () => {
                 </div>
               </Tabs.Content>
 
-              <Tabs.Content 
-                value="how-to-use" 
+              <Tabs.Content
+                value="how-to-use"
                 className="mt-4 data-[state=inactive]:hidden data-[state=active]:animate-fadeIn"
               >
                 <div className="space-y-4">
@@ -240,28 +223,32 @@ const Login: React.FC = () => {
         >
           <Transition.Child
             as={React.Fragment}
-            enter="ease-out duration-300"
+            enter="ease-out duration-500"
             enterFrom="opacity-0"
             enterTo="opacity-100"
-            leave="ease-in duration-200"
+            leave="ease-in duration-400"
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
+            <div className="fixed inset-0 bg-black/30 backdrop-blur-sm" aria-hidden="true" />
           </Transition.Child>
 
           <Transition.Child
             as={React.Fragment}
-            enter="ease-out duration-300"
-            enterFrom="opacity-0 scale-95"
-            enterTo="opacity-100 scale-100"
-            leave="ease-in duration-200"
-            leaveFrom="opacity-100 scale-100"
-            leaveTo="opacity-0 scale-95"
+            enter="ease-out duration-500"
+            enterFrom="opacity-0 scale-95 translate-y-4"
+            enterTo="opacity-100 scale-100 translate-y-0"
+            leave="ease-in duration-400"
+            leaveFrom="opacity-100 scale-100 translate-y-0"
+            leaveTo="opacity-0 scale-95 translate-y-4"
           >
             <div className="fixed inset-0 flex items-center justify-center z-50">
-              <Dialog.Panel className="bg-white rounded-lg shadow-lg p-0 w-full max-w-md mx-auto">
-                <ForgotPasswordForm />
+              <Dialog.Panel className="bg-white rounded-lg shadow-lg p-0 w-full max-w-sm mx-auto transform transition-all">
+                <div className="p-4 border-b border-gray-100 text-center">
+                  <h3 className="text-base font-semibold text-gray-900">Forgot Password</h3>
+                  <p className="text-xs text-gray-500 mt-1">Enter your email to receive a password reset link</p>
+                </div>
+                <ForgotPasswordForm onClose={() => setIsForgotPasswordOpen(false)} />
               </Dialog.Panel>
             </div>
           </Transition.Child>
