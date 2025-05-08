@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
-import Login from '@/app/login/Login';
+import { useAuth } from '@/contexts/AuthContext';
 
 const DynamicLogin = dynamic(() => import('@/app/login/Login'), {
   ssr: false,
@@ -13,14 +13,14 @@ export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const from = searchParams.get('from') || '/';
+  const { isAuthenticated } = useAuth();
 
-  // Check if user is already authenticated
+  // Handle authenticated users
   useEffect(() => {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('user') : null;
-    if (token) {
+    if (isAuthenticated) {
       router.push(from);
     }
-  }, [router, from]);
+  }, [isAuthenticated, router, from]);
 
   return <DynamicLogin />;
 }

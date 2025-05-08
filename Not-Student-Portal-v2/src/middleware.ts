@@ -4,31 +4,27 @@ import type { NextRequest } from 'next/server'
 export function middleware(request: NextRequest) {
   // Allow NextAuth.js API routes
   if (request.nextUrl.pathname.startsWith('/api/auth')) {
-    return NextResponse.next()
+    return NextResponse.next();
+  }
+
+  // Define public routes that don't require authentication
+  const publicRoutes = ['/login', '/result', '/notices', '/certificate-verify'];
+  
+  // Check if current route is public
+  if (publicRoutes.some(route => request.nextUrl.pathname.startsWith(route))) {
+    return NextResponse.next();
   }
 
   // Get auth token from cookies
   const token = request.cookies.get('next-auth.session-token')?.value;
   const isAuth = !!token;
 
-  // If user is authenticated and trying to access login
-  if (isAuth && request.nextUrl.pathname === '/login') {
-    // Redirect to home page
-    return NextResponse.redirect(new URL('/', request.url));
-  }
-
-  // If user is not authenticated and trying to access protected routes
-  if (!isAuth && !request.nextUrl.pathname.startsWith('/login')) {
-    // Get the current path to redirect back after login
-    let from = request.nextUrl.pathname;
-    if (request.nextUrl.search) {
-      from += request.nextUrl.search;
-    }
-
-    // Redirect to login with return URL
-    return NextResponse.redirect(
-      new URL(`/login?from=${encodeURIComponent(from)}`, request.url)
-    );
+  // If user is not authenticated, redirect to login with return URL
+  if (!isAuth) {
+    const from = request.nextUrl.pathname + request.nextUrl.search;
+    const loginUrl = new URL('/login', request.url);
+    loginUrl.searchParams.set('from', encodeURIComponent(from));
+    return NextResponse.redirect(loginUrl);
   }
 
   return NextResponse.next();
