@@ -21,7 +21,9 @@ export function middleware(request: NextRequest) {
 
   // If user is not authenticated, redirect to login with return URL
   if (!isAuth) {
-    const from = request.nextUrl.pathname + request.nextUrl.search;
+    // Decode the URL before redirecting
+    const decodedPath = decodeURIComponent(request.nextUrl.pathname);
+    const from = decodedPath + request.nextUrl.search;
     const loginUrl = new URL('/login', request.url);
     loginUrl.searchParams.set('from', encodeURIComponent(from));
     return NextResponse.redirect(loginUrl);
@@ -31,5 +33,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/profile/:path*', '/login']
+  matcher: ['/profile/:path*', '/login']
 }

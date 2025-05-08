@@ -1,7 +1,4 @@
 import { proxyClient, proxyRequest } from './proxyUtils';
-import mongoose from 'mongoose';
-import { connectDB } from '@/lib/mongodb';
-import { activitySchema } from '@/models/activity';
 
 // Semester Exam Clearance Interfaces
 export interface SemesterExamClearance {
@@ -20,9 +17,6 @@ export interface SemesterExamClearanceTabProps {
 
 // Export proxyRequest directly
 export { proxyRequest };
-
-// Create activity model
-const Activity = mongoose.model('Activity', activitySchema);
 
 // Create API instance with configuration
 const api = proxyClient;
@@ -356,80 +350,29 @@ export interface PaymentSummary {
 }
 
 
+
 // Auth Service
 export const authService = {
   login: async (credentials: LoginCredentials): Promise<LoginResponse> => {
     try {
-      // Log login attempt
-      const loginAttempt = {
-        userId: credentials.username,
-        action: 'login' as const,
-        path: '/login',
-        metadata: {
-          email: credentials.username,
-          ipAddress: '127.0.0.1', // Replace with actual IP address if available
-          userAgent: navigator.userAgent,
-          deviceName: navigator.userAgent
-        },
-        timestamp: new Date()
-      };
-
-      // Store login activity in MongoDB
-      await connectDB();
-      await Activity.create(loginAttempt);
-
       const response = await proxyRequest({
         method: 'POST',
         url: '/login',
         data: {
           ...credentials,
-          deviceName: navigator.userAgent,
         }
       });
 
-      if (!response.data || !response.data.accessToken) {
+      // console.log('Login response:', response);
+      if (!response.accessToken) {
         throw new Error('Invalid response: Missing access token');
       }
 
-      const userData: LoginResponse = {
-        id: response.data.id,
-        name: response.data.name,
-        email: response.data.email,
-        accessToken: response.data.accessToken,
-        userName: response.data.userName,
-        roles: response.data.roles,
-        commaSeparatedRoles: response.data.commaSeparatedRoles,
-        deviceName: response.data.deviceName,
-        lastLoginTime: new Date().toISOString()
-      };
-
-      localStorage.setItem('user', JSON.stringify(userData));
+      localStorage.setItem('user', JSON.stringify(response));
       localStorage.setItem('isAuthenticated', 'true');
 
-      return response.data;
+      return response;
     } catch (error) {
-      // Log failed login attempt
-      const failedLogin = {
-        userId: credentials.username,
-        action: 'login' as const,
-        path: '/login',
-        metadata: {
-          email: credentials.username,
-          ipAddress: '127.0.0.1', // Replace with actual IP address if available
-          userAgent: navigator.userAgent,
-          deviceName: navigator.userAgent,
-          error: error instanceof Error ? error.message : 'Unknown error'
-        },
-        timestamp: new Date()
-      };
-
-      try {
-        await connectDB();
-        await Activity.create(failedLogin);
-      } catch (activityError) {
-        console.error('Failed to log failed login attempt:', activityError);
-      }
-
       // Clear auth data
       localStorage.removeItem('user');
       localStorage.removeItem('isAuthenticated');

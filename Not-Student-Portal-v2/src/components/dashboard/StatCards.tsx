@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Skeleton } from "../ui/skeleton"; 
+import { Skeleton } from "@/components/ui/skeleton"; 
 import { 
   faMoneyBillAlt, 
 } from "@fortawesome/free-solid-svg-icons";
@@ -8,7 +8,7 @@ import {
   dashboardService, 
   calculatePaymentSummary, 
   PaymentSummary 
-} from "../../services/api";
+} from "@/services/api";
 
 // Props Interface
 interface StatCardsProps {

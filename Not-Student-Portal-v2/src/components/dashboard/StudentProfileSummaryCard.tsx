@@ -1,10 +1,10 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent,CardTitle, CardHeader, CardFooter } from '../ui/card';
-import { Table, TableBody, TableRow, TableCell } from '../ui/table';
-import { Skeleton } from '../ui/skeleton';
-import { Button } from '../ui/button';
-import { StudentInfo } from '../../services/api';
+import { Card, CardContent,CardTitle, CardHeader, CardFooter } from '@/components/ui/card';
+import { Table, TableBody, TableRow, TableCell } from '@/components/ui/table';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
+import { StudentInfo } from '@/services/api';
 import { ArrowRightIcon } from 'lucide-react';
 
 interface StudentProfileSummaryCardProps {

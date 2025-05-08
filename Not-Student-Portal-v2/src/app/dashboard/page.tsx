@@ -87,10 +87,13 @@ export default function DashboardPage() {
       {/* CGPA Graph */}
       <div className="mt-8 bg-white rounded-lg shadow p-6">
         <h2 className="text-xl font-semibold mb-4">Academic Performance</h2>
-        <SGPAGraph 
-          semesters={cgpaData.labels}
-          sgpa={cgpaData.data}
-        />
+        {loading ? (
+          <div className="flex items-center justify-center h-64">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+          </div>
+        ) : (
+          <SGPAGraph cgpaData={cgpaData} />
+        )}
       </div>
     </div>
   );

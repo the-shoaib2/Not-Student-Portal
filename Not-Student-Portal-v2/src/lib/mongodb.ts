@@ -1,9 +1,10 @@
 import mongoose, { Connection, ConnectOptions } from 'mongoose';
 
 const MONGODB_URI = process.env.DATABASE_URI!
+const MONGODB_NAME = process.env.DATABASE_NAME!
 
-if (!MONGODB_URI) {
-  throw new Error('Please define the MONGODB_URI environment variable inside .env')
+if (!MONGODB_URI || !MONGODB_NAME) {
+  throw new Error('Please define the MONGODB_URI and MONGODB_NAME environment variable inside .env')
 }
 
 interface Cached {

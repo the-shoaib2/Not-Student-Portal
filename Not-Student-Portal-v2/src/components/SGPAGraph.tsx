@@ -4,24 +4,43 @@ import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
-interface SGPAGraphProps {
-  semesters: string[];
-  sgpa: number[];
+interface CGPAData {
+  labels: string[];
+  data: number[];
+  sgpaData: {
+    semester: string;
+    sgpa: number;
+  }[];
 }
 
-const SGPAGraph: React.FC<SGPAGraphProps> = ({ semesters, sgpa }) => {
+interface SGPAGraphProps {
+  cgpaData: CGPAData;
+}
+
+const SGPAGraph: React.FC<SGPAGraphProps> = ({ cgpaData }) => {
+  const { labels, sgpaData } = cgpaData;
+  
+  // Handle empty or undefined data
+  if (!labels || !sgpaData || labels.length === 0) {
+    return (
+      <div className="bg-white rounded-lg shadow p-4 mt-6">
+        <p className="text-gray-500 text-center py-4">No SGPA data available</p>
+      </div>
+    );
+  }
+
   const chartData = useMemo(() => ({
-    labels: semesters,
+    labels: labels,
     datasets: [
       {
         label: 'SGPA',
-        data: sgpa,
+        data: sgpaData.map(item => item.sgpa),
         borderColor: 'rgb(75, 192, 192)',
         tension: 0.1,
         fill: false,
       },
     ],
-  }), [semesters, sgpa]);
+  }), [labels, sgpaData]);
 
   const chartOptions = useMemo(() => ({
     responsive: true,
@@ -29,8 +48,8 @@ const SGPAGraph: React.FC<SGPAGraphProps> = ({ semesters, sgpa }) => {
     scales: {
       y: {
         beginAtZero: false,
-        min: Math.min(...sgpa) - 0.5,
-        max: Math.max(...sgpa) + 0.5,
+        min: Math.min(...sgpaData.map(item => item.sgpa)) - 0.5,
+        max: Math.max(...sgpaData.map(item => item.sgpa)) + 0.5,
       },
     },
     plugins: {
@@ -45,15 +64,13 @@ const SGPAGraph: React.FC<SGPAGraphProps> = ({ semesters, sgpa }) => {
     animation: {
       duration: 1000,
     },
-  }), [sgpa]);
+  }), [cgpaData]);
 
   return (
     <div className="bg-white rounded-lg shadow p-4 mt-6">
       <h3 className="text-lg font-semibold mb-3">Semester-wise SGPA</h3>
       <div className="h-64">
-        {semesters.length > 0 && (
-          <Line data={chartData} options={chartOptions} />
-        )}
+        <Line data={chartData} options={chartOptions} />
       </div>
     </div>
   );
