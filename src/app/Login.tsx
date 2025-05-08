@@ -7,6 +7,7 @@ import { Loader, Eye, EyeOff } from 'lucide-react';
 import { authService } from '../services/api';
 import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
+import { ForgotPasswordForm } from "../components/forgot-password-form";
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -59,21 +60,24 @@ const Login: React.FC = () => {
     }
   };
 
-  const handleForgotPassword = (e: React.FormEvent) => {
+  const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email) {
-      setForgotPasswordError('');
-      // Simulate sending password reset email
-      setForgotPasswordSuccess('Password reset link has been sent to your email. Please check your inbox and spam folder.');
-      toast.success('Password reset link sent!');
-      setTimeout(() => {
-        setIsForgotPasswordOpen(false);
-        setEmail('');
-        setForgotPasswordSuccess('');
-      }, 3000);
-    } else {
+    if (!email) {
       setForgotPasswordError('Please enter your email address');
       toast.error('Please enter your email address');
+      return;
+    }
+    setForgotPasswordError('');
+    setForgotPasswordSuccess('');
+    try {
+      await authService.forgotPassword({ email });
+      setForgotPasswordSuccess('Password reset link has been sent to your email. Please check your inbox and spam folder.');
+      toast.success('Password reset link sent!');
+      setIsForgotPasswordOpen(false);
+      setEmail('');
+    } catch (err: any) {
+      setForgotPasswordError(err?.message || 'Failed to send reset link');
+      toast.error(err?.message || 'Failed to send reset link');
     }
   };
 
@@ -255,41 +259,9 @@ const Login: React.FC = () => {
             leaveFrom="opacity-100 scale-100"
             leaveTo="opacity-0 scale-95"
           >
-            <div className="fixed inset-0 flex items-center justify-center p-4">
-              <Dialog.Panel className="mx-auto max-w-sm rounded bg-white p-6 shadow-xl">
-                <Dialog.Title className="text-lg font-medium mb-4">Reset Password</Dialog.Title>
-                <form onSubmit={handleForgotPassword}>
-                  <div className="mb-4">
-                    <input
-                      type="email"
-                      placeholder="Enter your university email"
-                      className="w-full border-b border-gray-300 focus:outline-none p-2 text-xs"
-                      value={email}
-                      onChange={e => setEmail(e.target.value)}
-                    />
-                  </div>
-                  {forgotPasswordError && (
-                    <div className="text-red-500 text-xs mb-2">{forgotPasswordError}</div>
-                  )}
-                  {forgotPasswordSuccess && (
-                    <div className="text-green-500 text-xs mb-2">{forgotPasswordSuccess}</div>
-                  )}
-                  <div className="flex justify-end space-x-2">
-                    <button
-                      type="button"
-                      onClick={() => setIsForgotPasswordOpen(false)}
-                      className="px-4 py-2 text-xs text-gray-600 hover:text-gray-800"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      className="px-4 py-2 text-xs bg-teal-600 text-white rounded hover:bg-teal-700"
-                    >
-                      Send
-                    </button>
-                  </div>
-                </form>
+            <div className="fixed inset-0 flex items-center justify-center z-50">
+              <Dialog.Panel className="bg-white rounded-lg shadow-lg p-0 w-full max-w-md mx-auto">
+                <ForgotPasswordForm />
               </Dialog.Panel>
             </div>
           </Transition.Child>
