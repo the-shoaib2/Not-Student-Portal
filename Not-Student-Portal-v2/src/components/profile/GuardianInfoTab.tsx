@@ -1,3 +1,4 @@
+"use client"
 import React, { memo } from 'react';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';

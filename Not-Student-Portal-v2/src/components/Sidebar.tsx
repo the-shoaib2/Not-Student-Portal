@@ -1,3 +1,5 @@
+
+"use client"
 import React, { useState, useEffect, JSX } from 'react';
 import { X, Home, LogIn, User, UserPlus, KeyRound, FileText, FileCheck, BookOpen, Calendar, Bell, Briefcase, Building2, Laptop, ClipboardList, Users, Award, MonitorCheck, CreditCard, Layers, GraduationCap, LogOut } from 'lucide-react';
 import Link from 'next/link';

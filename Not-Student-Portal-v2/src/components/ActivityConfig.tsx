@@ -1,3 +1,4 @@
+"use client"
 import { useActivityTracking } from '@/hooks/useActivityTracking'
 import { useState } from 'react'
 

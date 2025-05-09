@@ -1,4 +1,4 @@
-import { SemesterExamClearance } from '@/app/RegistrationExamClearance/page';
+import { SemesterExamClearance } from '@/services/api';
 
 // Define the store interface
 interface TableState {

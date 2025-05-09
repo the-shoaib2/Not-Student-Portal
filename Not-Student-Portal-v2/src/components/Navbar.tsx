@@ -1,3 +1,4 @@
+"use client"
 import React, { useState, useRef, useEffect } from 'react';
 import { Menu, User } from 'lucide-react';
 import UserCard from '@/components/UserCard';

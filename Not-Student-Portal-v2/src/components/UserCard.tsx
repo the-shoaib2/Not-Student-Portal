@@ -1,3 +1,4 @@
+"use client"
 import React, { useState } from 'react';
 import { LogOut, User } from 'lucide-react';
 import { useRouter } from 'next/navigation';

@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import connectDB from '@/lib/mongodb'
+import { connectDB } from '@/lib/mongodb'
 import { Activity } from '@/models/activity'
+
+
+const NEXTAUTH_URL = process.env.NEXTAUTH_URL || 'http://localhost:3000'
+
 
 export async function trackActivity(req: NextRequest) {
   try {
@@ -13,7 +17,7 @@ export async function trackActivity(req: NextRequest) {
       userId: session.user.id,
       action: req.method,
       path: req.nextUrl.pathname,
-      ip: req.ip,
+      ip: req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || req.headers.get('host'),
       userAgent: req.headers.get('user-agent'),
       timestamp: new Date(),
     })
@@ -29,7 +33,7 @@ async function getSession(req: NextRequest) {
     const token = req.cookies.get('next-auth.session-token')?.value
     if (!token) return null
 
-    const res = await fetch(`${process.env.NEXTAUTH_URL}/api/auth/session`, {
+    const res = await fetch(`${NEXTAUTH_URL}/api/auth/session`, {
       headers: {
         Cookie: `next-auth.session-token=${token}`,
       },
