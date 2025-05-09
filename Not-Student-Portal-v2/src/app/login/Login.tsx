@@ -7,6 +7,7 @@ import { Loader, Eye, EyeOff } from 'lucide-react';
 import { authService } from '@/services/proxy-api';
 import toast from 'react-hot-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLoading } from '@/hooks/useLoading';
 import { ForgotPasswordForm } from "@/components/forgot-password-form";
 
 const Login: React.FC = () => {
@@ -16,7 +17,7 @@ const Login: React.FC = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const { isLoading, setIsLoading } = useLoading();
   const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
   const [email, setEmail] = useState('');
   const [forgotPasswordError, setForgotPasswordError] = useState('');

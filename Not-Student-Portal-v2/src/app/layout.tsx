@@ -4,6 +4,8 @@ import './index.css'
 import { AuthProvider } from '@/providers/auth-provider'
 import LayoutWrapper from '@/app/LayoutWrapper'
 import { Toaster } from 'react-hot-toast'
+import { LoadingBar } from '@/components/LoadingBar'
+import { LoadingProvider } from '@/hooks/useLoading'
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,11 +25,14 @@ export default function RootLayout({
   return (
     <html className="h-full">
       <body className={`${inter.className} h-full`}>
-        <AuthProvider>
-          <LayoutWrapper>
-            {children}
-          </LayoutWrapper>
-        </AuthProvider>
+        <LoadingProvider>
+          <AuthProvider>
+            <LayoutWrapper>
+              {children}
+              <LoadingBar />
+            </LayoutWrapper>
+          </AuthProvider>
+        </LoadingProvider>
         <Toaster position="top-center" toastOptions={{
         }} />
       </body>
