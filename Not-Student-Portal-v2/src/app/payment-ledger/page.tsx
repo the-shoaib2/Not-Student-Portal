@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { InfoIcon, UserCircle, UserCircle2, ReceiptIcon } from "lucide-react"
 import StudentInfo from "@/components/payment-ledger/student-info"
@@ -13,47 +13,51 @@ import PageTitle from '@/components/PageTitle';
 import toast from 'react-hot-toast';
 
 export default function PaymentLedgerPage() {
+  const memoizedPaymentService = useMemo(() => paymentService, []);
   const [semesters, setSemesters] = useState<Semester[]>([])
   const [selectedSemester, setSelectedSemester] = useState<string>("")
   const [student, setStudent] = useState<Student | null>(null)
-  const [paymentSummary, setPaymentSummary] = useState<PaymentSummaryData | null>(null)
+  const [paymentSummary, setPaymentSummary] = useState<PaymentLedgerItem[] | null>(null)
   const [paymentLedger, setPaymentLedger] = useState<PaymentLedgerItem[]>([])
   const [loading, setLoading] = useState(true)
+  const [hasLoadedData, setHasLoadedData] = useState(false)
+
+  let hasFetchedData = false
 
   useEffect(() => {
     const fetchData = async () => {
+      if (hasFetchedData) return
+      hasFetchedData = true
+  
       setLoading(true)
-
       try {
-        // Fetch all data from API
         const [semestersData, studentData, summaryData, ledgerData] = await Promise.all([
           paymentService.semesterList(),
           paymentService.studentInfo(),
           paymentService.paymentLedgerSummery(),
           paymentService.paymentLedger()
         ])
-
-        // Update state with API data
+  
         if (semestersData) {
           setSemesters(semestersData)
           setSelectedSemester(semestersData[0]?.semesterId || "")
         }
-        setStudent(studentData as Student | null)
-        setPaymentSummary(summaryData as PaymentSummaryData | null)
-        setPaymentLedger(ledgerData as PaymentLedgerItem[])
-
+        setStudent(studentData || null)
+        setPaymentSummary(summaryData || null)
+        setPaymentLedger(ledgerData || [])
       } catch (error) {
-        console.error('Error fetching payment ledger data:', error)
+        console.error('Error fetching data:', error)
         toast.error('Failed to load payment ledger data')
       } finally {
         setLoading(false)
       }
     }
-
+  
     fetchData()
   }, [])
+  
 
-  // Handle semester change
+  // Handle semester change (only updates selected semester)
   const handleSemesterChange = (semesterId: string) => {
     setSelectedSemester(semesterId)
   }

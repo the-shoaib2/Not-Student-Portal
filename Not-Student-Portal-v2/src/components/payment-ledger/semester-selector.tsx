@@ -1,7 +1,8 @@
 "use client"
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import type { Semester } from "@/types/student"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import type { Semester } from "@/services/proxy-api"
 
 interface SemesterSelectorProps {
   semesters: Semester[]
@@ -17,13 +18,15 @@ export default function SemesterSelector({ semesters, selectedSemester, onSemest
         <SelectTrigger className="w-full sm:w-[180px]">
           <SelectValue placeholder="Select semester" />
         </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">All</SelectItem>
-          {semesters.map((semester) => (
-            <SelectItem key={semester.semesterId} value={semester.semesterId}>
-              {semester.semesterName} {semester.semesterYear}
-            </SelectItem>
-          ))}
+        <SelectContent className="min-w-[200px]">
+          <ScrollArea className="h-[200px] w-full pr-1">
+            <SelectItem value="all">All</SelectItem>
+            {semesters.map((semester) => (
+              <SelectItem key={semester.semesterId} value={semester.semesterId}>
+                {semester.semesterName} {semester.semesterYear}
+              </SelectItem>
+            ))}
+          </ScrollArea>
         </SelectContent>
       </Select>
     </div>
