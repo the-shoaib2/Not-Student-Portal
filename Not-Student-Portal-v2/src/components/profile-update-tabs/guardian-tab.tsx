@@ -4,7 +4,11 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 
-export default function GuardianTab() {
+interface GuardianTabProps {
+  data?: any;
+}
+
+export default function GuardianTab({ data }: GuardianTabProps) {
   return (
     <div className="bg-white p-6 border rounded-md">
       <h2 className="text-center text-lg font-semibold mb-6 border-b pb-2">Guardian Information</h2>

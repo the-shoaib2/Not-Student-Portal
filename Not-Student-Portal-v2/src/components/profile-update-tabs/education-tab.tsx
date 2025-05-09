@@ -4,7 +4,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { PlusCircle } from "lucide-react"
 
-export default function EducationTab() {
+interface EducationTabProps {
+  data?: any;
+  degree?: any[];
+}
+
+export default function EducationTab({ data, degree }: EducationTabProps) {
   return (
     <div className="bg-white p-6 border rounded-md">
       <h2 className="text-center text-lg font-semibold mb-6 border-b pb-2">Educational Information</h2>

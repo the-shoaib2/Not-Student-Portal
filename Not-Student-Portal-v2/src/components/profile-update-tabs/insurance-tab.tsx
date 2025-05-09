@@ -8,7 +8,11 @@ import { useState } from "react"
 import { format } from "date-fns"
 import { CalendarIcon } from "lucide-react"
 
-export default function InsuranceTab() {
+interface InsuranceTabProps {
+  data?: any;
+}
+
+export default function InsuranceTab({ data }: InsuranceTabProps) {
   const [dob, setDob] = useState<Date | undefined>()
 
   return (

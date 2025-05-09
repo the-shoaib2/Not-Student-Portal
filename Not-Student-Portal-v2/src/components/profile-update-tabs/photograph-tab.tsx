@@ -5,7 +5,11 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Upload } from "lucide-react"
 
-export default function PhotographTab() {
+interface PhotographTabProps {
+  data?: any;
+}
+
+export default function PhotographTab({ data }: PhotographTabProps) {
   return (
     <div className="bg-white p-6 border rounded-md">
       <h2 className="text-center text-lg font-semibold mb-6 border-b pb-2">Photograph</h2>
@@ -38,7 +42,7 @@ export default function PhotographTab() {
 
           <div className="text-sm text-gray-500">
             <p>* Photo must be in JPG/JPEG format</p>
-            <p>* Maximum file size: 100KB</p>
+            <p>* Maximum file size: 10MB</p>
             <p>* Dimension: 300x300 pixels</p>
           </div>
         </div>
@@ -52,7 +56,12 @@ export default function PhotographTab() {
 }
 
 // Helper component for file input
-function Input({ className, ...props }) {
+interface InputProps {
+  className?: string
+  [key: string]: any
+}
+
+function Input({ className = '', ...props }: InputProps) {
   return (
     <input
       className={`flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${className}`}

@@ -6,7 +6,14 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
-export default function ContactTab() {
+interface ContactTabProps {
+  data?: any;
+  district?: any[];
+  division?: any[];
+  country?: any[];
+}
+
+export default function ContactTab({ data, district, division, country }: ContactTabProps) {
   return (
     <div className="bg-white p-6 border rounded-md">
       <h2 className="text-center text-lg font-semibold mb-6 border-b pb-2">Contact Information</h2>
