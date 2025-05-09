@@ -63,13 +63,13 @@ export default function DashboardPage() {
       }
 
       // 4. Drop Semester List
-      try {
-        const dropSemesterList = await dashboardService.getDropSemesterList();
-        setDropSemesters(dropSemesterList);
-      } catch (err) {
-        console.error('Drop semester list fetch error:', err);
-        errors.push('Failed to load drop semester list');
-      }
+      // try {
+      //   const dropSemesterList = await dashboardService.getDropSemesterList();
+      //   setDropSemesters(dropSemesterList);
+      // } catch (err) {
+      //   console.error('Drop semester list fetch error:', err);
+      //   errors.push('Failed to load drop semester list');
+      // }
 
       // Set error if any errors occurred
       if (errors.length > 0) {
