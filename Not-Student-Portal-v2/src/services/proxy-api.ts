@@ -920,8 +920,8 @@ export const profileService = {
     }
   },
 
-   //guardian info
-   guardianInfo: async (): Promise<StudentInfo | null> => {
+  //guardian info
+  guardianInfo: async (): Promise<StudentInfo | null> => {
     try {
       const token = profileService.getAuthToken();
       const response = await proxyRequest({
@@ -1155,12 +1155,6 @@ export const profileService = {
 
 
 
-
-
-
-
-
-
 // Result Service
 export const resultService = {
   getSemesterList: async (): Promise<Semester[]> => {
@@ -1205,6 +1199,11 @@ export const resultService = {
   },
 };
 
+
+
+
+
+
 // Payment Service
 export const paymentService = {
   getPaymentScheme: async (): Promise<PaymentScheme> => {
@@ -1216,6 +1215,151 @@ export const paymentService = {
     const response = await api.get<PaymentLedger>('/paymentLedger/paymentLedgerSummery');
     return response.data;
   },
+
+  semesterList: async (): Promise<Semester[] | null> => {
+    try {
+      const token = profileService.getAuthToken();
+      const response = await proxyRequest({
+        method: 'GET',
+        url: '/paymentLedger/semesterList',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          accessToken: token,
+          'Accept': '*/*'
+        }
+      });
+
+      // console.log('Semester List Response:', response);
+
+      return response;
+    } catch (error) {
+      // console.error('Error fetching semester list:', error);
+      // Throw a more descriptive error
+      throw new Error(`Failed to fetch semester list: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  },
+
+  //Student info
+
+  studentInfo: async (): Promise<Student | null> => {
+    try {
+      const token = profileService.getAuthToken();
+      const response = await proxyRequest({
+        method: 'GET',
+        url: '/paymentLedger/studentInfo',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          accessToken: token,
+          'Accept': '*/*'
+        }
+      });
+
+      // console.log('Student Info Response:', response);
+
+      return response;
+    } catch (error) {
+      // console.error('Error fetching student info:', error);
+      // Throw a more descriptive error
+      throw new Error(`Failed to fetch student info: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  },
+
+  //payment ledger summery
+  paymentLedgerSummery: async (): Promise<PaymentLedgerItem[] | null> => {
+    try {
+      const token = profileService.getAuthToken();
+      const response = await proxyRequest({
+        method: 'GET',
+        url: '/paymentLedger/paymentLedgerSummery',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          accessToken: token,
+          'Accept': '*/*'
+        }
+      });
+
+      // console.log('Payment Ledger Response:', response);
+
+      return response;
+    } catch (error) {
+      // console.error('Error fetching payment ledger:', error);
+      // Throw a more descriptive error
+      throw new Error(`Failed to fetch payment ledger: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  },
+
+  paymentLedger: async (): Promise<PaymentLedgerItem[] | null> => {
+    try {
+      const token = profileService.getAuthToken();
+      const response = await proxyRequest({
+        method: 'GET',
+        url: '/paymentLedger',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          accessToken: token,
+          'Accept': '*/*'
+        }
+      });
+
+      // console.log('Payment Ledger Response:', response);
+
+      return response;
+    } catch (error) {
+      // console.error('Error fetching payment ledger:', error);
+      // Throw a more descriptive error
+      throw new Error(`Failed to fetch payment ledger: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  },
+
+  //Waiver list
+  waiverList: async (): Promise<PaymentLedgerItem[] | null> => {
+    try {
+      const token = profileService.getAuthToken();
+      const response = await proxyRequest({
+        method: 'GET',
+        url: '/paymentLedger/waiverList',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          accessToken: token,
+          'Accept': '*/*'
+        }
+      });
+
+      // console.log('Waiver List Response:', response);
+
+      return response;
+    } catch (error) {
+      // console.error('Error fetching waiver list:', error);
+      // Throw a more descriptive error
+      throw new Error(`Failed to fetch waiver list: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  },
+
+  //Waiver details
+  waiverDetails: async (waiverId: string): Promise<PaymentLedgerItem[] | null> => {
+    try {
+      const token = profileService.getAuthToken();
+      const response = await proxyRequest({
+        method: 'GET',
+        url: `/paymentLedger/waiverDetails/${waiverId}`,
+        headers: {
+          Authorization: `Bearer ${token}`,
+          accessToken: token,
+          'Accept': '*/*'
+        }
+      });
+
+      // console.log('Waiver Details Response:', response);
+
+      return response;
+    } catch (error) {
+      // console.error('Error fetching waiver details:', error);
+      // Throw a more descriptive error
+      throw new Error(`Failed to fetch waiver details: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  },
+
+
 };
 
 

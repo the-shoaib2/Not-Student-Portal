@@ -8,7 +8,10 @@ import PaymentSummary from "@/components/payment-ledger/payment-summary"
 import PaymentLedger from "@/components/payment-ledger/payment-ledger"
 import SemesterSelector from "@/components/payment-ledger/semester-selector"
 import { Semester, Student, PaymentSummaryData, PaymentLedgerItem } from "@/services/proxy-api"
+import { paymentService } from "@/services/proxy-api"
 import PageTitle from '@/components/PageTitle';
+import toast from 'react-hot-toast';
+
 export default function PaymentLedgerPage() {
   const [semesters, setSemesters] = useState<Semester[]>([])
   const [selectedSemester, setSelectedSemester] = useState<string>("")
@@ -17,24 +20,57 @@ export default function PaymentLedgerPage() {
   const [paymentLedger, setPaymentLedger] = useState<PaymentLedgerItem[]>([])
   const [loading, setLoading] = useState(true)
 
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true)
 
+      try {
+        // Fetch all data from API
+        const [semestersData, studentData, summaryData, ledgerData] = await Promise.all([
+          paymentService.semesterList(),
+          paymentService.studentInfo(),
+          paymentService.paymentLedgerSummery(),
+          paymentService.paymentLedger()
+        ])
 
+        // Update state with API data
+        if (semestersData) {
+          setSemesters(semestersData)
+          setSelectedSemester(semestersData[0]?.semesterId || "")
+        }
+        setStudent(studentData as Student | null)
+        setPaymentSummary(summaryData as PaymentSummaryData | null)
+        setPaymentLedger(ledgerData as PaymentLedgerItem[])
+
+      } catch (error) {
+        console.error('Error fetching payment ledger data:', error)
+        toast.error('Failed to load payment ledger data')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [])
+
+  // Handle semester change
   const handleSemesterChange = (semesterId: string) => {
     setSelectedSemester(semesterId)
-    // In a real app, you would fetch new data based on the selected semester
   }
+  
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
-      </div>
-    )
-  }
+ 
+
+  // if (loading) {
+  //   return (
+  //     <div className="flex justify-center items-center min-h-screen">
+  //       <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
+  //     </div>
+  //   )
+  // }
 
   return (
     <div className="w-full">
-
       {/* Page Title */}
       <div className="w-full bg-white border-b">
         <PageTitle 
@@ -43,7 +79,7 @@ export default function PaymentLedgerPage() {
         />
       </div>
       <div className="mx-auto px-4 sm:px-6 lg:px-8 py-6">
-      {/* Content Container */}
+        {/* Content Container */}
         <div className="mb-6 bg-green-50 p-3 sm:p-4 rounded-md border border-green-200">
           <div className="flex flex-col sm:flex-row gap-2">
             <InfoIcon className="h-5 w-5 text-green-700 mt-0.5 hidden sm:block" />
@@ -107,6 +143,6 @@ export default function PaymentLedgerPage() {
           </CardContent>
         </Card>
       </div>
-      </div>
+    </div>
   )
 }
