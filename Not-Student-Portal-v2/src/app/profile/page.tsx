@@ -5,16 +5,17 @@ import { profileService, StudentInfo, PresentAddressInfo, PermanentAddressInfo, 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableRow, TableCell } from '@/components/ui/table';
 // Removed unused Button import
-import ProfileCard from '@/components/profile/ProfileCard';
+import ProfileCard from '@/components/profile-tabs/ProfileCard';
 import PageTitle from '@/components/PageTitle';
 import { useAuth } from '@/contexts/AuthContext';
+import { UserCircle2 } from 'lucide-react';
 
 // Import components directly
-import { PersonalInfoTab } from '@/components/profile/PersonalInfoTab';
-import { GuardianInfoTab } from '@/components/profile/GuardianInfoTab';
-import { PresentAddressTab } from '@/components/profile/PresentAddressTab';
-import { PermanentAddressTab } from '@/components/profile/PermanentAddressTab';
-import { EducationTab } from '@/components/profile/EducationTab';
+import { PersonalInfoTab } from '@/components/profile-tabs/PersonalInfoTab';
+import { GuardianInfoTab } from '@/components/profile-tabs/GuardianInfoTab';
+import { PresentAddressTab } from '@/components/profile-tabs/PresentAddressTab';
+import { PermanentAddressTab } from '@/components/profile-tabs/PermanentAddressTab';
+import { EducationTab } from '@/components/profile-tabs/EducationTab';
 
 // Skeleton component for profile header
 const ProfileHeaderSkeleton = () => (
@@ -202,13 +203,13 @@ const ProfileComponent: React.FC = () => {
       {/* Page Title */}
       <div className="w-full bg-white border-b">
           <PageTitle 
-            title="Student Profile" 
-            icon="UserCircle2" 
+            title={"Student Profile"}
+            icon={<UserCircle2/>}
           />
       </div>
 
       {/* Main Content */}
-      <div className="max-w-[2000px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div className="mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Profile Header */}
         <Card className="overflow-hidden mb-8">
           <CardHeader className="p-4 sm:p-5 bg-gradient-to-r from-teal-50 to-cyan-50 border-b">
@@ -216,36 +217,36 @@ const ProfileComponent: React.FC = () => {
               <span>Profile Overview</span>
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-4 sm:p-5">
-            <div className="flex items-center gap-6">
-              <ProfileCard 
-                studentInfo={studentInfo} 
-                photograph={photograph}
-                loading={loading}
+          <CardContent className="p-4 sm:p-5 ">
+            <div className="flex items-center gap-3 sm:gap-6">
+                <ProfileCard 
+                  studentInfo={studentInfo} 
+                  photograph={photograph}
+                  loading={loading}
                 className="w-1/4"
-              />
+                />
               <div className="flex-grow">
                 {loading.studentInfo ? (
                   <ProfileHeaderSkeleton />
                 ) : (
-                  <Table>
+                  <Table  className="rounded-md">
                     <TableBody>
                       <TableRow>
-                        <TableCell className="text-xs text-gray-500 w-1/3 py-3">Name</TableCell>
-                        <TableCell className="text-sm font-medium text-gray-800 w-2/3 py-3">
-                          {studentInfo?.firstName || 'N/A'}
+                        <TableCell className="text-xs text-gray-500 w-1/3 py-1 sm:py-3">Name</TableCell>
+                        <TableCell className="text-sm font-medium text-gray-800 w-2/3 py-1 sm:py-3">
+                        {studentInfo?.firstName || 'N/A'}
                         </TableCell>
                       </TableRow>
                       <TableRow>
-                        <TableCell className="text-xs text-gray-500 w-1/3 py-3">Student ID</TableCell>
-                        <TableCell className="text-sm font-medium text-gray-800 w-2/3 py-3">
-                          {user?.userName || 'N/A'}
+                        <TableCell className="text-xs text-gray-500 w-1/3 py-1 sm:py-3">Student ID</TableCell>
+                        <TableCell className="text-sm font-medium text-gray-800 w-2/3 py-1 sm:py-3">
+                        {user?.userName || 'N/A'}
                         </TableCell>
                       </TableRow>
                       <TableRow>
-                        <TableCell className="text-xs text-gray-500 w-1/3 py-3">Email</TableCell>
-                        <TableCell className="text-sm font-medium text-gray-800 w-2/3 py-3">
-                          {studentInfo?.email || 'N/A'}
+                        <TableCell className="text-xs text-gray-500 w-1/3 py-1 sm:py-3">Email</TableCell>
+                        <TableCell className="text-sm font-medium text-gray-800 w-2/3 py-3 sm:py-3">
+                        {studentInfo?.email || 'N/A'}
                         </TableCell>
                       </TableRow>
                     </TableBody>

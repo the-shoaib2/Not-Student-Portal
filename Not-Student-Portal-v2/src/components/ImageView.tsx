@@ -23,8 +23,10 @@ const Base64ImageCard: React.FC<Base64ImageCardProps> = ({
 
   if (!base64Data) {
     return (
-      <div className={`bg-gray-100 w-24 h-24 md:w-28 md:h-28 rounded-lg flex items-center justify-center text-gray-400 ${className}`}>
-        No Image
+      <div className={`bg-gray-100 w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 rounded-lg flex items-center justify-center text-gray-400 ${className}`}>
+        <div className="w-full h-full flex items-center justify-center">
+          <span className="text-sm sm:text-base">No Image</span>
+        </div>
       </div>
     );
   }
@@ -32,7 +34,7 @@ const Base64ImageCard: React.FC<Base64ImageCardProps> = ({
   const dataUri = `data:image/${format};base64,${base64Data}`;
 
   return (
-    <Card className={`max-w-sm mx-auto rounded-2xl shadow-md p-2 ${className}`}>
+    <Card className={`max-w-sm mx-auto rounded-2xl shadow-md transition-all duration-300 ${className}`}>
       <CardContent className="flex items-center justify-center">
         <img
           src={dataUri}

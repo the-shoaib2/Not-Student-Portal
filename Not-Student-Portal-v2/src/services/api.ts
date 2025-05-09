@@ -363,22 +363,37 @@ export const authService = {
         }
       });
 
-      // console.log('Login response:', response);
+      console.log('Login response:', response);
+
       if (!response.accessToken) {
-        throw new Error('Invalid response: Missing access token');
+        // Check for specific error messages from the API
+        if (response.responseMessage) {
+          throw new Error(response.responseMessage);
+        } else if (response.message) {
+          throw new Error(response.message);
+        } else {
+          throw new Error('Invalid response: Missing access token');
+        }
       }
 
+      // Store user data and authentication state
       localStorage.setItem('user', JSON.stringify(response));
       localStorage.setItem('isAuthenticated', 'true');
 
       return response;
-    } catch (error) {
+    } catch (error: any) {
       // Clear auth data
       localStorage.removeItem('user');
       localStorage.removeItem('isAuthenticated');
 
-      // Re-throw the error
-      throw error;
+      // Extract error message from the response if available
+      if (error.response?.data?.message) {
+        throw new Error(error.response.data.message);
+      } else if (error.message) {
+        throw new Error(error.message);
+      } else {
+        throw new Error('An error occurred during login. Please try again.');
+      }
     }
   },
 
@@ -775,7 +790,339 @@ export const profileService = {
     });
     return response;
   },
+
+
+  //personal info
+
+  personalInfo: async (): Promise<StudentInfo | null> => {
+    try {
+      const token = profileService.getAuthToken();
+      const response = await proxyRequest({
+        method: 'GET',
+        url: '/profileUpdate/personalInfo',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          accessToken: token,
+          'Accept': '*/*'
+        }
+      });
+
+      // console.log('Personal Info Response:', response);
+
+      return response;
+    } catch (error) {
+      // console.error('Error fetching personal info:', error);
+      // Throw a more descriptive error
+      throw new Error(`Failed to fetch personal info: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  },
+  maritalStatusList: async (): Promise<any | null> => {
+    try {
+      const token = profileService.getAuthToken();
+      const response = await proxyRequest({
+        method: 'GET',
+        url: '/profileUpdate/maritalStatusList',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          accessToken: token,
+          'Accept': '*/*'
+        }
+      });
+
+      // console.log('Marital Status List Response:', response);
+
+      return response;
+    } catch (error) {
+      // console.error('Error fetching marital status list:', error);
+      // Throw a more descriptive error
+      throw new Error(`Failed to fetch marital status list: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  },
+  bloodGroupList: async (): Promise<any | null> => {
+    try {
+      const token = profileService.getAuthToken();
+      const response = await proxyRequest({
+        method: 'GET',
+        url: '/profileUpdate/bloodGroupList',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          accessToken: token,
+          'Accept': '*/*'
+        }
+      });
+
+      // console.log('Blood Group List Response:', response);
+
+      return response;
+    } catch (error) {
+      // console.error('Error fetching blood group list:', error);
+      // Throw a more descriptive error
+      throw new Error(`Failed to fetch blood group list: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  },
+  religionList: async (): Promise<any | null> => {
+    try {
+      const token = profileService.getAuthToken();
+      const response = await proxyRequest({
+        method: 'GET',
+        url: '/profileUpdate/religionList',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          accessToken: token,
+          'Accept': '*/*'
+        }
+      });
+
+      // console.log('Religion List Response:', response);
+
+      return response;
+    } catch (error) {
+      // console.error('Error fetching religion list:', error);
+      // Throw a more descriptive error
+      throw new Error(`Failed to fetch religion list: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  },
+
+   //guardian info
+   guardianInfo: async (): Promise<StudentInfo | null> => {
+    try {
+      const token = profileService.getAuthToken();
+      const response = await proxyRequest({
+        method: 'GET',
+        url: '/profileUpdate/guardian',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          accessToken: token,
+          'Accept': '*/*'
+        }
+      });
+
+      // console.log('Guardian Info Response:', response);
+
+      return response;
+    } catch (error) {
+      // console.error('Error fetching guardian info:', error);
+      // Throw a more descriptive error
+      throw new Error(`Failed to fetch guardian info: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  },
+
+
+  //Contact/Address
+  contactAddress: async (): Promise<StudentInfo | null> => {
+    try {
+      const token = profileService.getAuthToken();
+      const response = await proxyRequest({
+        method: 'GET',
+        url: '/profileUpdate/contactAddress',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          accessToken: token,
+          'Accept': '*/*'
+        }
+      });
+
+      // console.log('Contact Address Response:', response);
+
+      return response;
+    } catch (error) {
+      // console.error('Error fetching contact address:', error);
+      // Throw a more descriptive error
+      throw new Error(`Failed to fetch contact address: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  },
+  districtList: async (): Promise<any | null> => {
+    try {
+      const token = profileService.getAuthToken();
+      const response = await proxyRequest({
+        method: 'GET',
+        url: '/profileUpdate/districtList',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          accessToken: token,
+          'Accept': '*/*'
+        }
+      });
+
+      // console.log('District List Response:', response);
+
+      return response;
+    } catch (error) {
+      // console.error('Error fetching district list:', error);
+      // Throw a more descriptive error
+      throw new Error(`Failed to fetch district list: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  },
+
+  divisionList: async (): Promise<any | null> => {
+    try {
+      const token = profileService.getAuthToken();
+      const response = await proxyRequest({
+        method: 'GET',
+        url: '/profileUpdate/divisionList',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          accessToken: token,
+          'Accept': '*/*'
+        }
+      });
+
+      // console.log('Division List Response:', response);
+
+      return response;
+    } catch (error) {
+      // console.error('Error fetching division list:', error);
+      // Throw a more descriptive error
+      throw new Error(`Failed to fetch division list: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  },
+
+  countryList: async (): Promise<any | null> => {
+    try {
+      const token = profileService.getAuthToken();
+      const response = await proxyRequest({
+        method: 'GET',
+        url: '/profileUpdate/countryList',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          accessToken: token,
+          'Accept': '*/*'
+        }
+      });
+
+      // console.log('Country List Response:', response);
+
+      return response;
+    } catch (error) {
+      // console.error('Error fetching country list:', error);
+      // Throw a more descriptive error
+      throw new Error(`Failed to fetch country list: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  },
+  //education
+  education: async (): Promise<any | null> => {
+    try {
+      const token = profileService.getAuthToken();
+      const response = await proxyRequest({
+        method: 'GET',
+        url: '/profileUpdate/education',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          accessToken: token,
+          'Accept': '*/*'
+        }
+      });
+
+      // console.log('Education Response:', response);
+
+      return response;
+    } catch (error) {
+      // console.error('Error fetching education:', error);
+      // Throw a more descriptive error
+      throw new Error(`Failed to fetch education: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  },
+  degreeList: async (): Promise<any | null> => {
+    try {
+      const token = profileService.getAuthToken();
+      const response = await proxyRequest({
+        method: 'GET',
+        url: '/profileUpdate/degreeList',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          accessToken: token,
+          'Accept': '*/*'
+        }
+      });
+
+      // console.log('Degree List Response:', response);
+
+      return response;
+    } catch (error) {
+      // console.error('Error fetching degree list:', error);
+      // Throw a more descriptive error
+      throw new Error(`Failed to fetch degree list: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  },
+  photograph: async (): Promise<any | null> => {
+    try {
+      const token = profileService.getAuthToken();
+      const response = await proxyRequest({
+        method: 'GET',
+        url: '/profileUpdate/photograph',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          accessToken: token,
+          'Accept': '*/*'
+        }
+      });
+
+      // console.log('Photograph Response:', response);
+
+      return response;
+    } catch (error) {
+      // console.error('Error fetching photograph:', error);
+      // Throw a more descriptive error
+      throw new Error(`Failed to fetch photograph: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  },
+  insurance: async (): Promise<any | null> => {
+    try {
+      const token = profileService.getAuthToken();
+      const response = await proxyRequest({
+        method: 'GET',
+        url: '/profileUpdate/insurance',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          accessToken: token,
+          'Accept': '*/*'
+        }
+      });
+
+      // console.log('Insurance Response:', response);
+
+      return response;
+    } catch (error) {
+      // console.error('Error fetching insurance:', error);
+      // Throw a more descriptive error
+      throw new Error(`Failed to fetch insurance: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  },
+  guardian: async (): Promise<any | null> => {
+    try {
+      const token = profileService.getAuthToken();
+      const response = await proxyRequest({
+        method: 'GET',
+        url: '/profileUpdate/guardian',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          accessToken: token,
+          'Accept': '*/*'
+        }
+      });
+
+      // console.log('Guardian Response:', response);
+
+      return response;
+    } catch (error) {
+      // console.error('Error fetching guardian:', error);
+      // Throw a more descriptive error
+      throw new Error(`Failed to fetch guardian: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  },
+
+
 };
+
+
+
+
+
+
+
+
+
+
 
 // Result Service
 export const resultService = {

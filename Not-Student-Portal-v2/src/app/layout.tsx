@@ -21,7 +21,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html className="h-full bg-gray-100">
+    <html className="h-full">
       <body className={`${inter.className} h-full`}>
         <AuthProvider>
           <LayoutWrapper>
