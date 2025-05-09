@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardTitle, CardHeader, CardContent } from '@/components/ui/card';
 import { Table, TableHeader, TableBody, TableRow, TableCell, TableHead } from '@/components/ui/table';
-import type { SemesterExamClearance, SemesterExamClearanceTabProps } from '@/services/api';
+import type { SemesterExamClearance, SemesterExamClearanceTabProps } from '@/services/proxy-api';
 
 import { Check, X } from "lucide-react";
 

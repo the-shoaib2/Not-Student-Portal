@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Card, CardTitle, CardHeader, CardContent } from '@/components/ui/card';
 import { Table, TableHeader, TableBody, TableRow, TableCell, TableHead } from '@/components/ui/table';
-import { registeredCourseService } from '@/services/api';
+import { registeredCourseService } from '@/services/proxy-api';
 
 export interface SemesterInfo {
   semesterId: string;

@@ -4,7 +4,7 @@ import { Dialog, Transition } from '@headlessui/react';
 import * as Tabs from '@radix-ui/react-tabs';
 import { cn } from '@/lib/utils';
 import { Loader, Eye, EyeOff } from 'lucide-react';
-import { authService } from '@/services/api';
+import { authService } from '@/services/proxy-api';
 import toast from 'react-hot-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { ForgotPasswordForm } from "@/components/forgot-password-form";

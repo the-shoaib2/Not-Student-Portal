@@ -2,8 +2,8 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Camera, ArrowRight as ArrowRightIcon, Edit } from 'lucide-react';
-import { StudentInfo } from '@/services/api';
-import { PhotographInfo } from '@/services/api';
+import { StudentInfo } from '@/services/proxy-api';
+import { PhotographInfo } from '@/services/proxy-api';
 import Base64ImageCard from '@/components/ImageView';
 
 interface ProfileCardProps {

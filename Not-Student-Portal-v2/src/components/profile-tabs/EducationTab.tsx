@@ -3,7 +3,7 @@
 import React, { memo } from 'react';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { StudentInfo, EducationInfo } from '@/services/api';
+import { StudentInfo, EducationInfo } from '@/services/proxy-api';
 
 interface EducationTabProps {
   studentInfo: StudentInfo | null;

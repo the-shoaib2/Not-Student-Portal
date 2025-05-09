@@ -8,7 +8,7 @@ import {
   dashboardService, 
   calculatePaymentSummary, 
   PaymentSummary 
-} from "@/services/api";
+} from "@/services/proxy-api";
 
 // Props Interface
 interface StatCardsProps {

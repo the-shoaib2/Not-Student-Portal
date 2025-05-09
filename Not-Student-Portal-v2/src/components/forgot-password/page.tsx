@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { authService } from '../../services/api';
+import { authService } from '../../services/proxy-api';
 import toast from 'react-hot-toast';
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";

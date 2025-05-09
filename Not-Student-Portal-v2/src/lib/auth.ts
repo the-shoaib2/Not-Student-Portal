@@ -2,7 +2,7 @@ import NextAuth from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { connectDB } from '@/lib/mongodb'
 import { User as UserModel } from '@/models/user'
-import { proxyRequest } from '@/services/api'
+import { proxyRequest } from '@/services/proxy-api'
 import mongoose from 'mongoose'
 
 // Define the User type based on the schema

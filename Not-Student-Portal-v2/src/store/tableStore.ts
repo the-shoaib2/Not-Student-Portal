@@ -1,4 +1,4 @@
-import { SemesterExamClearance } from '@/services/api';
+import { SemesterExamClearance } from '@/services/proxy-api';
 
 // Define the store interface
 interface TableState {

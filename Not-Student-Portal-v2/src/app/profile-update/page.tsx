@@ -10,7 +10,7 @@ import ContactTab from '@/components/profile-update-tabs/contact-tab'
 import EducationTab from '@/components/profile-update-tabs/education-tab'
 import PhotographTab from '@/components/profile-update-tabs/photograph-tab'
 import InsuranceTab from '@/components/profile-update-tabs/insurance-tab'
-import { profileService } from '@/services/api'
+import { profileService } from '@/services/proxy-api'
 
 const ProfileUpdate: React.FC = () => {
   const [activeTab, setActiveTab] = useState("personal")

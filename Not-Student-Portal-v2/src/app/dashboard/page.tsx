@@ -15,7 +15,7 @@ import {
   SGPAData,
   profileService,
   StudentInfo
-} from '@/services/api';
+} from '@/services/proxy-api';
 
 export default function DashboardPage() {
   const pageTitle = 'Student Dashboard';

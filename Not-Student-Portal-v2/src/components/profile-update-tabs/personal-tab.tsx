@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { DatePicker } from "@/components/ui/date-picker"
 import { PersonalTabProps, PersonalInfo, MaritalStatus, BloodGroup, Religion } from "@/types/profile"
-import { profileService } from "@/services/api"
+import { profileService } from "@/services/proxy-api"
 import { toast } from "react-hot-toast"
 
 export default function PersonalTab({ data, maritalStatus, bloodGroup, religion }: PersonalTabProps) {

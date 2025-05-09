@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { resultService } from '@/services/api';
+import { resultService } from '@/services/proxy-api';
 import { Search, Loader, BookOpen, Award, LayoutDashboard } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { Confetti } from '@/components/magicui/confetti';

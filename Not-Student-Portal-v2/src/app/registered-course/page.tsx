@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useEffect, useCallback, useState } from "react"
-import { registeredCourseService } from "@/services/api"
+import { registeredCourseService } from "@/services/proxy-api"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import PageTitle from "@/components/PageTitle"
 import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table"

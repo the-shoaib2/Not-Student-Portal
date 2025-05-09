@@ -9,7 +9,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "../ui/chart";
-import { CGPAData, SGPAData } from "../../services/api";
+import { CGPAData, SGPAData } from "../../services/proxy-api";
 
 interface SGPAChartDataItem {
   semester: string;

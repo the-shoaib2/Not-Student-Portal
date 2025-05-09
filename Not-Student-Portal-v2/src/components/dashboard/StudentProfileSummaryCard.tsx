@@ -4,7 +4,7 @@ import { Card, CardContent,CardTitle, CardHeader, CardFooter } from '@/component
 import { Table, TableBody, TableRow, TableCell } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
-import { StudentInfo } from '@/services/api';
+import { StudentInfo } from '@/services/proxy-api';
 import { ArrowRightIcon } from 'lucide-react';
 
 interface StudentProfileSummaryCardProps {

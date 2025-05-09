@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react"
 import { Button } from "./ui/button"
 import { ArrowLeft, Loader2, Eye, EyeOff } from "lucide-react"
-import { authService } from "../services/api"
+import { authService } from "../services/proxy-api"
 import toast from "react-hot-toast"
 import { InputOTP } from "./ui/input-otp"
 import { PasswordStrengthMeter } from "./ui/password-strength-meter"

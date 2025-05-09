@@ -1,7 +1,7 @@
 import React, { memo } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
-import { StudentInfo, PhotographInfo } from '@/services/api';
+import { StudentInfo, PhotographInfo } from '@/services/proxy-api';
 
 interface PersonalInfoTabProps {
   studentInfo: StudentInfo | null;
