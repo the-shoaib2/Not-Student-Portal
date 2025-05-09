@@ -199,7 +199,7 @@ const ProfileComponent: React.FC = () => {
   const isLoading = loading.studentInfo || loading.photograph || loading.educationList || loading.presentAddress || loading.permanentAddress;
 
   return (
-    <div className="w-full min-h-screen bg-gradient-to-b from-gray-50 to-white">
+    <div className="w-full">
       {/* Page Title */}
       <div className="w-full bg-white border-b">
           <PageTitle 

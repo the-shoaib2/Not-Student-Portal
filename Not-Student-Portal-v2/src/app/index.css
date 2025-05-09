@@ -72,4 +72,18 @@
     @apply bg-background text-foreground;
     font-family: 'Inter', sans-serif;
   }
-} 
+
+  /* Global placeholder styles */
+  ::placeholder {
+    color: white !important;
+    opacity: 1 !important;
+    font-size: 12px;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: white !important;
+    opacity: 1 !important;
+    font-size: 12px;
+  }
+}
