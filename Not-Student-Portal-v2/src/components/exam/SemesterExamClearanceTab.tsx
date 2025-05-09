@@ -12,12 +12,12 @@ const statusIcon = (ok: boolean) => (
 const SemesterExamClearanceTab: React.FC<SemesterExamClearanceTabProps> = ({ data, loading }) => {
   if (loading) {
     return (
-      <Card className="shadow-sm overflow-hidden animate-in fade-in-50 duration-500 max-w-3xl mx-auto">
-        <CardHeader className="p-2 sm:p-3 bg-gradient-to-r from-gray-50 to-gray-100 border-b">
-          <CardTitle className="h-5 w-32 sm:h-6 sm:w-48 bg-gray-200 rounded-md animate-pulse mx-auto" />
+      <Card className="shadow-sm overflow-hidden animate-in fade-in-50 duration-500 max-w-4xl mx-auto">
+        <CardHeader className="p-2 sm:p-4 flex items-left">
+          <CardTitle className="h-5 w-32 sm:h-6 sm:w-48 bg-gray-200 rounded-md animate-pulse ml-3 sm:ml-4" />
         </CardHeader>
         <CardContent>
-          <div className="overflow-x-auto rounded-md border border-teal-100 bg-white">
+          <div className="overflow-x-auto  border border-teal-100 bg-white w-full max-w-full">
             <Table>
               <TableHeader>
                 <TableRow>
