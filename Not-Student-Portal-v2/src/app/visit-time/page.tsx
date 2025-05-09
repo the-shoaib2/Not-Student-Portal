@@ -1,3 +1,5 @@
+'use client'
+
 import { useEffect, useState } from 'react'
 import { ActivityTracker } from '@/services/activity'
 import { VisitTime } from '@/models/visitTime'

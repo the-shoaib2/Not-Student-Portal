@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Card, CardTitle, CardHeader, CardContent } from '../ui/card';
-import { Table, TableHeader, TableBody, TableRow, TableCell, TableHead } from '../ui/table';
-import { registeredCourseService } from '../../services/api';
-import { data } from 'react-router-dom';
+import { Card, CardTitle, CardHeader, CardContent } from '@/components/ui/card';
+import { Table, TableHeader, TableBody, TableRow, TableCell, TableHead } from '@/components/ui/table';
+import { registeredCourseService } from '@/services/api';
 
 export interface SemesterInfo {
   semesterId: string;

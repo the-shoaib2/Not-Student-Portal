@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { proxyClient } from '@/services/proxyUtils';
 import { Activity } from '@/models/activity';
-import connectDB from '@/lib/mongodb';
+import { connectDB } from '@/lib/mongodb';
 import mongoose from 'mongoose';
 
 interface LoginRequest {

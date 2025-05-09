@@ -1,5 +1,5 @@
 import React from 'react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Card, CardContent,CardTitle, CardHeader, CardFooter } from '@/components/ui/card';
 import { Table, TableBody, TableRow, TableCell } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -16,8 +16,10 @@ const StudentProfileSummaryCard: React.FC<StudentProfileSummaryCardProps> = ({
   studentInfo,
   loading = false,
 }) => {
+  const router = useRouter();
+
   const handleViewProfile = () => {
-    window.location.href = '/profile';
+    router.push('/profile');
   };
 
   if (loading) {

@@ -1,7 +1,7 @@
 import React, { memo } from 'react';
-import { Card, CardHeader, CardContent } from '../ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
-import { StudentInfo, EducationInfo } from '../../services/api';
+import { Card, CardHeader, CardContent } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { StudentInfo, EducationInfo } from '@/services/api';
 
 interface EducationTabProps {
   studentInfo: StudentInfo | null;
@@ -63,14 +63,14 @@ const EducationTabComponent: React.FC<EducationTabProps> = ({ studentInfo, educa
               {hasEducationInfo ? (
                 educationInfo.map((edu, index) => (
                   <TableRow key={edu.id || index}>
-                    <TableCell className="text-sm">{edu.degree || 'N/A'}</TableCell>
-                    <TableCell className="text-sm">{edu.major || 'N/A'}</TableCell>
-                    <TableCell className="text-sm">{edu.institute || 'N/A'}</TableCell>
-                    <TableCell className="text-sm">N/A</TableCell>
-                    <TableCell className="text-sm">{edu.passingYear || 'N/A'}</TableCell>
-                    <TableCell className="text-sm">N/A</TableCell>
-                    <TableCell className="text-sm">{edu.result || 'N/A'} {edu.scale ? `(${edu.scale})` : ''}</TableCell>
-                    <TableCell className="text-sm">{edu.duration ? `${edu.duration} years` : 'N/A'}</TableCell>
+                    <TableCell className="text-sm text-center">{edu.degree || 'N/A'}</TableCell>
+                    <TableCell className="text-sm text-center">{edu.major || 'N/A'}</TableCell>
+                    <TableCell className="text-sm text-center">{edu.institute || 'N/A'}</TableCell>
+                    <TableCell className="text-sm text-center">N/A</TableCell>
+                    <TableCell className="text-sm text-center">{edu.passingYear || 'N/A'}</TableCell>
+                    <TableCell className="text-sm text-center">N/A</TableCell>
+                    <TableCell className="text-sm text-center">{edu.result || 'N/A'} {edu.scale ? `(${edu.scale})` : ''}</TableCell>
+                    <TableCell className="text-sm text-center">{edu.duration ? `${edu.duration} years` : 'N/A'}</TableCell>
                   </TableRow>
                 ))
               ) : (

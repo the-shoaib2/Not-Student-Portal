@@ -1,10 +1,10 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Button } from '../ui/button';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
 import { Camera, ArrowRight as ArrowRightIcon, Edit } from 'lucide-react';
-import { StudentInfo } from '../../services/api';
-import { PhotographInfo } from '../../services/api';
-import Base64ImageCard from '../ImageView';
+import { StudentInfo } from '@/services/api';
+import { PhotographInfo } from '@/services/api';
+import Base64ImageCard from '@/components/ImageView';
 
 interface ProfileCardProps {
   studentInfo?: StudentInfo | null;
@@ -23,10 +23,10 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
   useBase64Card = false,
   className = ''
 }) => {
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const handleEditProfile = () => {
-    navigate('/profile-update');
+    router.push('/profile-update');
   };
 
   const getBase64Data = () => {

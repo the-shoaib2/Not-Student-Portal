@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import crypto from 'crypto'
 import nodemailer from 'nodemailer'
-import connectDB from '@/lib/mongodb'
+import { connectDB } from '@/lib/mongodb'
 import { User } from '@/models/user'
 
 const transporter = nodemailer.createTransport({
