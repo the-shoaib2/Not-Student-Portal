@@ -10,7 +10,7 @@ interface VisitTimeMetadata {
   userAgent?: string
 }
 
-interface VisitTimeInterface {
+export interface VisitTimeInterface {
   userId: mongoose.Types.ObjectId
   sessionId: string
   pagePath: string

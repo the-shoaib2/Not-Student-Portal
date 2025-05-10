@@ -1,6 +1,6 @@
 import { Activity } from '../models/activity'
 import { ActivityConfig } from '../models/activityConfig'
-import { VisitTime } from '../models/visitTime'
+import { VisitTime, VisitTimeInterface } from '../models/visitTime'
 import { getCookie } from 'cookies-next'
 import { v4 as uuidv4 } from 'uuid'
 import { proxyClient } from '@/services/proxyUtils'
@@ -38,7 +38,7 @@ export interface ActivityConfig {
 export class ActivityTracker {
   private static instance: ActivityTracker
   private sessionId: string
-  private currentVisit: any
+  private currentVisit: VisitTimeInterface | null
   private config: ActivityConfig
 
   private constructor() {
@@ -155,8 +155,8 @@ export class ActivityTracker {
           Authorization: `Bearer ${await getCookie('token')}`
         }
       })
-    } catch (error) {
-      console.error('Error updating visit time:', error)
+    } catch {
+      console.error('Error updating visit time:')
     }
   }
 
@@ -173,8 +173,8 @@ export class ActivityTracker {
           Authorization: `Bearer ${token}`
         }
       })
-    } catch (error) {
-      console.error('Error ending visit:', error)
+    } catch {
+      console.error('Error ending visit:')
     }
   }
 
