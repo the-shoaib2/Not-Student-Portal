@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { ActivityTracker } from '@/services/activity'
+import { ActivityTracker, ActivityData } from '../services/activity';
 import { getServerSession } from 'next-auth'
 
 import { useSession } from 'next-auth/react'
@@ -33,10 +33,7 @@ export function useActivityTracking() {
 
   const [isLoading, setIsLoading] = useState(true)
   const { data: session } = useSession()
-  const tracker = useMemo(() => {
-    const { ActivityTracker } = require('@/services/activity')
-    return ActivityTracker.getInstance()
-  }, [])
+  const tracker = useMemo(() => ActivityTracker.getInstance(), [])
 
   useEffect(() => {
     const loadConfig = async () => {
@@ -71,49 +68,54 @@ export function useActivityTracking() {
     if (!config.enabled.pageViews) return
     const session = await getServerSession() as Session
     if (!session?.user?.id) return
-    await ActivityTracker.getInstance().trackPageView(path, metadata)
+    await tracker.trackPageView(path, metadata)
   }
 
   const trackButtonClick = async (elementId: string, path: string, metadata?: any) => {
     if (!config.enabled.buttonClicks) return
     const session = await getServerSession() as Session
     if (!session?.user?.id) return
-    await ActivityTracker.getInstance().trackButtonClick(elementId, path, metadata)
+    await tracker.trackButtonClick(elementId, path, metadata)
   }
 
   const trackFormSubmission = async (formId: string, path: string, formData: any, metadata?: any) => {
     if (!config.enabled.formSubmissions) return
     const session = await getServerSession() as Session
     if (!session?.user?.id) return
-    await ActivityTracker.getInstance().trackFormSubmission(formId, path, formData, metadata)
+    await tracker.trackFormSubmission(formId, path, formData, metadata)
   }
 
   const trackFormInput = async (formId: string, path: string, inputName: string, inputValue: string, metadata?: any) => {
     if (!config.enabled.formInputs) return
     const session = await getServerSession() as Session
     if (!session?.user?.id) return
-    await ActivityTracker.getInstance().trackFormInput(formId, path, inputName, inputValue, metadata)
+    await tracker.trackFormInput(formId, path, inputName, inputValue, metadata)
   }
 
-  const trackApiCall = async (apiEndpoint: string, apiMethod: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH', path: string, metadata?: any) => {
+  const trackApiCall = async (endpoint: string, method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH', path: string, metadata?: ActivityData['metadata']) => {
     if (!config.enabled.apiCalls) return
     const session = await getServerSession() as Session
     if (!session?.user?.id) return
-    await ActivityTracker.getInstance().trackApiCall(apiEndpoint, apiMethod, path, metadata)
+    await tracker.trackApiCall(endpoint, method, path, metadata)
   }
 
-  const trackLogin = async (path: string, metadata?: any) => {
+  const trackLogin = async (username: string, metadata?: {
+    studentId?: string
+    email?: string
+    name?: string
+    sessionDuration?: number
+  }) => {
     if (!config.enabled.loginLogout) return
     const session = await getServerSession() as Session
     if (!session?.user?.id) return
-    await ActivityTracker.getInstance().trackLogin(path, metadata)
+    await tracker.trackLogin(username, metadata)
   }
 
-  const trackLogout = async (path: string, metadata?: any) => {
+  const trackLogout = async (metadata?: any) => {
     if (!config.enabled.loginLogout) return
     const session = await getServerSession() as Session
     if (!session?.user?.id) return
-    await ActivityTracker.getInstance().trackLogout(path, metadata)
+    await tracker.trackLogout(metadata)
   }
 
   const toggleTracking = async (type: keyof ActivityConfig['enabled']) => {
