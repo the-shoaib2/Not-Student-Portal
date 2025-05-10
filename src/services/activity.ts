@@ -173,8 +173,8 @@ export class ActivityTracker {
           Authorization: `Bearer ${token}`
         }
       })
-    } catch {
-      console.error('Error ending visit:')
+    } catch (error: unknown) {
+      console.error('Error ending visit:', error)
     }
   }
 
