@@ -3,7 +3,7 @@ import { ActivityConfig } from '../models/activityConfig'
 import { VisitTime, VisitTimeInterface } from '../models/visitTime'
 import { getCookie } from 'cookies-next'
 import { v4 as uuidv4 } from 'uuid'
-import { proxyClient } from '@/services/proxyUtils'
+import axios from 'axios'
 
 export interface ActivityData {
   action: 'page_view' | 'button_click' | 'form_submission' | 'api_call' | 'login' | 'logout' | 'form_input'
@@ -87,7 +87,7 @@ export class ActivityTracker {
         sessionId: this.sessionId
       })
 
-      await proxyClient.post('/api/activity', {
+      await axios.post('/api/activity', {
         userId: data.metadata?.studentId || '',
         action: data.action,
         path: data.path,
@@ -116,7 +116,7 @@ export class ActivityTracker {
 
   async getUserConfig(token: string): Promise<ActivityConfig> {
     try {
-      const response = await proxyClient.get<ActivityConfig>('/api/activity/config', {
+      const response = await axios.get<ActivityConfig>('/api/activity/config', {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -130,7 +130,7 @@ export class ActivityTracker {
 
   async updateActivityConfig(token: string, config: ActivityConfig): Promise<void> {
     try {
-      await proxyClient.put('/api/activity/config', config, {
+      await axios.put('/api/activity/config', config, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -143,7 +143,7 @@ export class ActivityTracker {
 
   async updateVisitTime(userId: string, pagePath: string, metadata: any) {
     try {
-      await proxyClient.post('/api/visit-time', {
+      await axios.post('/api/visit-time', {
         userId,
         pagePath,
         startTime: new Date(),
@@ -165,7 +165,7 @@ export class ActivityTracker {
       const token = await getCookie('token')
       if (!token) return
 
-      await proxyClient.post('/api/visit-time/end', {
+      await axios.post('/api/visit-time/end', {
         userId: '',
         endTime: new Date()
       }, {
@@ -173,8 +173,8 @@ export class ActivityTracker {
           Authorization: `Bearer ${token}`
         }
       })
-    } catch {
-      console.error('Error ending visit:')
+    } catch (error: unknown) {
+      console.error('Error ending visit:', error)
     }
   }
 
