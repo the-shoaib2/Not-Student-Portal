@@ -243,9 +243,3 @@ export class ActivityTracker {
     })
   }
 }
-
-  }
-}
-
-  }
-}
