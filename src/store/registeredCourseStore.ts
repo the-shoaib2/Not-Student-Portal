@@ -6,7 +6,7 @@ interface RegisteredCourseState {
   selectedSemester: SemesterInfo | null;
   semesters: SemesterInfo[];
   semesterLoading: boolean;
-  selectedRoutine: any[] | null;
+  selectedRoutine: { courseId: string; courseTitle: string; routine: string }[] | null;
   selectedRoutineCourseTitle: string;
   sortColumn: keyof RegisteredCourse | null;
   sortDirection: 'asc' | 'desc';
@@ -17,7 +17,7 @@ interface RegisteredCourseState {
   setSelectedSemester: (semester: SemesterInfo | null) => void;
   setSemesters: (semesters: SemesterInfo[]) => void;
   setSemesterLoading: (loading: boolean) => void;
-  setSelectedRoutine: (routine: any[] | null) => void;
+  setSelectedRoutine: (routine: { courseId: string; courseTitle: string; routine: string }[] | null) => void;
   setSelectedRoutineCourseTitle: (title: string) => void;
   setSorting: (column: keyof RegisteredCourse | null, direction: 'asc' | 'desc') => void;
   setRoutineSorting: (column: string | null, direction: 'asc' | 'desc') => void;
@@ -40,17 +40,17 @@ const createStore = () => {
     sortDirection: 'asc',
     routineSortColumn: null,
     routineSortDirection: 'asc',
-    setRegisteredCourses: () => {},
-    setLoading: () => {},
-    setSelectedSemester: () => {},
-    setSemesters: () => {},
-    setSemesterLoading: () => {},
-    setSelectedRoutine: () => {},
-    setSelectedRoutineCourseTitle: () => {},
-    setSorting: () => {},
-    setRoutineSorting: () => {},
-    sortData: () => {},
-    sortRoutineData: () => {},
+    setRegisteredCourses: () => { },
+    setLoading: () => { },
+    setSelectedSemester: () => { },
+    setSemesters: () => { },
+    setSemesterLoading: () => { },
+    setSelectedRoutine: () => { },
+    setSelectedRoutineCourseTitle: () => { },
+    setSorting: () => { },
+    setRoutineSorting: () => { },
+    sortData: () => { },
+    sortRoutineData: () => { },
   };
 
   // Store implementation
@@ -102,55 +102,55 @@ const createStore = () => {
 
   state.sortData = () => {
     const { registeredCourses, sortColumn, sortDirection } = state;
-    
+
     if (!registeredCourses || !sortColumn) return;
-    
+
     const sortedData = [...registeredCourses].sort((a, b) => {
       const aValue = a[sortColumn];
       const bValue = b[sortColumn];
-      
+
       if (typeof aValue === 'string' && typeof bValue === 'string') {
-        return sortDirection === 'asc' 
-          ? aValue.localeCompare(bValue) 
+        return sortDirection === 'asc'
+          ? aValue.localeCompare(bValue)
           : bValue.localeCompare(aValue);
       }
-      
+
       if (typeof aValue === 'boolean' && typeof bValue === 'boolean') {
-        return sortDirection === 'asc' 
-          ? (aValue === bValue ? 0 : aValue ? -1 : 1) 
+        return sortDirection === 'asc'
+          ? (aValue === bValue ? 0 : aValue ? -1 : 1)
           : (aValue === bValue ? 0 : aValue ? 1 : -1);
       }
-      
+
       if (typeof aValue === 'number' && typeof bValue === 'number') {
-        return sortDirection === 'asc' 
-          ? aValue - bValue 
+        return sortDirection === 'asc'
+          ? aValue - bValue
           : bValue - aValue;
       }
-      
+
       return 0;
     });
-    
+
     store.setState({ registeredCourses: sortedData });
   };
 
   state.sortRoutineData = () => {
     const { selectedRoutine, routineSortColumn, routineSortDirection } = state;
-    
+
     if (!selectedRoutine || !routineSortColumn) return;
-    
+
     const sortedData = [...selectedRoutine].sort((a, b) => {
-      const aValue = a[routineSortColumn];
-      const bValue = b[routineSortColumn];
-      
+      const aValue = routineSortColumn === 'courseTitle' ? a.courseTitle : a.routine;
+      const bValue = routineSortColumn === 'courseTitle' ? b.courseTitle : b.routine;
+
       if (typeof aValue === 'string' && typeof bValue === 'string') {
-        return routineSortDirection === 'asc' 
-          ? aValue.localeCompare(bValue) 
+        return routineSortDirection === 'asc'
+          ? aValue.localeCompare(bValue)
           : bValue.localeCompare(aValue);
       }
-      
+
       return 0;
     });
-    
+
     store.setState({ selectedRoutine: sortedData });
   };
 
