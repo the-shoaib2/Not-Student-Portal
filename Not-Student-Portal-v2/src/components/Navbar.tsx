@@ -1,7 +1,6 @@
-"use client"
 import React, { useState, useRef, useEffect } from 'react';
 import { Menu, User } from 'lucide-react';
-import UserCard from '@/components/UserCard';
+import UserCard from './UserCard';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface NavbarProps {
@@ -25,7 +24,7 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar }) => {
   }, []);
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-40 bg-gradient-to-r from-teal-600 to-cyan-700 text-white shadow-lg">
+    <nav className="fixed top-0 left-0 right-0 z-49 bg-gradient-to-r from-teal-600 to-cyan-700 text-white shadow-lg">
       <div className="max-w-8xl mx-auto px-2 sm:px-4 lg:px-2">
         <div className="flex items-center justify-between h-12 relative">
           <div className="flex items-center">

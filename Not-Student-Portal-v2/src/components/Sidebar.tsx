@@ -1,10 +1,8 @@
-
-"use client"
-import React, { useState, useEffect, JSX } from 'react';
+import React, { useState } from 'react';
 import { X, Home, LogIn, User, UserPlus, KeyRound, FileText, FileCheck, BookOpen, Calendar, Bell, Briefcase, Building2, Laptop, ClipboardList, Users, Award, MonitorCheck, CreditCard, Layers, GraduationCap, LogOut } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '../contexts/AuthContext';
+import { useRouter, usePathname } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 import toast from 'react-hot-toast';
 
 interface SidebarProps {
@@ -24,18 +22,12 @@ interface MenuItem {
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
   const { isAuthenticated, logout } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
 
   const menuItems: MenuItem[] = [
+    { icon: <LogIn size={20} />, text: 'Log in', path: '/login', category: 'General', showWhenAuthenticated: false, public: true },
     { icon: <Home size={20} />, text: 'Home', path: '/', category: 'General', showWhenAuthenticated: true },
-    ...(isAuthenticated ? [] : [{
-      icon: <LogIn size={20} />, 
-      text: 'Log in', 
-      path: '/login', 
-      category: 'General', 
-      showWhenAuthenticated: false, 
-      public: true 
-    }]),
     { icon: <ClipboardList size={20} />, text: 'Dashboard', path: '/dashboard', category: 'General', showWhenAuthenticated: true },
     { icon: <User size={20} />, text: 'Profile', path: '/profile', category: 'Profile', showWhenAuthenticated: true },
     { icon: <UserPlus size={20} />, text: 'Profile Update', path: '/profile-update', category: 'Profile', showWhenAuthenticated: true },
@@ -68,21 +60,13 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
   ];
 
   const filteredMenuItems = menuItems.filter(item => {
-    // Always show Login when not authenticated
-    if (!isAuthenticated && item.text === 'Log in') {
-      return true;
+    // Remove Login item when user is authenticated
+    if (isAuthenticated && item.text === 'Log in') {
+      return false;
     }
-    // Always show Logout when authenticated
-    if (isAuthenticated && item.text === 'Logout') {
-      return true;
-    }
-    // Show public routes regardless of authentication
-    if (item.public) {
-      return true;
-    }
-    // For private routes, show only when authenticated
-    return isAuthenticated && item.showWhenAuthenticated;
+    return item.public || (isAuthenticated ? item.showWhenAuthenticated : !item.showWhenAuthenticated);
   });
+
 
   // Group menu items by category, excluding Logout
   const categorizedMenu: { [category: string]: MenuItem[] } = {};
@@ -99,15 +83,16 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
   });
 
   // Handle logout confirmation
-  const handleLogout = () => {
+  const handleLogout = (e: React.MouseEvent) => {
+    e.preventDefault();
     setShowLogoutDialog(true);
   };
   const confirmLogout = () => {
     setShowLogoutDialog(false);
     logout();
-    router.push('/login');
     toast.success('Logged out successfully');
     toggleSidebar();
+    router.push('/login');
   };
   const cancelLogout = () => {
     setShowLogoutDialog(false);
@@ -150,13 +135,17 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
                 {category}
               </div>
               {items.map((item) => {
-                const isActive = window.location.pathname === item.path;
+                const isActive = pathname === item.path;
                 return (
                   <Link 
                     key={item.text}
                     href={item.path}
                     className={`flex items-center space-x-3 px-4 py-2 hover:bg-teal-700/50 transition-colors duration-200 rounded ${isActive ? 'bg-teal-800 font-bold' : ''}`}
-                    onClick={toggleSidebar}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      toggleSidebar();
+                      router.push(item.path);
+                    }}
                   >
                     <span className="text-teal-300">{item.icon}</span>
                     <span className="text-sm">{item.text}</span>

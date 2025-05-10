@@ -1,8 +1,9 @@
 import { Activity } from '../models/activity'
 import { ActivityConfig } from '../models/activityConfig'
 import { VisitTime } from '../models/visitTime'
-import { getServerSession } from 'next-auth'
+import { getCookie } from 'cookies-next'
 import { v4 as uuidv4 } from 'uuid'
+import { proxyClient } from '@/services/proxyUtils'
 
 export interface ActivityData {
   action: 'page_view' | 'button_click' | 'form_submission' | 'api_call' | 'login' | 'logout' | 'form_input'
@@ -21,8 +22,6 @@ export interface ActivityData {
     sessionDuration?: number
   }
 }
-
-import type { Session } from 'next-auth'
 
 export interface ActivityConfig {
   enabled: {
@@ -67,14 +66,14 @@ export class ActivityTracker {
 
   async trackActivity(data: ActivityData) {
     try {
-      const session = await getServerSession()
-      if (!session?.user?.id) return
+      const token = await getCookie('token')
+      if (!token) return
 
-      const config = await this.getUserConfig(session.user.id)
+      const config = await this.getUserConfig(token)
       if (!config?.enabled[data.action as keyof ActivityConfig['enabled']]) return
 
       const activity = new Activity({
-        userId: session.user.id as string,
+        userId: data.metadata?.studentId || '',
         action: data.action,
         path: data.path,
         elementId: data.elementId,
@@ -87,46 +86,55 @@ export class ActivityTracker {
         metadata: data.metadata,
         sessionId: this.sessionId
       })
-      await activity.save()
+
+      await proxyClient.post('/api/activity', {
+        userId: data.metadata?.studentId || '',
+        action: data.action,
+        path: data.path,
+        elementId: data.elementId,
+        formId: data.formId,
+        formData: data.formData,
+        inputName: data.inputName,
+        inputValue: data.inputValue,
+        apiEndpoint: data.apiEndpoint,
+        apiMethod: data.apiMethod,
+        metadata: data.metadata,
+        sessionId: this.sessionId
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
 
       if (config.enabled.visitTime) {
-        await this.updateVisitTime(session.user.id as string, data.path, data.metadata)
+        await this.updateVisitTime(data.metadata?.studentId || '', data.path, data.metadata)
       }
     } catch (error) {
       console.error('Error tracking activity:', error)
     }
   }
 
-  async getUserConfig(userId: string): Promise<ActivityConfig> {
+  async getUserConfig(token: string): Promise<ActivityConfig> {
     try {
-      const config = await ActivityConfig.findOne({ userId })
-      if (!config) {
-        return {
-          enabled: {
-            pageViews: true,
-            buttonClicks: true,
-            formSubmissions: true,
-            apiCalls: true,
-            loginLogout: true,
-            formInputs: true,
-            visitTime: true
-          }
+      const response = await proxyClient.get<ActivityConfig>('/api/activity/config', {
+        headers: {
+          Authorization: `Bearer ${token}`
         }
-      }
-      return config
+      })
+      return response.data
     } catch (error) {
       console.error('Error getting user config:', error)
       throw error
     }
   }
 
-  async updateActivityConfig(userId: string, config: ActivityConfig): Promise<void> {
+  async updateActivityConfig(token: string, config: ActivityConfig): Promise<void> {
     try {
-      await ActivityConfig.findOneAndUpdate(
-        { userId },
-        { $set: { enabled: config.enabled } },
-        { upsert: true, new: true }
-      )
+      await proxyClient.put('/api/activity/config', config, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
     } catch (error) {
       console.error('Error updating activity config:', error)
       throw error
@@ -135,21 +143,18 @@ export class ActivityTracker {
 
   async updateVisitTime(userId: string, pagePath: string, metadata: any) {
     try {
-      const visit = await VisitTime.findOne({ userId, pagePath })
-      if (!visit) {
-        await new VisitTime({
-          userId,
-          pagePath,
-          startTime: new Date(),
-          endTime: null,
-          duration: 0,
-          metadata
-        }).save()
-      } else {
-        visit.endTime = new Date()
-        visit.duration = Math.floor((visit.endTime.getTime() - visit.startTime.getTime()) / 1000)
-        await visit.save()
-      }
+      await proxyClient.post('/api/visit-time', {
+        userId,
+        pagePath,
+        startTime: new Date(),
+        endTime: null,
+        duration: 0,
+        metadata
+      }, {
+        headers: {
+          Authorization: `Bearer ${await getCookie('token')}`
+        }
+      })
     } catch (error) {
       console.error('Error updating visit time:', error)
     }
@@ -157,19 +162,17 @@ export class ActivityTracker {
 
   async endVisit() {
     try {
-      const session = await getServerSession()
-      if (!session?.user?.id) return
+      const token = await getCookie('token')
+      if (!token) return
 
-      const visit = await VisitTime.findOne({
-        userId: session.user.id,
-        endTime: null
+      await proxyClient.post('/api/visit-time/end', {
+        userId: '',
+        endTime: new Date()
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
       })
-
-      if (visit) {
-        visit.endTime = new Date()
-        visit.duration = Math.floor((visit.endTime.getTime() - visit.startTime.getTime()) / 1000)
-        await visit.save()
-      }
     } catch (error) {
       console.error('Error ending visit:', error)
     }
@@ -223,20 +226,26 @@ export class ActivityTracker {
     })
   }
 
-  async trackLogin(path: string, metadata?: ActivityData['metadata']): Promise<void> {
+  async trackLogin(userId: string, metadata?: ActivityData['metadata']): Promise<void> {
     await this.trackActivity({
       action: 'login',
-      path,
-      metadata
+      path: '',
+      metadata: { studentId: userId, ...metadata }
     })
   }
 
-  async trackLogout(path: string, metadata?: ActivityData['metadata']): Promise<void> {
+  async trackLogout(userId: string, metadata?: ActivityData['metadata']): Promise<void> {
     await this.endVisit()
     await this.trackActivity({
       action: 'logout',
-      path,
-      metadata
+      path: '',
+      metadata: { studentId: userId, ...metadata }
     })
+  }
+}
+
+  }
+}
+
   }
 }
