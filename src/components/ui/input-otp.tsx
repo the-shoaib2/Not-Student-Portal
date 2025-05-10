@@ -1,5 +1,5 @@
 import * as React from "react"
-import { cn } from "../../lib/utils"
+import { cn } from "@/lib/utils"
 
 interface InputOTPProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'> {
   value?: string;
@@ -101,7 +101,7 @@ const InputOTP = React.forwardRef<HTMLDivElement, InputOTPProps>(({
         <React.Fragment key={i}>
           <div className="relative">
             <input
-              ref={(el) => (inputRefs.current[i] = el)}
+              ref={(el) => { inputRefs.current[i] = el; }}
               type="text"
               inputMode="numeric"
               pattern="[0-9]*"

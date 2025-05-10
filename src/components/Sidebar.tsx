@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { X, Home, LogIn, User, UserPlus, KeyRound, FileText, FileCheck, BookOpen, Calendar, Bell, Briefcase, Building2, Laptop, ClipboardList, Users, Award, MonitorCheck, CreditCard, Layers, GraduationCap, LogOut } from 'lucide-react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import Link from 'next/link';
+import { useRouter, usePathname } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 import toast from 'react-hot-toast';
 
 interface SidebarProps {
@@ -20,8 +21,8 @@ interface MenuItem {
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
   const { isAuthenticated, logout } = useAuth();
-  const location = useLocation();
-  const navigate = useNavigate();
+  const router = useRouter();
+  const pathname = usePathname();
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
 
   const menuItems: MenuItem[] = [
@@ -91,7 +92,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
     logout();
     toast.success('Logged out successfully');
     toggleSidebar();
-    navigate('/login');
+    router.push('/login');
   };
   const cancelLogout = () => {
     setShowLogoutDialog(false);
@@ -134,13 +135,17 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
                 {category}
               </div>
               {items.map((item) => {
-                const isActive = location.pathname === item.path;
+                const isActive = pathname === item.path;
                 return (
                   <Link 
                     key={item.text}
-                    to={item.path}
+                    href={item.path}
                     className={`flex items-center space-x-3 px-4 py-2 hover:bg-teal-700/50 transition-colors duration-200 rounded ${isActive ? 'bg-teal-800 font-bold' : ''}`}
-                    onClick={toggleSidebar}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      toggleSidebar();
+                      router.push(item.path);
+                    }}
                   >
                     <span className="text-teal-300">{item.icon}</span>
                     <span className="text-sm">{item.text}</span>

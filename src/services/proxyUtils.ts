@@ -4,15 +4,16 @@
  * This file provides utility functions for working with the proxy server.
  */
 
-import axios from 'axios';
+import axios, { AxiosRequestConfig, AxiosResponse, AxiosError, isAxiosError, InternalAxiosRequestConfig } from 'axios';
 
 // Constants
 export const PROXY_BASE = '/proxy';
-export const API_BASE_URL = import.meta.env.API_BASE_URL || 'http://software.diu.edu.bd:8189';
+export const API_BASE_URL = process.env.API_BASE_URL || 'http://peoplepulse.diu.edu.bd:8189';
 
 // Create a proxy client instance
-export const proxyClient = axios.create({
-  baseURL: PROXY_BASE,
+const proxyClient = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: 100000, // 100 seconds timeout
   headers: {
     'Accept': 'application/json',
     'Content-Type': 'application/json'
@@ -21,40 +22,56 @@ export const proxyClient = axios.create({
 
 // Add request interceptor
 proxyClient.interceptors.request.use(
-  async (config) => {
-    // Log request details
-    // console.log('[Proxy] Request:', {
-    //   method: config.method?.toUpperCase(),
-    //   url: `${config.baseURL}${config.url}`,
-    //   headers: config.headers,
-    //   data: config.data
-    // });
+  (config: InternalAxiosRequestConfig) => {
+    // Add any request-specific headers or modifications
     return config;
   },
-  (error: any) => {
-    // console.error('[Proxy] Request Error:', error);
+  (error: AxiosError) => {
+    console.error('[Proxy] Request error:', error);
     return Promise.reject(error);
   }
 );
 
 // Add response interceptor
 proxyClient.interceptors.response.use(
-  (response) => {
+  (response: AxiosResponse) => {
     // console.log('[Proxy] Response:', {
     //   status: response.status,
     //   data: response.data
     // });
     return response;
   },
-  (error: any) => {
-    // console.error('[Proxy] Response Error:', {
-    //   status: error.response?.status,
-    //   data: error.response?.data,
-    //   message: error.message
-    // });
+  (error: AxiosError) => {
+    console.error('[Proxy] Response Error:', {
+      status: error.response?.status,
+      data: error.response?.data,
+      message: error.message
+    });
     return Promise.reject(error);
   }
 );
+
+// Export the proxy client and request function
+export { proxyClient };
+
+// Health check function
+export const checkProxyHealth = async (): Promise<{ status: string; message: string; data?: any }> => {
+  try {
+    const response = await proxyClient.get('/health');
+    const responseData = response.data || {};
+    return {
+      status: 'ok',
+      message: 'Proxy server is working correctly',
+      ...responseData
+    };
+  } catch (error) {
+    console.error('[Proxy] Health check failed:', error);
+    return {
+      status: 'error',
+      message: 'Proxy server is not working correctly'
+    };
+  }
+};
 
 /**
  * Helper function to determine if a request should use the proxy
@@ -122,8 +139,8 @@ export const proxyRequest = async ({
     } catch (error: any) {
       // If it's a network error or timeout, retry
       if (
-        axios.isAxiosError(error) && 
-        (error.code === 'ECONNABORTED' || error.code === 'ERR_NETWORK')
+        error instanceof Error && 
+        (error as any).code === 'ECONNABORTED' || (error as any).code === 'ERR_NETWORK'
       ) {
         if (retryCount < maxRetries) {
           // Exponential backoff
@@ -136,7 +153,7 @@ export const proxyRequest = async ({
       }
       
       // If max retries reached or different error, throw
-      if (axios.isAxiosError(error) && error.response) {
+      if (error instanceof AxiosError && error.response) {
         throw new Error(error.response.data?.message || error.message);
       }
       throw error;
@@ -174,7 +191,7 @@ export const checkProxyStatus = async (): Promise<{ status: string; message: str
 export const getProxyConfig = () => {
   return {
     baseUrl: '/api',
-    targetUrl: import.meta.env.API_BASE_URL,
+    targetUrl: process.env.API_BASE_URL,
     isProxyEnabled: true,
   };
 };

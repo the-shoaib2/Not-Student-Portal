@@ -3,8 +3,8 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { authService } from "../../../services/api";
-import { Button } from "../../../components/ui/button";
+import { authService } from "../../../services/proxy-api";
+import { Button } from "../../ui/button";
 import {
   Form,
   FormControl,
@@ -12,8 +12,8 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "../../../components/ui/form";
-import { Input } from "../../../components/ui/input";
+} from "../../ui/form";
+import { Input } from "../../ui/input";
 import { Eye, EyeOff } from "lucide-react";
 import { PasswordStrengthMeter } from "../../ui/password-strength-meter";
 import { toast } from "react-hot-toast";

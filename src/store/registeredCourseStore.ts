@@ -1,4 +1,4 @@
-import { SemesterInfo, RegisteredCourse } from '../app/RegisteredCourse';
+import { SemesterInfo, RegisteredCourse } from '@/app/registered-course/page';
 
 interface RegisteredCourseState {
   registeredCourses: RegisteredCourse[] | null;

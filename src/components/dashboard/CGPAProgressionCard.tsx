@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
-import { Skeleton } from "../ui/skeleton";
-import { Table, TableBody, TableRow, TableCell } from "../ui/table";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Table, TableBody, TableRow, TableCell } from "@/components/ui/table";
 import { BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid } from 'recharts';
 import {
   ChartConfig,
@@ -9,7 +9,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "../ui/chart";
-import { CGPAData, SGPAData } from "../../services/api";
+import { CGPAData, SGPAData } from "../../services/proxy-api";
 
 interface SGPAChartDataItem {
   semester: string;

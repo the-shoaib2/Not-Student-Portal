@@ -11,7 +11,7 @@ import axios, { AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 
 // Create a custom axios instance for the proxy
 const proxyClient = axios.create({
-  baseURL: import.meta.env.API_BASE_URL,
+  baseURL: process.env.API_BASE_URL,
   timeout: 100000, // 100 seconds timeout
 });
 
@@ -19,9 +19,9 @@ const proxyClient = axios.create({
 proxyClient.interceptors.request.use(
   (config) => {
     // Log outgoing requests (in development only)
-    if (import.meta.env.DEV) {
-      console.log(`[Proxy] Request: ${config.method?.toUpperCase()} ${config.url}`);
-    }
+    // if (false) {
+    //   console.log(`[Proxy] Request: ${config.method?.toUpperCase()} ${config.url}`);
+    // }
     
     return config;
   },
@@ -35,7 +35,7 @@ proxyClient.interceptors.request.use(
 proxyClient.interceptors.response.use(
   (response) => {
     // Log successful responses (in development only)
-    if (import.meta.env.DEV) {
+    if (process.env.NODE_ENV === 'development') {
       console.log(`[Proxy] Response: ${response.status} from ${response.config.url}`);
     }
     
