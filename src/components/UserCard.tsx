@@ -1,11 +1,12 @@
+"use client"
 import React, { useState } from 'react';
 import { LogOut, User } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
 
 const UserCard: React.FC = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const { user, logout } = useAuth();
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
 
@@ -16,7 +17,7 @@ const UserCard: React.FC = () => {
     setShowLogoutDialog(false);
     logout();
     toast.success('Logged out successfully');
-    navigate('/login');
+    router.push('/login');
   };
   const cancelLogout = () => {
     setShowLogoutDialog(false);

@@ -1,10 +1,10 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Card, CardContent,CardTitle, CardHeader, CardFooter } from '../ui/card';
-import { Table, TableBody, TableRow, TableCell } from '../ui/table';
-import { Skeleton } from '../ui/skeleton';
-import { Button } from '../ui/button';
-import { StudentInfo } from '../../services/api';
+import { useRouter } from 'next/navigation';
+import { Card, CardContent,CardTitle, CardHeader, CardFooter } from '@/components/ui/card';
+import { Table, TableBody, TableRow, TableCell } from '@/components/ui/table';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
+import { StudentInfo } from '@/services/proxy-api';
 import { ArrowRightIcon } from 'lucide-react';
 
 interface StudentProfileSummaryCardProps {
@@ -16,7 +16,11 @@ const StudentProfileSummaryCard: React.FC<StudentProfileSummaryCardProps> = ({
   studentInfo,
   loading = false,
 }) => {
-  const navigate = useNavigate();
+  const router = useRouter();
+
+  const handleViewProfile = () => {
+    router.push('/profile');
+  };
 
   if (loading) {
     return (
@@ -106,7 +110,7 @@ const StudentProfileSummaryCard: React.FC<StudentProfileSummaryCardProps> = ({
         <Button
           variant="default"
           size="sm"
-          onClick={() => navigate('/profile')}
+          onClick={handleViewProfile}
           className="bg-teal-600 hover:bg-teal-800 text-white group"
         >
           More Details
