@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { LoginResponse } from '@/services/proxy-api';
+import Cookies from 'js-cookie';
 
 interface AuthContextType {
   user: LoginResponse | null;
@@ -19,6 +20,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isLoading, setIsLoading] = useState(true);
 
   const logout = useCallback(() => {
+    // Clear cookies
+    Cookies.remove('token');
+    // Clear localStorage
     localStorage.removeItem('user');
     localStorage.removeItem('isAuthenticated');
     setUser(null);
@@ -27,10 +31,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const checkAuthStatus = useCallback(() => {
     setIsLoading(true);
+    const token = Cookies.get('token');
     const userString = localStorage.getItem('user');
     const isAuthenticatedFlag = localStorage.getItem('isAuthenticated');
 
-    if (userString && isAuthenticatedFlag === 'true') {
+    if (token && userString && isAuthenticatedFlag === 'true') {
       try {
         const userData = JSON.parse(userString);
         const lastLoginTime = new Date(userData.lastLoginTime);
@@ -68,8 +73,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       ...userData,
       lastLoginTime: new Date().toISOString()
     };
+    
+    // Set token in cookie
+    Cookies.set('token', userData.accessToken, { 
+      expires: 1, // 1 day
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict'
+    });
+    
+    // Store user data in localStorage
     localStorage.setItem('user', JSON.stringify(userDataWithTimestamp));
     localStorage.setItem('isAuthenticated', 'true');
+    
     setUser(userDataWithTimestamp);
     setIsAuthenticated(true);
   }, []);

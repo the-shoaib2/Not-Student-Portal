@@ -1,37 +1,112 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
+// Define public routes that don't require authentication
+const publicRoutes = [
+  '/login',
+  '/result',
+  '/notices',
+  '/certificate-verify',
+  '/',
+  '/api/auth'
+];
+
+// Define protected routes that require authentication
+const protectedRoutes = [
+  '/dashboard',
+  '/profile',
+  '/profile-update',
+  '/password-change',
+  '/payment-ledger',
+  '/payment-scheme',
+  '/registration-exam-clearance',
+  '/registered-course',
+  '/live-result',
+  '/teaching-evaluation',
+  '/alumni-professional',
+  '/convocation-apply',
+  '/certificate-transcript-apply',
+  '/online-exam',
+  '/laptop',
+  '/routine',
+  '/mentor-meeting',
+  '/transport-card-apply',
+  '/alumni-card-apply',
+  '/internship',
+  '/hall',
+  '/student-application',
+  '/library',
+  '/calendar',
+  '/skill-jobs'
+];
+
 export function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
   // Allow NextAuth.js API routes
-  if (request.nextUrl.pathname.startsWith('/api/auth')) {
+  if (pathname.startsWith('/api/auth')) {
     return NextResponse.next();
   }
 
-  // Define public routes that don't require authentication
-  const publicRoutes = ['/login', '/result', '/notices', '/certificate-verify'];
-  
-  // Check if current route is public
-  if (publicRoutes.some(route => request.nextUrl.pathname.startsWith(route))) {
+  // Check if the current route is public
+  const isPublicRoute = publicRoutes.some(route => 
+    pathname === route || pathname.startsWith(`${route}/`)
+  );
+
+  // If it's a public route, allow access
+  if (isPublicRoute) {
     return NextResponse.next();
   }
+
+  // Check if the route is protected
+  const isProtectedRoute = protectedRoutes.some(route => 
+    pathname === route || pathname.startsWith(`${route}/`)
+  );
+
+  const userJson = localStorage.getItem('user');
+  let token = '';
+  if (userJson) {
+  
+      const user = JSON.parse(userJson);
+      token = user.accessToken;
+    
+  }
+
+
 
   // Get auth token from cookies
-  const token = request.cookies.get('next-auth.session-token')?.value;
+  // const token = request.cookies.get('next-auth.session-token')?.value;
   const isAuth = !!token;
+  console.log('isAuth', isAuth);
+  console.log('isProtectedRoute', isProtectedRoute);
 
-  // If user is not authenticated, redirect to login with return URL
-  if (!isAuth) {
-    // Decode the URL before redirecting
-    const decodedPath = decodeURIComponent(request.nextUrl.pathname);
-    const from = decodedPath + request.nextUrl.search;
+  // If it's a protected route and user is not authenticated
+  if (isProtectedRoute && !isAuth) {
+    console.log('isProtectedRoute', isProtectedRoute);
+    console.log('isAuth', isAuth);
+    // Create login URL with return path
     const loginUrl = new URL('/login', request.url);
-    loginUrl.searchParams.set('from', encodeURIComponent(from));
+    // loginUrl.searchParams.set('from', pathname);
     return NextResponse.redirect(loginUrl);
+  }
+
+  // If user is authenticated and trying to access login page, redirect to dashboard
+  if (isAuth && pathname === '/login') {
+    return NextResponse.redirect(new URL('/', request.url));
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ['/login']
-}
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - public folder
+     */
+    '/((?!_next/static|_next/image|favicon.ico|public/).*)',
+  ],
+};

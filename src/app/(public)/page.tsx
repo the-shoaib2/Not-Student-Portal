@@ -62,7 +62,7 @@ const Home: React.FC = () => {
   );
 
   return (
-    <main className="flex-grow p-3 pt-20">
+    <main className="flex-grow p-4 pt-10">
       <div className="max-w-5xl mx-auto">
         {/* Welcome Section */}
         <div className="relative mb-4 bg-gradient-to-r from-sky-300 to-emerald-300 rounded-lg shadow p-4 sm:p-6 md:p-8 text-center overflow-hidden">

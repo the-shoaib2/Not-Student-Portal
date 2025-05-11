@@ -2,12 +2,9 @@
 
 import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import dynamic from 'next/dynamic';
 import { useAuth } from '@/contexts/AuthContext';
+import Login from '@/app/login/Login';
 
-const DynamicLogin = dynamic(() => import('@/app/login/Login'), {
-  ssr: false,
-});
 
 export default function LoginPage() {
   const router = useRouter();
@@ -22,5 +19,5 @@ export default function LoginPage() {
     }
   }, [isAuthenticated, router, from]);
 
-  return <DynamicLogin />;
+  return <Login />;
 }
