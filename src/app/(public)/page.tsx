@@ -3,7 +3,8 @@
 import React, { Suspense } from 'react';
 import { GraduationCap, BookOpen, Calendar, Building2, Briefcase } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { Skeleton } from '@/components/Skeleton';
+import Image from 'next/image';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const Home: React.FC = () => {
   const router = useRouter();
@@ -71,9 +72,11 @@ const Home: React.FC = () => {
           </h1>
           {/* Logo */}
           <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-3 relative z-10">
-            <img
+            <Image
               src="/diuLogo.png"
               alt="DIU Logo"
+              width={80}
+              height={80}
               className="w-full h-full object-contain"
             />
           </div>

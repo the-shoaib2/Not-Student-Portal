@@ -10,35 +10,25 @@ import {
   PaymentSummary 
 } from "@/services/proxy-api";
 
-// Props Interface
-interface StatCardsProps {
-  onRetry?: () => void;
-}
-
-
-
 // Main StatCards Component
-export default function StatCards({ onRetry }: StatCardsProps) {
+export default function StatCards() {
   const [summary, setSummary] = useState<PaymentSummary | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   const fetchPaymentSummary = useCallback(async () => {
     try {
       setLoading(true);
-      setError(null);
       const data = await dashboardService.getPaymentLedgerSummary();
       setSummary(calculatePaymentSummary(data));
     } catch (err) {
       console.error('Failed to fetch payment summary:', err);
-      setError('Failed to load payment summary');
     } finally {
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-      fetchPaymentSummary();
+    fetchPaymentSummary();
   }, [fetchPaymentSummary]);
 
   // Dashboard stats configuration
@@ -73,22 +63,6 @@ export default function StatCards({ onRetry }: StatCardsProps) {
     },
   ];
 
-  // if (error) {
-  //   return (
-  //     <div className="bg-red-100 p-4 rounded-lg text-center">
-  //       <p className="text-red-600 mb-2">{error}</p>
-  //       {onRetry && (
-  //         <button
-  //           onClick={onRetry}
-  //           className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition"
-  //         >
-  //           Retry
-  //         </button>
-  //       )}
-  //     </div>
-  //   );
-  // }
-
   return (
     <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mb-6 ">
       {dashboardStats.map((stat) => (
@@ -101,7 +75,7 @@ export default function StatCards({ onRetry }: StatCardsProps) {
               {loading ? (
                 <Skeleton className="h-6 w-full mb-1 bg-white/50 rounded" />
               ) : (
-              <div className="text-white text-2xl font-semibold mb-1">{stat.value}</div>
+                <div className="text-white text-2xl font-semibold mb-1">{stat.value}</div>
               )}
               <div className="text-white text-sm">{stat.title}</div>
             </div>

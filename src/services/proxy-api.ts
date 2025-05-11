@@ -1,4 +1,106 @@
 import { proxyClient, proxyRequest } from './proxyUtils';
+import { InternalAxiosRequestConfig, AxiosResponse, AxiosError, AxiosHeaders } from 'axios';
+
+interface ApiResponse<T> {
+  data: T;
+  message?: string;
+  status: number;
+}
+
+interface ErrorResponse {
+  message: string;
+  status: number;
+}
+
+// Add specific types for API responses
+interface ApiError {
+  responseMessage?: string;
+  message?: string;
+  status?: number;
+}
+
+interface ApiSuccess<T> {
+  data: T;
+  message?: string;
+  status: number;
+}
+
+// Add type for request body
+interface RequestBody {
+  [key: string]: unknown;
+}
+
+// Add type for metadata
+interface ActivityMetadata {
+  userAgent?: string;
+  screenResolution?: string;
+  pageLoadTime?: number;
+  referrer?: string;
+  [key: string]: unknown;
+}
+
+// Add type for form data
+interface FormData {
+  [key: string]: string | number | boolean | null;
+}
+
+// Add type for API call metadata
+interface ApiCallMetadata {
+  endpoint: string;
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+  path: string;
+  metadata?: ActivityMetadata;
+}
+
+// Add type for login metadata
+interface LoginMetadata {
+  studentId?: string;
+  email?: string;
+  name?: string;
+  sessionDuration?: number;
+}
+
+// Add type for logout metadata
+interface LogoutMetadata {
+  reason?: string;
+  timestamp?: Date;
+  [key: string]: unknown;
+}
+
+// Add type for activity data
+interface ActivityData {
+  type: string;
+  details: Record<string, unknown>;
+  timestamp: Date;
+  metadata?: ActivityMetadata;
+}
+
+// Add type for user config
+interface UserConfig {
+  enabled: {
+    pageViews: boolean;
+    buttonClicks: boolean;
+    formSubmissions: boolean;
+    apiCalls: boolean;
+    loginLogout: boolean;
+    formInputs: boolean;
+    visitTime: boolean;
+  };
+}
+
+// Add type for activity tracker
+interface ActivityTracker {
+  getInstance(): ActivityTracker;
+  getUserConfig(userId: string): Promise<UserConfig>;
+  updateActivityConfig(userId: string, config: UserConfig): Promise<void>;
+  trackPageView(path: string, metadata?: ActivityMetadata): Promise<void>;
+  trackButtonClick(elementId: string, path: string, metadata?: ActivityMetadata): Promise<void>;
+  trackFormSubmission(formId: string, path: string, formData: FormData, metadata?: ActivityMetadata): Promise<void>;
+  trackFormInput(formId: string, path: string, inputName: string, inputValue: string, metadata?: ActivityMetadata): Promise<void>;
+  trackApiCall(endpoint: string, method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH', path: string, metadata?: ActivityMetadata): Promise<void>;
+  trackLogin(username: string, metadata?: LoginMetadata): Promise<void>;
+  trackLogout(metadata?: LogoutMetadata): Promise<void>;
+}
 
 // Semester Exam Clearance Interfaces
 export interface SemesterExamClearance {
@@ -49,7 +151,111 @@ export interface PaymentLedgerItem {
   showLedger: string;
 }
 
+// Add type definitions for API responses
+export interface DivisionListResponse {
+  id: string;
+  name: string;
+}
 
+export interface CountryListResponse {
+  id: string;
+  name: string;
+}
+
+export interface EducationResponse {
+  id: string;
+  institute: string;
+  degree: string;
+  major: string;
+  result: string;
+  scale: string;
+  passingYear: string;
+  duration: string;
+}
+
+export interface DegreeListResponse {
+  id: string;
+  name: string;
+}
+
+export interface PhotographResponse {
+  photoUrl: string;
+  photoData: string;
+  image?: string;
+}
+
+export interface InsuranceResponse {
+  id: string;
+  policyNumber: string;
+  provider: string;
+  coverage: string;
+  expiryDate: string;
+}
+
+export interface GuardianResponse {
+  id: string;
+  name: string;
+  relation: string;
+  contact: string;
+  address: string;
+}
+
+export interface CourseRoutine {
+  courseId: string;
+  courseTitle: string;
+  section: string;
+  schedule: Array<{
+    day: string;
+    time: string;
+    room: string;
+  }>;
+}
+
+export interface RegisteredCourse {
+  courseId: string;
+  courseTitle: string;
+  credit: number;
+  section: string;
+  instructor: string;
+}
+
+export interface DropSemester {
+  semesterId: string;
+  semesterName: string;
+  status: string;
+}
+
+export interface PaymentData {
+  totalDue: number;
+  totalPaid: number;
+  balance: number;
+}
+
+export interface CGPAData {
+  cgpa: number;
+  creditsCompleted: number;
+  creditsAttempted: number;
+}
+
+export interface Semester {
+  id: string;
+  name: string;
+  year: number;
+}
+
+export interface TevalSubmitCheck {
+  submitted: boolean;
+  message: string;
+}
+
+export interface LiveResult {
+  courseId: string;
+  courseTitle: string;
+  section: string;
+  instructor: string;
+  grade: string;
+  marks: number;
+}
 
 // Export proxyRequest directly
 export { proxyRequest };
@@ -59,42 +265,36 @@ const api = proxyClient;
 
 // Add request interceptor to handle authentication and proxy
 api.interceptors.request.use(
-  async (config: any) => {
+  async (config: InternalAxiosRequestConfig) => {
     // Get stored user data
     const userJson = localStorage.getItem('user');
     if (userJson) {
       const user = JSON.parse(userJson);
-      config.headers.Authorization = `Bearer ${user.accessToken}`;
+      if (!config.headers) {
+        config.headers = new AxiosHeaders();
+      }
+      config.headers.set('Authorization', `Bearer ${user.accessToken}`);
     }
 
     // Handle URL formatting
     if (config.url) {
       // Remove any leading slash to prevent double slashes
       config.url = config.url.replace(/^\/+/, '');
-
-      // Log request details
-      // console.log('[API] Making request:', {
-      //   method: config.method?.toUpperCase(),
-      //   url: `${BASE_URL}/${config.url}`,
-      //   headers: config.headers,
-      //   data: config.data
-      // });
     }
 
     return config;
   },
-  (error: any) => {
-    // console.error('[API] Request error:', error);
+  (error: AxiosError) => {
     return Promise.reject(error);
   }
 );
 
 // Add response interceptor to handle common errors and retry logic
 api.interceptors.response.use(
-  (response) => {
+  (response: AxiosResponse) => {
     return response;
   },
-  (error: any) => {
+  (error: AxiosError) => {
     const originalRequest = error.config;
 
     // Check if we should retry based on the endpoint
@@ -104,7 +304,7 @@ api.interceptors.response.use(
       originalRequest?.url?.includes('/semesterList');
 
     // Check if we've already retried
-    if (!originalRequest || originalRequest._retry) {
+    if (!originalRequest || (originalRequest as any)._retry) {
       return Promise.reject(error);
     }
 
@@ -990,8 +1190,7 @@ export const profileService = {
       throw new Error(`Failed to fetch district list: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   },
-
-  divisionList: async (): Promise<any | null> => {
+  divisionList: async (): Promise<DivisionListResponse[] | null> => {
     try {
       const token = profileService.getAuthToken();
       const response = await proxyRequest({
@@ -1003,18 +1202,12 @@ export const profileService = {
           'Accept': '*/*'
         }
       });
-
-      // console.log('Division List Response:', response);
-
       return response;
     } catch (error) {
-      // console.error('Error fetching division list:', error);
-      // Throw a more descriptive error
       throw new Error(`Failed to fetch division list: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   },
-
-  countryList: async (): Promise<any | null> => {
+  countryList: async (): Promise<CountryListResponse[] | null> => {
     try {
       const token = profileService.getAuthToken();
       const response = await proxyRequest({
@@ -1026,18 +1219,12 @@ export const profileService = {
           'Accept': '*/*'
         }
       });
-
-      // console.log('Country List Response:', response);
-
       return response;
     } catch (error) {
-      // console.error('Error fetching country list:', error);
-      // Throw a more descriptive error
       throw new Error(`Failed to fetch country list: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   },
-  //education
-  education: async (): Promise<any | null> => {
+  education: async (): Promise<EducationResponse[] | null> => {
     try {
       const token = profileService.getAuthToken();
       const response = await proxyRequest({
@@ -1049,17 +1236,12 @@ export const profileService = {
           'Accept': '*/*'
         }
       });
-
-      // console.log('Education Response:', response);
-
       return response;
     } catch (error) {
-      // console.error('Error fetching education:', error);
-      // Throw a more descriptive error
       throw new Error(`Failed to fetch education: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   },
-  degreeList: async (): Promise<any | null> => {
+  degreeList: async (): Promise<DegreeListResponse[] | null> => {
     try {
       const token = profileService.getAuthToken();
       const response = await proxyRequest({
@@ -1071,17 +1253,12 @@ export const profileService = {
           'Accept': '*/*'
         }
       });
-
-      // console.log('Degree List Response:', response);
-
       return response;
     } catch (error) {
-      // console.error('Error fetching degree list:', error);
-      // Throw a more descriptive error
       throw new Error(`Failed to fetch degree list: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   },
-  photograph: async (): Promise<any | null> => {
+  photograph: async (): Promise<PhotographResponse | null> => {
     try {
       const token = profileService.getAuthToken();
       const response = await proxyRequest({
@@ -1093,17 +1270,12 @@ export const profileService = {
           'Accept': '*/*'
         }
       });
-
-      // console.log('Photograph Response:', response);
-
       return response;
     } catch (error) {
-      // console.error('Error fetching photograph:', error);
-      // Throw a more descriptive error
       throw new Error(`Failed to fetch photograph: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   },
-  insurance: async (): Promise<any | null> => {
+  insurance: async (): Promise<InsuranceResponse | null> => {
     try {
       const token = profileService.getAuthToken();
       const response = await proxyRequest({
@@ -1115,17 +1287,12 @@ export const profileService = {
           'Accept': '*/*'
         }
       });
-
-      // console.log('Insurance Response:', response);
-
       return response;
     } catch (error) {
-      // console.error('Error fetching insurance:', error);
-      // Throw a more descriptive error
       throw new Error(`Failed to fetch insurance: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   },
-  guardian: async (): Promise<any | null> => {
+  guardian: async (): Promise<GuardianResponse | null> => {
     try {
       const token = profileService.getAuthToken();
       const response = await proxyRequest({
@@ -1137,13 +1304,8 @@ export const profileService = {
           'Accept': '*/*'
         }
       });
-
-      // console.log('Guardian Response:', response);
-
       return response;
     } catch (error) {
-      // console.error('Error fetching guardian:', error);
-      // Throw a more descriptive error
       throw new Error(`Failed to fetch guardian: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   },
@@ -1359,7 +1521,69 @@ export const paymentService = {
     }
   },
 
+  async getCourseRoutine(courseSectionId: string): Promise<{
+    courseId: string;
+    courseTitle: string;
+    section: string;
+    schedule: Array<{
+      day: string;
+      time: string;
+      room: string;
+    }>;
+  }> {
+    const response = await api.get(`/courseRoutine/${courseSectionId}`);
+    return response.data;
+  },
 
+  async getRegisteredCourses(semesterId: string): Promise<Array<{
+    courseId: string;
+    courseTitle: string;
+    credit: number;
+    section: string;
+    instructor: string;
+  }>> {
+    const response = await api.get(`/registeredCourses/${semesterId}`);
+    return response.data;
+  },
+
+  async getLiveResultSemesterList(): Promise<Array<{
+    semesterId: string;
+    semesterName: string;
+    semesterYear: number;
+  }>> {
+    const response = await api.get('/liveResultSemesterList');
+    return response.data;
+  },
+
+  async getTevalSubmitCheck(courseSectionId: string): Promise<{
+    submitted: boolean;
+    message: string;
+  }> {
+    const response = await api.get(`/tevalSubmitCheck/${courseSectionId}`);
+    return response.data;
+  },
+
+  async getLiveRegisteredCourseList(semesterId: string): Promise<Array<{
+    courseId: string;
+    courseTitle: string;
+    section: string;
+    instructor: string;
+  }>> {
+    const response = await api.get(`/liveRegisteredCourseList/${semesterId}`);
+    return response.data;
+  },
+
+  async getLiveResult(courseSectionId: string): Promise<{
+    courseId: string;
+    courseTitle: string;
+    section: string;
+    instructor: string;
+    grade: string;
+    marks: number;
+  }> {
+    const response = await api.get(`/liveResult/${courseSectionId}`);
+    return response.data;
+  }
 };
 
 
@@ -1401,11 +1625,7 @@ export const registeredCourseService = {
     });
     return response || [];
   },
-
-  /**
-   * Get routine for a specific course section
-   */
-  async getCourseRoutine(courseSectionId: string): Promise<any> {
+  getCourseRoutine: async (courseSectionId: string): Promise<CourseRoutine | null> => {
     const token = await profileService.getAuthToken();
     const response = await proxyRequest({
       method: 'GET',
@@ -1418,11 +1638,7 @@ export const registeredCourseService = {
     });
     return response || null;
   },
-
-  /**
-   * Get registered courses for a semester
-   */
-  async getRegisteredCourses(semesterId: string): Promise<any[]> {
+  getRegisteredCourses: async (semesterId: string): Promise<RegisteredCourse[]> => {
     const token = await profileService.getAuthToken();
     const response = await proxyRequest({
       method: 'GET',
@@ -1462,11 +1678,8 @@ export const examService = {
   }
 };
 
-// Dashboard Service
 export const dashboardService = {
-
   getPaymentLedgerSummary: async (): Promise<PaymentData> => {
-    // try {
     const token = profileService.getAuthToken();
     const response = await proxyRequest({
       method: 'GET',
@@ -1476,9 +1689,9 @@ export const dashboardService = {
         accessToken: token,
         'Accept': '*/*'
       },
-      timeout: 45000,  // 45 seconds timeout
-      maxRetries: 3,   // 3 retries
-      retryDelay: 2000 // 2 seconds between retries
+      timeout: 45000,
+      maxRetries: 3,
+      retryDelay: 2000
     });
     return response;
     // } catch (error) {
@@ -1490,8 +1703,7 @@ export const dashboardService = {
     // };
     // }
   },
-
-  getDropSemesterList: async (): Promise<any[]> => {
+  getDropSemesterList: async (): Promise<DropSemester[]> => {
     try {
       const token = profileService.getAuthToken();
       const response = await proxyRequest({
@@ -1512,9 +1724,7 @@ export const dashboardService = {
       return [];
     }
   },
-
   getCGPAData: async (): Promise<CGPAData> => {
-    // try {
     const token = profileService.getAuthToken();
     const response = await proxyRequest({
       method: 'GET',
@@ -1537,9 +1747,7 @@ export const dashboardService = {
     //   throw error;
     // }
   },
-
-  // --- Live Result APIs ---
-  async getLiveResultSemesterList(): Promise<any[]> {
+  getLiveResultSemesterList: async (): Promise<Semester[]> => {
     const token = await profileService.getAuthToken();
     const response = await proxyRequest({
       method: 'GET',
@@ -1552,8 +1760,7 @@ export const dashboardService = {
     });
     return response || [];
   },
-
-  async getTevalSubmitCheck(courseSectionId: string): Promise<any> {
+  getTevalSubmitCheck: async (courseSectionId: string): Promise<TevalSubmitCheck | null> => {
     const token = await profileService.getAuthToken();
     const response = await proxyRequest({
       method: 'GET',
@@ -1566,8 +1773,7 @@ export const dashboardService = {
     });
     return response || null;
   },
-
-  async getLiveRegisteredCourseList(semesterId: string): Promise<any[]> {
+  getLiveRegisteredCourseList: async (semesterId: string): Promise<RegisteredCourse[]> => {
     const token = await profileService.getAuthToken();
     const response = await proxyRequest({
       method: 'GET',
@@ -1580,8 +1786,7 @@ export const dashboardService = {
     });
     return response || [];
   },
-
-  async getLiveResult(courseSectionId: string): Promise<any> {
+  getLiveResult: async (courseSectionId: string): Promise<LiveResult | null> => {
     const token = await profileService.getAuthToken();
     const response = await proxyRequest({
       method: 'GET',
@@ -1593,5 +1798,8 @@ export const dashboardService = {
       },
     });
     return response || null;
-  },
+  }
 };
+
+
+

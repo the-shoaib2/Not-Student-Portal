@@ -21,10 +21,9 @@ export default function DashboardPage() {
   const pageTitle = 'Student Dashboard';
   const pageIcon = <LayoutDashboard />;
 
-  const [paymentSummary, setPaymentSummary] = useState<PaymentSummary | null>(null);
   const [cgpaData, setCgpaData] = useState<CGPAData | SGPAData[] | null>(null);
   const [studentInfo, setStudentInfo] = useState<StudentInfo | null>(null);
-  const [dropSemesters, setDropSemesters] = useState<any[]>([]);
+  const [dropSemesters] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -35,16 +34,7 @@ export default function DashboardPage() {
     const errors: string[] = [];
 
     try {
-      // 1. Payment Ledger Summary
-      try {
-        const paymentLedger = await dashboardService.getPaymentLedgerSummary();
-        setPaymentSummary(calculatePaymentSummary(paymentLedger));
-      } catch (err) {
-        console.error('Payment summary fetch error:', err);
-        errors.push('Failed to load payment summary');
-      }
-
-      // 2. CGPA Data
+      // 1. CGPA Data
       try {
         const cgpaGraph = await dashboardService.getCGPAData();
         setCgpaData(cgpaGraph);
@@ -53,7 +43,7 @@ export default function DashboardPage() {
         errors.push('Failed to load CGPA data');
       }
 
-      // 3. Student Profile
+      // 2. Student Profile
       try {
         const studentProfile = await profileService.getStudentInfo();
         setStudentInfo(studentProfile);
@@ -61,15 +51,6 @@ export default function DashboardPage() {
         console.error('Student profile fetch error:', err);
         errors.push('Failed to load student profile');
       }
-
-      // 4. Drop Semester List
-      // try {
-      //   const dropSemesterList = await dashboardService.getDropSemesterList();
-      //   setDropSemesters(dropSemesterList);
-      // } catch (err) {
-      //   console.error('Drop semester list fetch error:', err);
-      //   errors.push('Failed to load drop semester list');
-      // }
 
       // Set error if any errors occurred
       if (errors.length > 0) {
@@ -93,11 +74,7 @@ export default function DashboardPage() {
 
       <div className="p-6 bg-gray-50 min-h-screen">
         <div className="container mx-auto">
-          <StatCards
-            onRetry={() => {
-              fetchDashboardData();
-            }}
-          />
+          <StatCards />
 
           <div className="grid md:grid-cols-2 gap-6 mb-6">
             <CGPAProgressionCard 

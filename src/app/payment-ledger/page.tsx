@@ -1,8 +1,8 @@
 'use client'
 
-import { useEffect, useState, useMemo } from "react"
+import { useEffect, useState, useRef } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { InfoIcon, UserCircle, UserCircle2, ReceiptIcon } from "lucide-react"
+import { InfoIcon } from "lucide-react"
 import StudentInfo from "@/components/payment-ledger/student-info"
 import PaymentSummary from "@/components/payment-ledger/payment-summary"
 import PaymentLedger from "@/components/payment-ledger/payment-ledger"
@@ -14,21 +14,18 @@ import toast from 'react-hot-toast';
 import { Skeleton } from "@/components/ui/skeleton"
 
 export default function PaymentLedgerPage() {
-  const memoizedPaymentService = useMemo(() => paymentService, []);
   const [semesters, setSemesters] = useState<Semester[]>([])
   const [selectedSemester, setSelectedSemester] = useState<string>("")
   const [student, setStudent] = useState<Student | null>(null)
   const [paymentSummary, setPaymentSummary] = useState<PaymentSummaryData | null>(null)
   const [paymentLedger, setPaymentLedger] = useState<PaymentLedgerItem[]>([])
   const [loading, setLoading] = useState(true)
-  const [hasLoadedData, setHasLoadedData] = useState(false)
-
-  let hasFetchedData = false
+  const hasFetchedDataRef = useRef(false)
 
   useEffect(() => {
     const fetchData = async () => {
-      if (hasFetchedData) return
-      hasFetchedData = true
+      if (hasFetchedDataRef.current) return
+      hasFetchedDataRef.current = true
   
       setLoading(true)
       try {
@@ -56,23 +53,11 @@ export default function PaymentLedgerPage() {
   
     fetchData()
   }, [])
-  
 
   // Handle semester change (only updates selected semester)
   const handleSemesterChange = (semesterId: string) => {
     setSelectedSemester(semesterId)
   }
-  
-
- 
-
-  // if (loading) {
-  //   return (
-  //     <div className="flex justify-center items-center min-h-screen">
-  //       <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
-  //     </div>
-  //   )
-  // }
 
   return (
     <div className="w-full">

@@ -30,48 +30,48 @@ const SGPAGraph: React.FC<SGPAGraphProps> = ({ cgpaData }) => {
     );
   }
 
-  const chartData = useMemo(() => ({
-    labels: labels,
-    datasets: [
-      {
-        label: 'SGPA',
-        data: sgpaData.map(item => item.sgpa),
-        borderColor: 'rgb(75, 192, 192)',
-        tension: 0.1,
-        fill: false,
-      },
-    ],
-  }), [labels, sgpaData]);
+  const chartData = useMemo(() => {
+    if (!sgpaData) return null;
+    return {
+      labels: sgpaData.map((item) => item.semester),
+      datasets: [
+        {
+          label: 'SGPA',
+          data: sgpaData.map((item) => item.sgpa),
+          borderColor: 'rgb(75, 192, 192)',
+          tension: 0.1,
+        },
+      ],
+    };
+  }, [sgpaData]);
 
-  const chartOptions = useMemo(() => ({
-    responsive: true,
-    maintainAspectRatio: false,
-    scales: {
-      y: {
-        beginAtZero: false,
-        min: Math.min(...sgpaData.map(item => item.sgpa)) - 0.5,
-        max: Math.max(...sgpaData.map(item => item.sgpa)) + 0.5,
+  const options = useMemo(() => {
+    if (!sgpaData) return null;
+    return {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: 'top' as const,
+        },
+        title: {
+          display: true,
+          text: 'SGPA Progress',
+        },
       },
-    },
-    plugins: {
-      legend: {
-        position: 'top' as const,
+      scales: {
+        y: {
+          beginAtZero: true,
+          max: 4.0,
+        },
       },
-      title: {
-        display: true,
-        text: 'Semester-wise SGPA Progress',
-      },
-    },
-    animation: {
-      duration: 1000,
-    },
-  }), [cgpaData]);
+    };
+  }, [sgpaData]);
 
   return (
     <div className="bg-white rounded-lg shadow p-4 mt-6">
       <h3 className="text-lg font-semibold mb-3">Semester-wise SGPA</h3>
       <div className="h-64">
-        <Line data={chartData} options={chartOptions} />
+        <Line data={chartData} options={options} />
       </div>
     </div>
   );

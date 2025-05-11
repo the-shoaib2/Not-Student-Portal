@@ -1,6 +1,6 @@
 'use client'
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { LoginResponse } from '@/services/proxy-api';
 
 interface AuthContextType {
@@ -18,7 +18,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  const checkAuthStatus = () => {
+  const logout = useCallback(() => {
+    localStorage.removeItem('user');
+    localStorage.removeItem('isAuthenticated');
+    setUser(null);
+    setIsAuthenticated(false);
+  }, []);
+
+  const checkAuthStatus = useCallback(() => {
     setIsLoading(true);
     const userString = localStorage.getItem('user');
     const isAuthenticatedFlag = localStorage.getItem('isAuthenticated');
@@ -47,16 +54,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setIsAuthenticated(false);
     }
     setIsLoading(false);
-  };
+  }, [logout]);
 
   useEffect(() => {
     checkAuthStatus();
     // Check auth status every 5 minutes
     const interval = setInterval(checkAuthStatus, 5 * 60 * 1000);
     return () => clearInterval(interval);
-  }, []);
+  }, [checkAuthStatus]);
 
-  const login = (userData: LoginResponse) => {
+  const login = useCallback((userData: LoginResponse) => {
     const userDataWithTimestamp = {
       ...userData,
       lastLoginTime: new Date().toISOString()
@@ -65,14 +72,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem('isAuthenticated', 'true');
     setUser(userDataWithTimestamp);
     setIsAuthenticated(true);
-  };
-
-  const logout = () => {
-    localStorage.removeItem('user');
-    localStorage.removeItem('isAuthenticated');
-    setUser(null);
-    setIsAuthenticated(false);
-  };
+  }, []);
 
   return (
     <AuthContext.Provider value={{ user, isAuthenticated, login, logout, checkAuthStatus }}>

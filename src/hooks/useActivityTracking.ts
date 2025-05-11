@@ -18,6 +18,12 @@ interface ActivityConfig {
   }
 }
 
+interface ActivityData {
+  type: string;
+  details: Record<string, unknown>;
+  timestamp: Date;
+}
+
 export function useActivityTracking() {
   const [config, setConfig] = useState<ActivityConfig>({
     enabled: {

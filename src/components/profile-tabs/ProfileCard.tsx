@@ -1,5 +1,8 @@
+"use client"
+
 import React from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Camera, ArrowRight as ArrowRightIcon, Edit } from 'lucide-react';
 import { StudentInfo } from '@/services/proxy-api';
@@ -53,13 +56,14 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
               format={getBase64Data().format} 
             />
           ) : (
-            <img 
+            <Image 
               src={photograph.photoUrl}
               alt={studentInfo?.studentName || 'Student Photo'} 
+              width={200}
+              height={200}
               className="w-full h-full object-cover transition-all duration-300"
               crossOrigin="anonymous"
               loading="lazy"
-              decoding="async"
             />
           )
         ) : (

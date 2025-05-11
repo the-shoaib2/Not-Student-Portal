@@ -1,4 +1,4 @@
-import NextAuth from 'next-auth'
+import { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { connectDB } from '@/lib/mongodb'
 import { User as UserModel } from '@/models/user'
@@ -59,7 +59,6 @@ interface AuthorizeCallback {
 }
 
 import type { 
-  NextAuthOptions, 
   Session,
   Account,
   User

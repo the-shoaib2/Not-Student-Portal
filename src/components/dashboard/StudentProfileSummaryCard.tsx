@@ -86,13 +86,13 @@ const StudentProfileSummaryCard: React.FC<StudentProfileSummaryCardProps> = ({
               </TableCell>
             </TableRow>
             <TableRow>
-              <TableCell className="text-xs text-gray-500 w-1/3">Father's Name</TableCell>
+              <TableCell className="text-xs text-gray-500 w-1/3">Father&apos;s Name</TableCell>
               <TableCell className="text-sm font-medium text-gray-800 w-2/3">
                 {studentInfo?.fatherName || 'N/A'}
               </TableCell>
             </TableRow>
             <TableRow>
-              <TableCell className="text-xs text-gray-500 w-1/3">Mother's Name</TableCell>
+              <TableCell className="text-xs text-gray-500 w-1/3">Mother&apos;s Name</TableCell>
               <TableCell className="text-sm font-medium text-gray-800 w-2/3">
                 {studentInfo?.motherName || 'N/A'}
               </TableCell>

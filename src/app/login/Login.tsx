@@ -203,8 +203,8 @@ const Login: React.FC = () => {
                   <ol className="list-decimal text-xs list-inside space-y-2 text-gray-600">
                     <li>Use your Student ID and Password to login</li>
                     <li>Navigate through the menu to access different services</li>
-                    <li>For any issues, use the "Forgot Password" option or contact your department</li>
-                    <li>Keep your login credentials secure and don't share them with others</li>
+                    <li>For any issues, use the &quot;Forgot Password&quot; option or contact your department</li>
+                    <li>Keep your login credentials secure and don&apos;t share them with others</li>
                   </ol>
                 </div>
               </Tabs.Content>

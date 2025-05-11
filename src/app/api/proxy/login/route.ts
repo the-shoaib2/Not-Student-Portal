@@ -3,12 +3,7 @@ import { proxyClient } from '@/services/proxyUtils';
 import { Activity } from '@/models/activity';
 import { connectDB } from '@/lib/mongodb';
 import mongoose from 'mongoose';
-
-interface LoginRequest {
-  studentId: string;
-  password: string;
-  deviceName: string;
-}
+import { LoginRequest, LoginResponse } from '@/types/auth';
 
 export async function POST(request: Request) {
   try {
@@ -34,7 +29,7 @@ export async function POST(request: Request) {
     });
 
     // Extract user data from response
-    const userData = proxyResponse.data as any;
+    const userData = proxyResponse.data as LoginResponse;
 
     // Save login activity
     const activity = new Activity({

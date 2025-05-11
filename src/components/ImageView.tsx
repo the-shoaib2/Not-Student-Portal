@@ -1,6 +1,7 @@
 "use client"
 import React from "react";
 import { Card, CardContent } from "./ui/card";
+import Image from "next/image";
 
 interface Base64ImageCardProps {
   base64Data?: string; // Just the base64 string, no prefix
@@ -36,9 +37,11 @@ const Base64ImageCard: React.FC<Base64ImageCardProps> = ({
   return (
     <Card className={`max-w-sm mx-auto rounded-2xl shadow-md transition-all duration-300 ${className}`}>
       <CardContent className="flex items-center justify-center">
-        <img
+        <Image
           src={dataUri}
           alt="Base64 Preview"
+          width={256}
+          height={256}
           className="object-contain max-h-64 w-full"
         />
       </CardContent>
