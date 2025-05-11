@@ -19,18 +19,13 @@ export const LoadingBar = () => {
   if (!isLoading) return null;
 
   return (
-    <div className="fixed top-0 left-0 right-0 h-1 bg-primary/50" style={{
-      zIndex: 2000,
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      height: '1px'
-    }}>
-      <div className="h-full bg-primary" style={{
-        width: `${progress}%`,
-        height: '100%'
-      }} />
+    <div className="fixed top-0 left-0 right-0 h-1 bg-primary/50 z-[100]">
+      <div 
+        className="h-full bg-primary transition-all duration-100 ease-in-out" 
+        style={{
+          width: `${progress}%`,
+        }} 
+      />
     </div>
   );
 };

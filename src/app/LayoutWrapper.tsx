@@ -12,17 +12,15 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
-    <div className="relative h-full">
+    <div className="min-h-full flex flex-col relative">
       <LoadingBar />
-      <div className="flex h-full absolute top-0 left-0 right-0 bottom-0">
-      <Sidebar isOpen={isSidebarOpen} toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
-      <div className="flex flex-col flex-1 w-0">
-        <Navbar toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
+      <Navbar toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
+      <div className="flex flex-1 pt-12">
+        <Sidebar isOpen={isSidebarOpen} toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
         <div className="flex-1 flex flex-col">
           <MainContent>{children}</MainContent>
+          <Footer />
         </div>
-        <Footer />
-      </div>
       </div>
     </div>
   );

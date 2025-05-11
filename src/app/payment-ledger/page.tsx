@@ -115,7 +115,9 @@ export default function PaymentLedgerPage() {
                 Student Info
               </CardTitle>
             </CardHeader>
-            <CardContent className="pt-4">{student && <StudentInfo student={student} />}</CardContent>
+            <CardContent className="pt-4">
+              {student && <StudentInfo student={student} loading={loading} />}
+            </CardContent>
           </Card>
 
           <Card className="h-full shadow-sm hover:shadow-md transition-shadow duration-300">
@@ -127,7 +129,9 @@ export default function PaymentLedgerPage() {
                 Payment Ledger Summary
               </CardTitle>
             </CardHeader>
-            <CardContent className="pt-4">{paymentSummary && <PaymentSummary summary={paymentSummary} />}</CardContent>
+            <CardContent className="pt-4">
+              {paymentSummary && <PaymentSummary summary={paymentSummary} loading={loading} />}
+            </CardContent>
           </Card>
         </div>
 

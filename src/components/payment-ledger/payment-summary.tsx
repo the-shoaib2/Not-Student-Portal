@@ -1,10 +1,25 @@
-import type { PaymentSummaryData } from "@/types/student"
+import type { PaymentSummaryData } from "@/services/proxy-api"
+import { Skeleton } from "@/components/ui/skeleton"
 
 interface PaymentSummaryProps {
   summary: PaymentSummaryData
+  loading?: boolean
 }
 
-export default function PaymentSummary({ summary }: PaymentSummaryProps) {
+export default function PaymentSummary({ summary, loading = false }: PaymentSummaryProps) {
+  if (loading) {
+    return (
+      <div className="space-y-2">
+        {[...Array(7)].map((_, i) => (
+          <div key={i} className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            <Skeleton className="h-5 w-24" />
+            <Skeleton className="h-5 w-32 col-span-1 sm:col-span-2" />
+          </div>
+        ))}
+      </div>
+    )
+  }
+
   // Calculate due amount
   const due = summary.totalDebit - summary.totalCredit
   const isDue = due > 0

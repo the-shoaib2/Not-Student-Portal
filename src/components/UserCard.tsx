@@ -3,7 +3,16 @@ import React, { useState } from 'react';
 import { LogOut, User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '@/contexts/AuthContext';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 const UserCard: React.FC = () => {
   const router = useRouter();
@@ -13,14 +22,12 @@ const UserCard: React.FC = () => {
   const handleLogoutClick = () => {
     setShowLogoutDialog(true);
   };
+
   const confirmLogout = () => {
     setShowLogoutDialog(false);
     logout();
     toast.success('Logged out successfully');
     router.push('/login');
-  };
-  const cancelLogout = () => {
-    setShowLogoutDialog(false);
   };
 
   return (
@@ -44,37 +51,34 @@ const UserCard: React.FC = () => {
           <span>Logout</span>
         </div>
       </div>
-      {/* Logout Confirmation Dialog */}
-      {showLogoutDialog && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm transition-all duration-100 ease-in-out">
-          <div 
-            className="bg-white rounded-lg shadow-xl p-4 max-w-xs w-full mx-4 text-center transform dialog-fast" 
-            style={{
-              animation: 'fadeInScale 0.1s ease-out'
-            }}
-          >
-            <div className="flex items-center space-x-3 mb-2">
-              <LogOut className="text-red-600 flex-shrink-0" size={24} />
-              <h3 className="text-base font-semibold text-gray-900">Confirm Logout</h3>
-            </div>
-            <p className="text-sm text-gray-600 mb-3">Are you sure you want to log out?</p>
-            <div className="flex gap-2 justify-end">
-              <button
-                className="px-3 py-1.5 text-sm rounded bg-gray-100 text-gray-700 hover:bg-gray-200 font-medium transition-colors duration-150"
-                onClick={cancelLogout}
-              >
-                Cancel
-              </button>
-              <button
-                className="px-3 py-1.5 text-sm rounded bg-red-600 text-white hover:bg-red-700 font-medium shadow transition-colors duration-150"
-                onClick={confirmLogout}
-              >
-                Logout
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+
+      <Dialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
+        <DialogContent className="sm:max-w-[300px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <LogOut className="h-5 w-5 text-red-600" />
+              Confirm Logout
+            </DialogTitle>
+            <DialogDescription>
+              Are you sure you want to log out?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex gap-2 justify-end">
+            <Button
+              variant="outline"
+              onClick={() => setShowLogoutDialog(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={confirmLogout}
+            >
+              Logout
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

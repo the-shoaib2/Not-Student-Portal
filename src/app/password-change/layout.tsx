@@ -7,7 +7,7 @@ export default function ProfileUpdateLayout({
 }) {
   return (
     <main className="flex-1 mx-auto overflow-x-hidden overflow-y-auto ">
-      <div className="w-full py-16">
+      <div className="w-full py-2">
         {children}
       </div>
     </main>
