@@ -1265,7 +1265,7 @@ export const paymentService = {
   },
 
   //payment ledger summery
-  paymentLedgerSummery: async (): Promise<PaymentLedgerItem[] | null> => {
+  paymentLedgerSummery: async (): Promise<PaymentSummaryData | null> => {
     try {
       const token = profileService.getAuthToken();
       const response = await proxyRequest({

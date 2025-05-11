@@ -11,13 +11,14 @@ import { Semester, Student, PaymentSummaryData, PaymentLedgerItem } from "@/serv
 import { paymentService } from "@/services/proxy-api"
 import PageTitle from '@/components/PageTitle';
 import toast from 'react-hot-toast';
+import { Skeleton } from "@/components/ui/skeleton"
 
 export default function PaymentLedgerPage() {
   const memoizedPaymentService = useMemo(() => paymentService, []);
   const [semesters, setSemesters] = useState<Semester[]>([])
   const [selectedSemester, setSelectedSemester] = useState<string>("")
   const [student, setStudent] = useState<Student | null>(null)
-  const [paymentSummary, setPaymentSummary] = useState<PaymentLedgerItem[] | null>(null)
+  const [paymentSummary, setPaymentSummary] = useState<PaymentSummaryData | null>(null)
   const [paymentLedger, setPaymentLedger] = useState<PaymentLedgerItem[]>([])
   const [loading, setLoading] = useState(true)
   const [hasLoadedData, setHasLoadedData] = useState(false)
@@ -116,7 +117,18 @@ export default function PaymentLedgerPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-4">
-              {student && <StudentInfo student={student} loading={loading} />}
+              {loading ? (
+                <div className="space-y-2">
+                  {[...Array(4)].map((_, i) => (
+                    <div key={i} className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                      <Skeleton className="h-5 w-24" />
+                      <Skeleton className="h-5 w-48 col-span-1 sm:col-span-2" />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                student && <StudentInfo student={student} loading={loading} />
+              )}
             </CardContent>
           </Card>
 
@@ -130,7 +142,18 @@ export default function PaymentLedgerPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-4">
-              {paymentSummary && <PaymentSummary summary={paymentSummary} loading={loading} />}
+              {loading ? (
+                <div className="space-y-2">
+                  {[...Array(7)].map((_, i) => (
+                    <div key={i} className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                      <Skeleton className="h-5 w-24" />
+                      <Skeleton className="h-5 w-48 col-span-1 sm:col-span-2" />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                paymentSummary && <PaymentSummary summary={paymentSummary} loading={loading} />
+              )}
             </CardContent>
           </Card>
         </div>
@@ -147,7 +170,20 @@ export default function PaymentLedgerPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <PaymentLedger ledgerItems={paymentLedger} />
+            {loading ? (
+              <div className="space-y-2">
+                {[...Array(8)].map((_, i) => (
+                  <div key={i} className="grid grid-cols-4 gap-2">
+                    <Skeleton className="h-8 w-24" />
+                    <Skeleton className="h-8 w-32" />
+                    <Skeleton className="h-8 w-24" />
+                    <Skeleton className="h-8 w-24" />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <PaymentLedger ledgerItems={paymentLedger} />
+            )}
           </CardContent>
         </Card>
       </div>
