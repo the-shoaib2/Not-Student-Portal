@@ -1,4 +1,4 @@
-import { proxyClient, proxyRequest } from './proxyUtils';
+import { proxyClient, proxyRequest } from '@/services/proxyUtils';
 import { InternalAxiosRequestConfig, AxiosResponse, AxiosError, AxiosHeaders } from 'axios';
 
 interface ApiResponse<T> {
@@ -31,7 +31,7 @@ interface RequestBody {
 }
 
 // Add type for metadata
-interface ActivityMetadata {
+export interface ActivityMetadata {
   userAgent?: string;
   screenResolution?: string;
   pageLoadTime?: number;
@@ -40,7 +40,7 @@ interface ActivityMetadata {
 }
 
 // Add type for form data
-interface FormData {
+export interface FormData {
   [key: string]: string | number | boolean | null;
 }
 
@@ -151,7 +151,6 @@ export interface PaymentLedgerItem {
   showLedger: string;
 }
 
-// Add type definitions for API responses
 export interface DivisionListResponse {
   id: string;
   name: string;
