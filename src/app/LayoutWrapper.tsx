@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from 'react';
-import { Toaster } from 'react-hot-toast';
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
 import MainContent from '../components/MainContent';

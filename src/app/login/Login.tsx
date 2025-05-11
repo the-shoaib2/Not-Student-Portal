@@ -9,6 +9,7 @@ import toast from 'react-hot-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLoading } from '@/hooks/useLoading';
 import { ForgotPasswordForm } from "@/components/forgot-password-form";
+import Image from 'next/image';
 
 const Login: React.FC = () => {
   const router = useRouter();
@@ -19,9 +20,6 @@ const Login: React.FC = () => {
   const [error, setError] = useState('');
   const { isLoading, setIsLoading } = useLoading();
   const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
-  const [email, setEmail] = useState('');
-  const [forgotPasswordError, setForgotPasswordError] = useState('');
-  const [forgotPasswordSuccess, setForgotPasswordSuccess] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,7 +67,7 @@ const Login: React.FC = () => {
           {/* Login Card */}
           <div className="bg-white m-5 shadow-lg rounded-lg p-8 w-full max-w-sm">
             <div className="flex flex-col items-center mb-6">
-              <img src="/diuLogo.png" alt="DIU Logo" className="w-16 h-16 mb-2" />
+              <Image src="/diuLogo.png" alt="DIU Logo" width={64} height={64} className="w-16 h-16 mb-2" />
               <h2 className="text-lg font-semibold text-gray-700">Student Portal Login</h2>
             </div>
             <form onSubmit={handleSubmit}>
