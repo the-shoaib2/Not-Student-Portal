@@ -67,7 +67,19 @@ const Login: React.FC = () => {
           {/* Login Card */}
           <div className="bg-white m-5 shadow-lg rounded-lg p-8 w-full max-w-sm">
             <div className="flex flex-col items-center mb-6">
-              <Image src="/diuLogo.png" alt="DIU Logo" width={64} height={64} className="w-16 h-16 mb-2" />
+              <div className="relative w-16 h-16 mb-2">
+                <Image 
+                  src="/diuLogo.png" 
+                  alt="DIU Logo" 
+                  fill
+                  className="object-contain"
+                  priority
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = 'none';
+                  }}
+                />
+              </div>
               <h2 className="text-lg font-semibold text-gray-700">Student Portal Login</h2>
             </div>
             <form onSubmit={handleSubmit}>
