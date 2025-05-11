@@ -400,7 +400,7 @@ export const authService = {
         }
       });
 
-      console.log('Login response:', response);
+      // console.log('Login response:', response);
 
       if (!response.accessToken) {
         // Check for specific error messages from the API

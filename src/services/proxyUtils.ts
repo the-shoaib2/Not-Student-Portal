@@ -4,7 +4,7 @@
  * This file provides utility functions for working with the proxy server.
  */
 
-import axios, { AxiosRequestConfig, AxiosResponse, AxiosError, isAxiosError, InternalAxiosRequestConfig } from 'axios';
+import axios from 'axios';
 
 // Constants
 export const PROXY_BASE = '/proxy';
@@ -22,11 +22,11 @@ const proxyClient = axios.create({
 
 // Add request interceptor
 proxyClient.interceptors.request.use(
-  (config: InternalAxiosRequestConfig) => {
+  (config) => {
     // Add any request-specific headers or modifications
     return config;
   },
-  (error: AxiosError) => {
+  (error) => {
     console.error('[Proxy] Request error:', error);
     return Promise.reject(error);
   }
@@ -34,14 +34,15 @@ proxyClient.interceptors.request.use(
 
 // Add response interceptor
 proxyClient.interceptors.response.use(
-  (response: AxiosResponse) => {
+  // (response) => {
     // console.log('[Proxy] Response:', {
     //   status: response.status,
     //   data: response.data
     // });
+  (response) => {
     return response;
   },
-  (error: AxiosError) => {
+  (error) => {
     console.error('[Proxy] Response Error:', {
       status: error.response?.status,
       data: error.response?.data,
@@ -153,8 +154,8 @@ export const proxyRequest = async ({
       }
       
       // If max retries reached or different error, throw
-      if (error instanceof AxiosError && error.response) {
-        throw new Error(error.response.data?.message || error.message);
+      if (error instanceof Error && error.message) {
+        throw new Error(error.message);
       }
       throw error;
     }
@@ -176,7 +177,6 @@ export const checkProxyStatus = async (): Promise<{ status: string; message: str
       message: 'Proxy server is working correctly',
     };
   } catch (error) {
-    // console.error('[Proxy] Health check failed:', error);
     return {
       status: 'error',
       message: 'Proxy server is not working correctly',
