@@ -601,18 +601,19 @@ export interface PaymentSummary {
 
 // Auth Service
 export const authService = {
-  login: async (credentials: LoginCredentials): Promise<LoginResponse> => {
+  async login(credentials: LoginCredentials): Promise<LoginResponse> {
     try {
       const response = await proxyRequest({
         method: 'POST',
         url: '/login',
-        data: {
-          ...credentials,
-        }
+        data: credentials,
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        maxRetries: 3,
+        retryDelay: 1000
       });
-
-      // console.log('Login response:', response);
-
       if (!response.accessToken) {
         // Check for specific error messages from the API
         if (response.responseMessage) {

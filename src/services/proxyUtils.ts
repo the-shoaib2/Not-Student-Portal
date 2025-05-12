@@ -7,17 +7,16 @@
 import axios from 'axios';
 
 // Constants
-export const PROXY_BASE = '/proxy';
+export const PROXY_BASE = '/api/proxy';
 export const API_BASE_URL = process.env.API_BASE_URL || 'http://peoplepulse.diu.edu.bd:8189';
 
 // Create a proxy client instance
 const proxyClient = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: PROXY_BASE,
   timeout: 30000, // Increased timeout to 30 seconds
   headers: {
     'Accept': 'application/json',
     'Content-Type': 'application/json',
-    // 'Connection': 'close', // Don't keep connection alive
     'MaxDop': '1'// Force single-threaded query execution
   }
 });
