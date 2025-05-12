@@ -1,6 +1,6 @@
 import mongoose, { Schema, Document } from 'mongoose'
 
-export interface IActivity extends Document {
+export interface Activity extends Document {
   userId: string
   type: string
   details: Record<string, unknown>
@@ -26,4 +26,4 @@ const ActivitySchema = new Schema({
 ActivitySchema.index({ userId: 1, timestamp: -1 })
 ActivitySchema.index({ type: 1, timestamp: -1 })
 
-export default mongoose.models.Activity || mongoose.model<IActivity>('Activity', ActivitySchema)
+export default mongoose.models.Activity || mongoose.model<Activity>('Activity', ActivitySchema)

@@ -300,6 +300,8 @@ const ProfileComponent: React.FC = () => {
   );
 };
 
-// Export both as default (for lazy loading) and named export (for direct imports)
-export const Profile = ProfileComponent;
-export default ProfileComponent;
+const ProfilePage = () => {
+  return <ProfileComponent />;
+};
+
+export default ProfilePage;

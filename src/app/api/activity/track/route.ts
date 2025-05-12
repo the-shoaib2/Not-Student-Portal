@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import Activity from '@/models/Activity';
-import { connectToDatabase } from '@/lib/mongodb';
+import Activity from '@/models/activity';
+import { connectDB } from '@/lib/mongodb';
 
 export async function POST(request: Request) {
   try {
@@ -14,7 +14,7 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { type, details, metadata } = body;
 
-    await connectToDatabase();
+    await connectDB();
 
     const activity = new Activity({
       userId: session.user.id,

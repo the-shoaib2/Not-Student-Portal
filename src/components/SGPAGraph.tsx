@@ -71,7 +71,7 @@ const SGPAGraph: React.FC<SGPAGraphProps> = ({ cgpaData }) => {
     <div className="bg-white rounded-lg shadow p-4 mt-6">
       <h3 className="text-lg font-semibold mb-3">Semester-wise SGPA</h3>
       <div className="h-64">
-        <Line data={chartData} options={options} />
+        {chartData && options && <Line data={chartData} options={options} />}
       </div>
     </div>
   );

@@ -336,9 +336,16 @@ export interface LoginCredentials {
   grecaptcha?: string;
 }
 
+export interface LoginRequest {
+  studentId: string;
+  password: string;
+  deviceName: string;
+}
+
 export interface LoginResponse {
   accessToken: string;
   id: string;
+  studentId: string;
   name: string;
   userName: string;
   email: string;
@@ -1034,7 +1041,7 @@ export const profileService = {
     try {
       const token = profileService.getAuthToken();
       const response = await proxyRequest({
-        method: 'GET',
+        method: 'GET' ,
         url: '/profileUpdate/personalInfo',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -1052,6 +1059,30 @@ export const profileService = {
       throw new Error(`Failed to fetch personal info: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   },
+
+  updatePersonalInfo: async (): Promise<StudentInfo | null> => {
+    try {
+      const token = profileService.getAuthToken();
+      const response = await proxyRequest({
+        method: 'POST',
+        url: '/profileUpdate/personalInfo',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          accessToken: token,
+          'Accept': '*/*'
+        }
+      });
+
+      // console.log('Personal Info Response:', response);
+
+      return response;
+    } catch (error) {
+      // console.error('Error Updating personal info:', error);
+      // Throw a more descriptive error
+      throw new Error(`Failed to Update personal info: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  },
+
   maritalStatusList: async (): Promise<any | null> => {
     try {
       const token = profileService.getAuthToken();

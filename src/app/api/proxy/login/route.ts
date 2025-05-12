@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
 import { proxyClient } from '@/services/proxyUtils';
-import { Activity } from '@/models/activity';
+import type { Activity } from '@/models/activity';
 import { connectDB } from '@/lib/mongodb';
 import mongoose from 'mongoose';
-import { LoginRequest, LoginResponse } from '@/types/auth';
+import { LoginRequest, LoginResponse } from '@/services/proxy-api';
 
 export async function POST(request: Request) {
   try {
@@ -32,15 +32,16 @@ export async function POST(request: Request) {
     const userData = proxyResponse.data as LoginResponse;
 
     // Save login activity
-    const activity = new Activity({
-      userId: new mongoose.Types.ObjectId(userData.studentId),
+    const ActivityModel = mongoose.model<Activity>('Activity');
+    const activity = new ActivityModel({
+      userId: new mongoose.Types.ObjectId(userData.id),
       action: 'LOGIN',
       path: '/login',
       ip: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown',
       userAgent: deviceName,
       timestamp: new Date(),
       metadata: {
-        studentId: userData.studentId,
+        studentId: userData.id,
         email: userData.email,
         name: userData.name
       }
@@ -55,6 +56,5 @@ export async function POST(request: Request) {
       { error: 'Login failed' },
       { status: 401 }
     );
-
   }
 }

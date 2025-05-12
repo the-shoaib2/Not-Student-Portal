@@ -1,14 +1,26 @@
 import { useState } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import PersonalTab from "@/components/tabs/personal-tab"
-import GuardianTab from "@/components/tabs/guardian-tab"
-import ContactTab from "@/components/tabs/contact-tab"
-import EducationTab from "@/components/tabs/education-tab"
-import PhotographTab from "@/components/tabs/photograph-tab"
-import InsuranceTab from "@/components/tabs/insurance-tab"
+import PersonalTab from "@/components/profile-update-tabs/personal-tab"
+import GuardianTab from "@/components/profile-update-tabs/guardian-tab"
+import ContactTab from "@/components/profile-update-tabs/contact-tab"
+import EducationTab from "@/components/profile-update-tabs/education-tab"
+import PhotographTab from "@/components/profile-update-tabs/photograph-tab"
+import InsuranceTab from "@/components/profile-update-tabs/insurance-tab"
 
 export default function ProfileTabs() {
   const [activeTab, setActiveTab] = useState("personal")
+
+  // Mock data for all tabs
+  const personalData = {
+    data: null,
+    maritalStatus: [],
+    bloodGroup: [],
+    religion: []
+  }
+
+  const guardianData = {
+    data: null
+  }
 
   return (
     <Tabs defaultValue="personal" value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -52,11 +64,11 @@ export default function ProfileTabs() {
       </TabsList>
 
       <TabsContent value="personal">
-        <PersonalTab />
+        <PersonalTab {...personalData} />
       </TabsContent>
 
       <TabsContent value="guardian">
-        <GuardianTab />
+        <GuardianTab {...guardianData} />
       </TabsContent>
 
       <TabsContent value="contact">

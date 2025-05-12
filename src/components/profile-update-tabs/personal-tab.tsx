@@ -10,21 +10,60 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { DatePicker } from "@/components/ui/date-picker"
-import { PersonalTabProps, PersonalInfo, MaritalStatus, BloodGroup, Religion } from "@/types/profile"
 import { profileService } from "@/services/proxy-api"
 import { toast } from "react-hot-toast"
 
+export interface PersonalInfo {
+  personId: number;
+  firstName: string;
+  middleName: string | null;
+  lastName: string | null;
+  nickName: string | null;
+  birthDate: string;
+  placeOfBirth: string | null;
+  sex: string;
+  maritalStatus: string;
+  bloodGroup: string;
+  religion: string;
+  nationality: string;
+  voterId: string | null;
+  passportNo: string | null;
+  im: string | null;
+  socialNetId: string | null;
+  notes: string | null;
+}
+
+export interface MaritalStatus {
+  maritalStatus: string;
+}
+
+export interface BloodGroup {
+  bloodGroup: string;
+}
+
+export interface Religion {
+  religion: string;
+}
+
+export interface PersonalTabProps {
+  data: PersonalInfo | null;
+  maritalStatus: MaritalStatus[];
+  bloodGroup: BloodGroup[];
+  religion: Religion[];
+}
+
+
 export default function PersonalTab({ data, maritalStatus, bloodGroup, religion }: PersonalTabProps) {
-  const [dob, setDob] = useState<Date | undefined>()
+  const [dob, setDob] = useState<Date | undefined>(data?.birthDate ? new Date(data.birthDate) : undefined)
   
   // Initialize form state from data
   const [formData, setFormData] = useState<Partial<PersonalInfo>>(data || {})
 
   const handleFormSubmit = async () => {
     try {
-      // const response = await profileService.updateStudentInfo(formData)
+      const response = await profileService.updatePersonalInfo()
       toast.success("Personal info updated successfully")
-      // console.log("Personal info updated successfully:", response)
+      console.log("Personal info updated successfully:", response)
     } catch (error) {
       toast.error("Error updating personal info")
     }
@@ -55,6 +94,27 @@ export default function PersonalTab({ data, maritalStatus, bloodGroup, religion 
                 onChange={(e) => setFormData(prev => ({ ...prev, firstName: e.target.value }))}
               />
             </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="middleName">Middle Name</Label>
+              <Input 
+                id="middleName" 
+                placeholder="Enter middle name" 
+                value={formData.middleName || ''}
+                onChange={(e) => setFormData(prev => ({ ...prev, middleName: e.target.value }))}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="lastName">Last Name</Label>
+              <Input 
+                id="lastName" 
+                placeholder="Enter last name" 
+                value={formData.lastName || ''}
+                onChange={(e) => setFormData(prev => ({ ...prev, lastName: e.target.value }))}
+              />
+            </div>
+
 
             <div className="space-y-2">
               <Label>
@@ -126,61 +186,12 @@ export default function PersonalTab({ data, maritalStatus, bloodGroup, religion 
               </Select>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="nationality">
-                Nationality <span className="text-red-500">*</span>
-              </Label>
-              <Input 
-                id="nationality" 
-                placeholder="Enter nationality" 
-                value={formData.nationality || ''}
-                onChange={(e) => setFormData(prev => ({ ...prev, nationality: e.target.value }))}
-              />
-            </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="voterId">
-                Voter ID <span className="text-red-500">*</span>
-              </Label>
-              <Input 
-                id="voterId" 
-                placeholder="Enter voter ID" 
-                value={formData.voterId || ''}
-                onChange={(e) => setFormData(prev => ({ ...prev, voterId: e.target.value }))}
-              />
-            </div>
           </div>
 
           <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="middleName">Middle Name</Label>
-              <Input 
-                id="middleName" 
-                placeholder="Enter middle name" 
-                value={formData.middleName || ''}
-                onChange={(e) => setFormData(prev => ({ ...prev, middleName: e.target.value }))}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="lastName">Last Name</Label>
-              <Input 
-                id="lastName" 
-                placeholder="Enter last name" 
-                value={formData.lastName || ''}
-                onChange={(e) => setFormData(prev => ({ ...prev, lastName: e.target.value }))}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="fatherName">Father's Name</Label>
-              <Input id="fatherName" placeholder="Enter father's name" />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="motherName">Mother's Name</Label>
-              <Input id="motherName" placeholder="Enter mother's name" />
-            </div>
+            
+            
 
             <div className="space-y-2">
               <Label htmlFor="dob">
@@ -188,7 +199,10 @@ export default function PersonalTab({ data, maritalStatus, bloodGroup, religion 
               </Label>
               <DatePicker
                 date={dob}
-                setDate={setDob}
+                setDate={(date) => {
+                  setDob(date);
+                  setFormData(prev => ({ ...prev, birthDate: date ? date.toISOString().split('T')[0] : '' }));
+                }}
                 placeholder="Select date of birth"
                 startYear={1900}
                 endYear={new Date().getFullYear()}
@@ -197,17 +211,9 @@ export default function PersonalTab({ data, maritalStatus, bloodGroup, religion 
 
             <div className="space-y-2">
               <Label htmlFor="placeOfBirth">Place Of Birth</Label>
-              <Input id="placeOfBirth" placeholder="Enter place of birth" />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="notes">Notes</Label>
-              <Textarea 
-                id="notes" 
-                placeholder="Enter any additional notes" 
-                value={formData.notes || ''}
-                onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
-                className="min-h-[100px]"
+              <Input 
+              id="placeOfBirth" 
+              placeholder="Enter place of birth"
               />
             </div>
 
@@ -228,40 +234,68 @@ export default function PersonalTab({ data, maritalStatus, bloodGroup, religion 
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="nationality">Nationality</Label>
-              <Input id="nationality" placeholder="Enter nationality" defaultValue={data?.nationality || ''} />
+              <Label htmlFor="nationality">
+                Nationality <span className="text-red-500">*</span>
+              </Label>
+              <Input 
+                id="nationality" 
+                placeholder="Enter nationality" 
+                value={formData.nationality || ''}
+                onChange={(e) => setFormData(prev => ({ ...prev, nationality: e.target.value }))}
+              />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="nid">National ID/Birth Certificate No.</Label>
-              <Input id="nid" placeholder="Enter National ID" />
+              <Label htmlFor="voterId">
+                National ID/Birth Certificate No. <span className="text-red-500">*</span>
+              </Label>
+              <Input 
+                id="voterId" 
+                placeholder="Enter voter ID" 
+                value={formData.voterId || ''}
+                onChange={(e) => setFormData(prev => ({ ...prev, voterId: e.target.value }))}
+              />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="passport">Passport No</Label>
-              <Input id="passport" placeholder="Enter passport number" />
+              <Input 
+              id="passport" 
+              placeholder="Enter passport number"
+               />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="tin">TIN</Label>
-              <Input id="tin" placeholder="Enter TIN number" />
+              <Input 
+              id="tin" 
+              placeholder="Enter TIN number"
+               />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="socialId">Social Network Id</Label>
-              <Input id="socialId" placeholder="Enter social network ID" />
+              <Input 
+              id="socialId" 
+              placeholder="Enter social network ID"
+               />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="aboutYou">About You</Label>
-              <Textarea id="aboutYou" className="resize-none" placeholder="Write something about yourself..." />
-              <div className="text-xs text-right text-gray-500">0 / 200</div>
+              <Textarea 
+                id="notes" 
+                placeholder="Write something about yourself..."
+                value={formData.notes || ''}
+                onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
+                className="min-h-[100px]"
+              />
             </div>
           </div>
         </div>
 
         <div className="mt-8 flex justify-center">
-          <Button className="bg-orange-500 hover:bg-orange-600 text-white px-8">
+          <Button className="bg-orange-500 hover:bg-orange-600 text-white px-8" onClick={handleFormSubmit}>
             UPDATE PERSONAL INFO
           </Button>
         </div>

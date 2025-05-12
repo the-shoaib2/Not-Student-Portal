@@ -24,6 +24,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { ChevronDown } from "lucide-react"
+import { type RegisteredCourse as ApiRegisteredCourse, type CourseRoutine as ApiCourseRoutine } from "@/services/proxy-api"
 
 
 
@@ -34,27 +35,20 @@ export interface SemesterInfo {
   semesterName: string
 }
 
-interface CourseRoutine {
-  roomNo: string
-  day: string
-  levelTerm: string
-  timeSlot: string
-  teacher: string
+export interface CourseRoutine {
+  courseId: string;
+  courseTitle: string;
+  routine: string;
 }
 
-export interface RegisteredCourse {
-  customCourseId: string
-  courseTitle: string
-  totalCredit: number
-  sectionName: string
-  employeeName: string
-  advisedStatus: string
-  regClearenc: string
-  semesterId: string
-  studentId: string
-  designation: string
-  semesterYear: number
-  semesterName: string
+export interface RegisteredCourse extends ApiRegisteredCourse {
+  courseId: string;
+  courseTitle: string;
+  credit: number;
+  section: string;
+  instructor: string;
+  advisedStatus: string;
+  regClearenc: string;
 }
 
 // Column Helpers
@@ -64,24 +58,16 @@ const registeredCourseHelper = createColumnHelper<RegisteredCourse>()
 // Column Definitions
 const routineColumns: ColumnDef<CourseRoutine>[] = [
   {
-    accessorKey: "roomNo",
-    header: "Room No",
+    accessorKey: "courseId",
+    header: "Course ID",
   },
   {
-    accessorKey: "day",
-    header: "Day",
+    accessorKey: "courseTitle",
+    header: "Course Title",
   },
   {
-    accessorKey: "levelTerm",
-    header: "Level Term",
-  },
-  {
-    accessorKey: "timeSlot",
-    header: "Time Slot",
-  },
-  {
-    accessorKey: "teacher",
-    header: "Teacher",
+    accessorKey: "routine",
+    header: "Routine",
   },
 ]
 
@@ -280,7 +266,7 @@ const RoutineCard = React.memo(
                       className={row.index % 2 === 0 ? "bg-teal-50 hover:bg-teal-100" : "bg-white hover:bg-teal-100"}
                     >
                       {row.getVisibleCells().map((cell) => {
-                        const isLeftAligned = ['roomNo', 'day', 'teacher'].includes(cell.column.id);
+                        const isLeftAligned = ['courseId', 'courseTitle'].includes(cell.column.id);
                         return (
                           <TableCell 
                             key={cell.id} 
@@ -350,7 +336,8 @@ const RegisteredCourse: React.FC = () => {
           return
         }
         
-        setRegisteredCourses(res)
+        // Cast the API response to our component's type
+        setRegisteredCourses(res as RegisteredCourse[])
       } catch (err) {
         console.error("Error fetching registered courses:", err)
         setRegisteredCourses([])
@@ -397,16 +384,13 @@ const RegisteredCourse: React.FC = () => {
 
   const handleSemesterChange = useCallback(
     async (semester: SemesterInfo) => {
-      // Update UI immediately
       setSelectedSemester(semester);
       setSelectedRoutine(null);
       setSelectedRoutineCourseTitle("");
       
-      // Show loading state immediately
       setLoading(true);
       
       try {
-        // Fetch courses in the background
         const res = await registeredCourseService.getRegisteredCourses(semester.semesterId);
         
         if (!res || res.length === 0) {
@@ -415,7 +399,8 @@ const RegisteredCourse: React.FC = () => {
           return;
         }
         
-        setRegisteredCourses(res);
+        // Cast the API response to our component's type
+        setRegisteredCourses(res as RegisteredCourse[]);
       } catch (err) {
         console.error("Error fetching registered courses:", err);
         setRegisteredCourses([]);
@@ -428,7 +413,7 @@ const RegisteredCourse: React.FC = () => {
 
   const registeredCourseColumns = React.useMemo(
     () => [
-      registeredCourseHelper.accessor("customCourseId", {
+      registeredCourseHelper.accessor("courseId", {
         header: "Course Code",
         cell: (info) => <div className="text-left">{info.getValue()}</div>
       }),
@@ -436,13 +421,13 @@ const RegisteredCourse: React.FC = () => {
         header: "Course Title",
         cell: (info) => <div className="text-left">{info.getValue()}</div>
       }),
-      registeredCourseHelper.accessor("totalCredit", {
+      registeredCourseHelper.accessor("credit", {
         header: "Credit",
       }),
-      registeredCourseHelper.accessor("sectionName", {
+      registeredCourseHelper.accessor("section", {
         header: "Section",
       }),
-      registeredCourseHelper.accessor("employeeName", {
+      registeredCourseHelper.accessor("instructor", {
         header: "Teacher",
         cell: (info) => <div className="text-left">{info.getValue()}</div>
       }),
@@ -484,8 +469,16 @@ const RegisteredCourse: React.FC = () => {
       try {
         setSelectedRoutine(null)
         setSelectedRoutineCourseTitle("")
-        const routine = await registeredCourseService.getCourseRoutine(course.sectionName)
-        setSelectedRoutine(routine)
+        const routine = await registeredCourseService.getCourseRoutine(course.section)
+        // Handle the routine response
+        if (routine) {
+          const formattedRoutine = Array.isArray(routine) ? routine : [routine];
+          setSelectedRoutine(formattedRoutine.map(r => ({
+            courseId: r.courseId || '',
+            courseTitle: r.courseTitle || '',
+            routine: r.routine || ''
+          } as CourseRoutine)));
+        }
         setSelectedRoutineCourseTitle(course.courseTitle)
       } catch (err) {
         setSelectedRoutine(null)
@@ -584,7 +577,7 @@ const RegisteredCourse: React.FC = () => {
                         className={row.index % 2 === 0 ? "bg-teal-50 hover:bg-teal-100" : "bg-white hover:bg-teal-100"}
                       >
                         {row.getVisibleCells().map((cell) => {
-                          const isLeftAligned = ['customCourseId', 'courseTitle', 'employeeName'].includes(cell.column.id);
+                          const isLeftAligned = ['courseId', 'courseTitle', 'instructor'].includes(cell.column.id);
                           return (
                             <TableCell 
                               key={cell.id} 

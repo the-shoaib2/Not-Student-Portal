@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { X, Home, LogIn, User, UserPlus, KeyRound, FileText, FileCheck, BookOpen, Calendar, Bell, Briefcase, Building2, Laptop, ClipboardList, Users, Award, MonitorCheck, CreditCard, Layers, GraduationCap, LogOut } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
@@ -33,6 +33,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
   const router = useRouter();
   const pathname = usePathname();
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+
+  // Add optimized navigation handler
+  const handleNavigation = useCallback((path: string) => {
+    toggleSidebar();
+    router.push(path);
+  }, [router, toggleSidebar]);
 
   const menuItems: MenuItem[] = [
     { icon: <LogIn size={20} />, text: 'Log in', path: '/login', category: 'General', showWhenAuthenticated: false, public: true },
@@ -120,7 +126,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
           isOpen ? 'translate-x-0' : '-translate-x-full'
         } shadow-xl overflow-hidden flex flex-col z-50`}
       >
-        <div className="flex justify-between items-center px-4 p-2 border-b border-teal-500/30 sticky top-0 bg-teal-600 ">
+        <div className="flex justify-between items-center px-4 p-1.5 border-b border-teal-500/30 sticky top-0 bg-teal-600 ">
           <h2 className="text-xl font-semibold">Menu</h2>
           <button 
             onClick={toggleSidebar}
@@ -130,7 +136,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
             <X size={20} />
           </button>
         </div>
-        <nav className="py-2 flex-1 overflow-y-auto pr-1 sidebar-scrollbar" style={{
+        <nav className="py-2 flex-1 overflow-y-auto p-1 sidebar-scrollbar" style={{
           scrollbarWidth: 'thin',
           scrollbarColor: 'rgba(13, 148, 136, 0.5) rgba(13, 148, 136, 0.1)'
         }}>
@@ -149,8 +155,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
                     className={`flex items-center space-x-3 px-4 py-2 hover:bg-teal-700/50 transition-colors duration-200 rounded ${isActive ? 'bg-teal-800 font-bold' : ''}`}
                     onClick={(e) => {
                       e.preventDefault();
-                      toggleSidebar();
-                      router.push(item.path);
+                      handleNavigation(item.path);
                     }}
                   >
                     <span className="text-teal-300">{item.icon}</span>

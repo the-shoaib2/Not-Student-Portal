@@ -1,13 +1,11 @@
 import { useState, useEffect, useCallback } from 'react'
-import { ActivityTracker, ActivityData } from '../services/activity';
+import { ActivityTracker, type ActivityData } from '../services/activity';
 import { getServerSession } from 'next-auth'
-
 import { useSession } from 'next-auth/react'
 import type { Session } from 'next-auth'
 import { useMemo } from 'react'
 import { usePathname } from 'next/navigation'
 import { activityService } from '@/services/activityService'
-import { ActivityMetadata, FormData } from '@/services/proxy-api'
 
 interface ActivityConfig {
   enabled: {
@@ -21,11 +19,7 @@ interface ActivityConfig {
   }
 }
 
-interface ActivityData {
-  type: string;
-  details: Record<string, unknown>;
-  timestamp: Date;
-}
+type ActivityMetadata = ActivityData['metadata']
 
 export function useActivityTracking() {
   const [config, setConfig] = useState<ActivityConfig>({
@@ -74,58 +68,57 @@ export function useActivityTracking() {
     }
   }
 
-  const trackPageView = async (path: string, metadata?: any) => {
+  const trackPageView = async (path: string, metadata?: ActivityMetadata) => {
     if (!config.enabled.pageViews) return
     const session = await getServerSession() as Session
     if (!session?.user?.id) return
-    await tracker.trackPageView(path, metadata)
+    await tracker.trackPageView(path, {
+      studentId: session.user.id,
+      email: session.user.email || undefined,
+      name: session.user.name || undefined
+    })
   }
 
-  const trackButtonClick = useCallback(async (elementId: string, path: string, metadata?: any) => {
+  const trackButtonClick = useCallback(async (elementId: string, path: string, metadata?: ActivityMetadata) => {
     if (!config.enabled.buttonClicks) return
     const session = await getServerSession() as Session
     if (!session?.user?.id) return
     await tracker.trackButtonClick(elementId, path, metadata)
   }, [config.enabled.buttonClicks])
 
-  const trackFormSubmission = useCallback(async (formId: string, path: string, formData: any, metadata?: any) => {
+  const trackFormSubmission = useCallback(async (formId: string, path: string, formData: any, metadata?: ActivityMetadata) => {
     if (!config.enabled.formSubmissions) return
     const session = await getServerSession() as Session
     if (!session?.user?.id) return
     await tracker.trackFormSubmission(formId, path, formData, metadata)
   }, [config.enabled.formSubmissions])
 
-  const trackFormInput = useCallback(async (formId: string, path: string, inputName: string, inputValue: string, metadata?: any) => {
+  const trackFormInput = useCallback(async (formId: string, path: string, inputName: string, inputValue: string, metadata?: ActivityMetadata) => {
     if (!config.enabled.formInputs) return
     const session = await getServerSession() as Session
     if (!session?.user?.id) return
     await tracker.trackFormInput(formId, path, inputName, inputValue, metadata)
   }, [config.enabled.formInputs])
 
-  const trackApiCall = useCallback(async (endpoint: string, method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH', path: string, metadata?: ActivityData['metadata']) => {
+  const trackApiCall = useCallback(async (endpoint: string, method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH', path: string, metadata?: ActivityMetadata) => {
     if (!config.enabled.apiCalls) return
     const session = await getServerSession() as Session
     if (!session?.user?.id) return
     await tracker.trackApiCall(endpoint, method, path, metadata)
   }, [config.enabled.apiCalls])
 
-  const trackLogin = useCallback(async (username: string, metadata?: {
-    studentId?: string
-    email?: string
-    name?: string
-    sessionDuration?: number
-  }) => {
+  const trackLogin = useCallback(async (username: string, metadata?: ActivityMetadata) => {
     if (!config.enabled.loginLogout) return
     const session = await getServerSession() as Session
     if (!session?.user?.id) return
-    await tracker.trackLogin(username, metadata)
+    await tracker.trackLogin(session.user.id, metadata)
   }, [config.enabled.loginLogout])
 
-  const trackLogout = useCallback(async (metadata?: any) => {
+  const trackLogout = useCallback(async (metadata?: ActivityMetadata) => {
     if (!config.enabled.loginLogout) return
     const session = await getServerSession() as Session
     if (!session?.user?.id) return
-    await tracker.trackLogout(metadata)
+    await tracker.trackLogout(session.user.id)
   }, [config.enabled.loginLogout])
 
   const toggleTracking = async (type: keyof ActivityConfig['enabled']) => {
@@ -138,12 +131,13 @@ export function useActivityTracking() {
     if (!config.enabled.pageViews || isLoading) return
 
     // Track page view
-    trackPageView(pathname, {
-      userAgent: navigator.userAgent,
-      screenResolution: `${window.innerWidth}x${window.innerHeight}`,
-      pageLoadTime: performance.now() - window.performance.timing.navigationStart,
-      referrer: document.referrer
-    })
+    if (session?.user?.id) {
+      trackPageView(pathname, {
+        studentId: session.user.id,
+        email: session.user.email || undefined,
+        name: session.user.name || undefined
+      })
+    }
 
     // Track form submissions
     const handleFormSubmit = async (e: SubmitEvent) => {
@@ -193,47 +187,20 @@ export function useActivityTracking() {
       document.removeEventListener('click', handleButtonClick)
       document.removeEventListener('input', handleFormInput)
     }
-  }, [config, isLoading, pathname, trackButtonClick, trackFormSubmission, trackFormInput])
+  }, [config, isLoading, pathname, trackButtonClick, trackFormSubmission, trackFormInput, session])
 
   return {
     config,
     isLoading,
+    updateConfig,
     toggleTracking,
-    trackPageView: (path: string, metadata?: any) => {
-      if (session?.user?.id && config?.enabled?.pageViews) {
-        tracker.trackPageView(path, metadata)
-      }
-    },
-    trackButtonClick: (elementId: string, path: string, metadata?: any) => {
-      if (session?.user?.id && config?.enabled?.buttonClicks) {
-        tracker.trackButtonClick(elementId, path, metadata)
-      }
-    },
-    trackFormSubmission: (formId: string, path: string, formData: any, metadata?: any) => {
-      if (session?.user?.id && config?.enabled?.formSubmissions) {
-        tracker.trackFormSubmission(formId, path, formData, metadata)
-      }
-    },
-    trackFormInput: (formId: string, path: string, inputName: string, inputValue: string, metadata?: any) => {
-      if (session?.user?.id && config?.enabled?.formInputs) {
-        tracker.trackFormInput(formId, path, inputName, inputValue, metadata)
-      }
-    },
-    trackApiCall: (endpoint: string, method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH', metadata?: ActivityData['metadata']) => {
-      if (session?.user?.id && config?.enabled?.apiCalls) {
-        tracker.trackApiCall(endpoint, method, pathname, metadata)
-      }
-    },
-    trackLogin: (username: string, metadata?: ActivityMetadata) => {
-      if (session?.user?.id && config?.enabled?.loginLogout) {
-        tracker.trackLogin(username, metadata)
-      }
-    },
-    trackLogout: (metadata?: ActivityMetadata) => {
-      if (session?.user?.id && config?.enabled?.loginLogout) {
-        tracker.trackLogout(metadata)
-      }
-    }
+    trackPageView,
+    trackButtonClick,
+    trackFormSubmission,
+    trackFormInput,
+    trackApiCall,
+    trackLogin,
+    trackLogout
   }
 }
 
