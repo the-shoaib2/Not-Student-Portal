@@ -1,6 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
-
-const API_BASE_URL = process.env.API_BASE_URL;
+import { NextRequest, NextResponse } from 'next/server';
 
 export const config = {
   runtime: 'edge',
@@ -15,58 +13,71 @@ const corsHeaders = {
   'Access-Control-Max-Age': '86400',
 };
 
-export async function GET(req: NextRequest) {
-  // Handle OPTIONS request
-  if (req.method === 'OPTIONS') {
-    return new NextResponse(null, {
-      status: 204,
-      headers: corsHeaders,
-    });
+// Helper function to handle CORS preflight requests
+function handleCors() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: corsHeaders,
+  });
+}
+
+// Helper function to build headers
+function buildHeaders(req: NextRequest) {
+  const headers = new Headers();
+  headers.set('Content-Type', 'application/json');
+  headers.set('Accept', 'application/json');
+  
+  // Forward authorization header if present
+  const authHeader = req.headers.get('Authorization');
+  if (authHeader) {
+    headers.set('Authorization', authHeader);
   }
+  
+  return headers;
+}
 
+// Helper function to clean path
+function cleanPath(path: string) {
+  return path.replace(/^\/(?:api|proxy)\//, '');
+}
+
+async function handleRequest(req: NextRequest, method: string) {
   try {
-    // Get the path from the URL
     const url = new URL(req.url);
-    let path = url.pathname;
-
-    // Clean up the path
-    path = path.replace(/^\/(?:api|proxy)\//, '');
-
-    // Build target URL
+    const path = cleanPath(url.pathname);
+    const API_BASE_URL = process.env.API_BASE_URL || 'http://peoplepulse.diu.edu.bd:8189';
     const targetUrl = `${API_BASE_URL}/${path}`;
 
-    // Forward the request with all headers
-    const headers = new Headers(req.headers);
-    headers.set('Content-Type', 'application/json');
-    headers.set('Accept', 'application/json');
+    const headers = buildHeaders(req);
     
-    // Remove problematic headers
-    ['host', 'connection'].forEach(header => {
-      headers.delete(header);
-    });
+    let body: string | null = null;
+    if (method !== 'GET' && method !== 'HEAD') {
+      try {
+        const jsonBody = await req.json();
+        body = JSON.stringify(jsonBody);
+      } catch {
+        // Handle empty body
+      }
+    }
 
-    // Create the request to forward
-    const forwardRequest = new Request(targetUrl, {
-      method: req.method,
-      headers: headers,
+    const response = await fetch(targetUrl, {
+      method,
+      headers,
+      body,
       redirect: 'follow',
     });
 
-    // Forward the request
-    const response = await fetch(forwardRequest);
-
-    // Get response data
     const responseData = await response.text();
-
-    // Prepare response headers
     const responseHeaders = new Headers(corsHeaders);
+
+    // Copy relevant response headers
     response.headers.forEach((value, key) => {
       if (!['access-control-allow-origin'].includes(key.toLowerCase())) {
         responseHeaders.set(key, value);
       }
     });
 
-    // Try to parse response as JSON
+    // Try to parse as JSON, fallback to text
     try {
       const jsonData = JSON.parse(responseData);
       return NextResponse.json(jsonData, {
@@ -75,215 +86,37 @@ export async function GET(req: NextRequest) {
         headers: responseHeaders,
       });
     } catch {
-      // If not JSON, return as text
       return new NextResponse(responseData, {
         status: response.status,
         statusText: response.statusText,
         headers: responseHeaders,
       });
     }
-  } catch (_error) {
+  } catch (error) {
+    console.error('[Proxy Error]', error);
     return NextResponse.json(
-      { message: 'Internal server error' },
+      { message: 'Internal server error', error: String(error) },
       { status: 500, headers: corsHeaders }
     );
   }
+}
+
+export async function GET(req: NextRequest) {
+  if (req.method === 'OPTIONS') return handleCors();
+  return handleRequest(req, 'GET');
 }
 
 export async function POST(req: NextRequest) {
-  if (req.method === 'OPTIONS') {
-    return new NextResponse(null, {
-      status: 204,
-      headers: corsHeaders,
-    });
-  }
-
-  try {
-    const url = new URL(req.url);
-    let path = url.pathname;
-    path = path.replace(/^\/(?:api|proxy)\//, '');
-    const targetUrl = `${API_BASE_URL}/${path}`;
-
-    const headers = new Headers(req.headers);
-    headers.set('Content-Type', 'application/json');
-    headers.set('Accept', 'application/json');
-    
-    ['host', 'connection'].forEach(header => {
-      headers.delete(header);
-    });
-
-    let body: RequestBody | null = null;
-    try {
-      body = await req.json();
-    } catch (error) {
-      // Handle empty body
-    }
-
-    const forwardRequest = new Request(targetUrl, {
-      method: req.method,
-      headers: headers,
-      body: body ? JSON.stringify(body) : null,
-      redirect: 'follow',
-    });
-
-    const response = await fetch(forwardRequest);
-    const responseData = await response.text();
-
-    const responseHeaders = new Headers(corsHeaders);
-    response.headers.forEach((value, key) => {
-      if (!['access-control-allow-origin'].includes(key.toLowerCase())) {
-        responseHeaders.set(key, value);
-      }
-    });
-
-    try {
-      const jsonData = JSON.parse(responseData);
-      return NextResponse.json(jsonData, {
-        status: response.status,
-        statusText: response.statusText,
-        headers: responseHeaders,
-      });
-    } catch {
-      return new NextResponse(responseData, {
-        status: response.status,
-        statusText: response.statusText,
-        headers: responseHeaders,
-      });
-    }
-  } catch (_error) {
-    return NextResponse.json(
-      { message: 'Internal server error' },
-      { status: 500, headers: corsHeaders }
-    );
-  }
+  if (req.method === 'OPTIONS') return handleCors();
+  return handleRequest(req, 'POST');
 }
 
 export async function PUT(req: NextRequest) {
-  if (req.method === 'OPTIONS') {
-    return new NextResponse(null, {
-      status: 204,
-      headers: corsHeaders,
-    });
-  }
-
-  try {
-    const url = new URL(req.url);
-    let path = url.pathname;
-    path = path.replace(/^\/(?:api|proxy)\//, '');
-    const targetUrl = `${API_BASE_URL}/${path}`;
-
-    const headers = new Headers(req.headers);
-    headers.set('Content-Type', 'application/json');
-    headers.set('Accept', 'application/json');
-    
-    ['host', 'connection'].forEach(header => {
-      headers.delete(header);
-    });
-
-    let body: RequestBody | null = null;
-    try {
-      body = await req.json();
-    } catch (error) {
-      // Handle empty body
-    }
-
-    const forwardRequest = new Request(targetUrl, {
-      method: req.method,
-      headers: headers,
-      body: body ? JSON.stringify(body) : null,
-      redirect: 'follow',
-    });
-
-    const response = await fetch(forwardRequest);
-    const responseData = await response.text();
-
-    const responseHeaders = new Headers(corsHeaders);
-    response.headers.forEach((value, key) => {
-      if (!['access-control-allow-origin'].includes(key.toLowerCase())) {
-        responseHeaders.set(key, value);
-      }
-    });
-
-    try {
-      const jsonData = JSON.parse(responseData);
-      return NextResponse.json(jsonData, {
-        status: response.status,
-        statusText: response.statusText,
-        headers: responseHeaders,
-      });
-    } catch {
-      return new NextResponse(responseData, {
-        status: response.status,
-        statusText: response.statusText,
-        headers: responseHeaders,
-      });
-    }
-  } catch (_error) {
-    return NextResponse.json(
-      { message: 'Internal server error' },
-      { status: 500, headers: corsHeaders }
-    );
-  }
+  if (req.method === 'OPTIONS') return handleCors();
+  return handleRequest(req, 'PUT');
 }
 
 export async function DELETE(req: NextRequest) {
-  if (req.method === 'OPTIONS') {
-    return new NextResponse(null, {
-      status: 204,
-      headers: corsHeaders,
-    });
-  }
-
-  try {
-    const url = new URL(req.url);
-    let path = url.pathname;
-    path = path.replace(/^\/(?:api|proxy)\//, '');
-    const targetUrl = `${API_BASE_URL}/${path}`;
-
-    const headers = new Headers(req.headers);
-    headers.set('Content-Type', 'application/json');
-    headers.set('Accept', 'application/json');
-    
-    ['host', 'connection'].forEach(header => {
-      headers.delete(header);
-    });
-
-    const forwardRequest = new Request(targetUrl, {
-      method: req.method,
-      headers: headers,
-      redirect: 'follow',
-    });
-
-    const response = await fetch(forwardRequest);
-    const responseData = await response.text();
-
-    const responseHeaders = new Headers(corsHeaders);
-    response.headers.forEach((value, key) => {
-      if (!['access-control-allow-origin'].includes(key.toLowerCase())) {
-        responseHeaders.set(key, value);
-      }
-    });
-
-    try {
-      const jsonData = JSON.parse(responseData);
-      return NextResponse.json(jsonData, {
-        status: response.status,
-        statusText: response.statusText,
-        headers: responseHeaders,
-      });
-    } catch {
-      return new NextResponse(responseData, {
-        status: response.status,
-        statusText: response.statusText,
-        headers: responseHeaders,
-      });
-    }
-  } catch (_error) {
-    return NextResponse.json(
-      { message: 'Internal server error' },
-      { status: 500, headers: corsHeaders }
-    );
-  }
+  if (req.method === 'OPTIONS') return handleCors();
+  return handleRequest(req, 'DELETE');
 }
-
-type RequestBody = Record<string, unknown>; 
