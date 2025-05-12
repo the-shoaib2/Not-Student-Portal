@@ -10,8 +10,8 @@ import { LoadingProvider } from '@/hooks/useLoading'
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: '!Student Portal',
-  description: '!Student Portal -Daffodil International University',
+  title: 'Student Portal',
+  description: 'Student Portal - Daffodil International University',
   icons: {
     icon: '/favicon.ico',
   },
