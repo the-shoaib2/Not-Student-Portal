@@ -21,7 +21,10 @@ const corsHeaders = {
   'Access-Control-Max-Age': '86400',
 };
 
-export async function GET(req: NextRequest, { params }: { params: { path: string[] } }) {
+export async function GET(
+  req: NextRequest,
+  context: { params: { path: string[] } }
+) {
   // Handle OPTIONS request
   if (req.method === 'OPTIONS') {
     return new NextResponse(null, {
@@ -31,7 +34,7 @@ export async function GET(req: NextRequest, { params }: { params: { path: string
   }
 
   try {
-    const path = params.path.join('/');
+    const path = context.params.path.join('/');
     const searchParams = new URL(req.url).searchParams;
     const targetUrl = `${API_BASE_URL}/${path}`;
 
@@ -64,7 +67,10 @@ export async function GET(req: NextRequest, { params }: { params: { path: string
   }
 }
 
-export async function POST(req: NextRequest, { params }: { params: { path: string[] } }) {
+export async function POST(
+  req: NextRequest,
+  context: { params: { path: string[] } }
+) {
   if (req.method === 'OPTIONS') {
     return new NextResponse(null, {
       status: 204,
@@ -73,7 +79,7 @@ export async function POST(req: NextRequest, { params }: { params: { path: strin
   }
 
   try {
-    const path = params.path.join('/');
+    const path = context.params.path.join('/');
     const body = await req.json();
     
     const response = await proxyClient.post(path, body, {
@@ -104,7 +110,10 @@ export async function POST(req: NextRequest, { params }: { params: { path: strin
   }
 }
 
-export async function PUT(req: NextRequest, { params }: { params: { path: string[] } }) {
+export async function PUT(
+  req: NextRequest,
+  context: { params: { path: string[] } }
+) {
   if (req.method === 'OPTIONS') {
     return new NextResponse(null, {
       status: 204,
@@ -113,7 +122,7 @@ export async function PUT(req: NextRequest, { params }: { params: { path: string
   }
 
   try {
-    const path = params.path.join('/');
+    const path = context.params.path.join('/');
     const body = await req.json();
     
     const response = await proxyClient.put(path, body, {
@@ -144,7 +153,10 @@ export async function PUT(req: NextRequest, { params }: { params: { path: string
   }
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: { path: string[] } }) {
+export async function DELETE(
+  req: NextRequest,
+  context: { params: { path: string[] } }
+) {
   if (req.method === 'OPTIONS') {
     return new NextResponse(null, {
       status: 204,
@@ -153,7 +165,7 @@ export async function DELETE(req: NextRequest, { params }: { params: { path: str
   }
 
   try {
-    const path = params.path.join('/');
+    const path = context.params.path.join('/');
     const searchParams = new URL(req.url).searchParams;
     const targetUrl = `${API_BASE_URL}/${path}`;
 

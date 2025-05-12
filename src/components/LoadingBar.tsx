@@ -19,9 +19,9 @@ export const LoadingBar = () => {
   if (!isLoading) return null;
 
   return (
-    <div className="fixed top-0 left-0 right-0 h-1 bg-primary/50 z-[100]">
+    <div className="fixed top-0 left-0 right-0 h-1 bg-secondary z-[100] shadow-sm overflow-hidden">
       <div 
-        className="h-full bg-primary transition-all duration-100 ease-in-out" 
+        className="h-full bg-primary shadow-sm transition-all duration-100 ease-out transform -skew-x-12" 
         style={{
           width: `${progress}%`,
         }} 

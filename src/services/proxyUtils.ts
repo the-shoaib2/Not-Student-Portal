@@ -17,8 +17,8 @@ const proxyClient = axios.create({
   headers: {
     'Accept': 'application/json',
     'Content-Type': 'application/json',
-    'MaxDop': '1', // Force single-threaded query execution
-    'Connection': 'close' // Don't keep connection alive
+    // 'Connection': 'close', // Don't keep connection alive
+    'MaxDop': '1'// Force single-threaded query execution
   }
 });
 
