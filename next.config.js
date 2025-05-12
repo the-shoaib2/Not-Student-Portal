@@ -5,7 +5,10 @@ const nextConfig = {
     // your project has ESLint errors.
     ignoreDuringBuilds: true,
   },
-  output: 'standalone'
+  output: 'standalone',
+  distDir: '.next',
+  poweredByHeader: false,
+  reactStrictMode: true
 }
 
 module.exports = nextConfig
