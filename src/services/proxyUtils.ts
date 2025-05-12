@@ -8,12 +8,14 @@ import axios from 'axios';
 
 // Constants
 export const PROXY_BASE = '/proxy';
-export const API_BASE_URL = process.env.API_BASE_URL || 'http://peoplepulse.diu.edu.bd:8189';
+export const API_BASE_URL = process.env.NEXT_PUBLIC_VERCEL_URL 
+  ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}/api/proxy`
+  : '/api/proxy';
 
 // Create a proxy client instance
 const proxyClient = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 100000, // 100 seconds timeout
+  timeout: 10000, // 10 seconds timeout
   headers: {
     'Accept': 'application/json',
     'Content-Type': 'application/json'
