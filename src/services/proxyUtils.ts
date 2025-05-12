@@ -16,9 +16,28 @@ const proxyClient = axios.create({
   timeout: 30000, // Increased timeout to 30 seconds
   headers: {
     'Accept': 'application/json',
-    'Content-Type': 'application/json',
-    'MaxDop': '1'// Force single-threaded query execution
+    'Content-Type': 'application/json'
   }
+});
+
+// Add request interceptor to handle auth headers
+proxyClient.interceptors.request.use((config) => {
+  // Get auth token from localStorage if available
+  if (typeof window !== 'undefined') {
+    const userJson = localStorage.getItem('user');
+    if (userJson) {
+      try {
+        const user = JSON.parse(userJson);
+        if (user.accessToken) {
+          config.headers['Authorization'] = `Bearer ${user.accessToken}`;
+          config.headers['accessToken'] = user.accessToken;
+        }
+      } catch (error) {
+        console.warn('[Proxy] Error parsing user data:', error);
+      }
+    }
+  }
+  return config;
 });
 
 // Add request interceptor

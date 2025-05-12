@@ -30,17 +30,30 @@ function handleCors() {
 }
 
 // Helper function to build headers
-function buildHeaders(req: NextRequest) {
-  const headers = new Headers();
-  headers.set('Content-Type', 'application/json');
-  headers.set('Accept', 'application/json');
-  
-  // Forward authorization header if present
+function buildHeaders(req: NextRequest): HeadersInit {
+  const headers: HeadersInit = {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json',
+  };
+
+  // Forward Authorization header if present
   const authHeader = req.headers.get('Authorization');
   if (authHeader) {
-    headers.set('Authorization', authHeader);
+    headers['Authorization'] = authHeader;
   }
-  
+
+  // Forward accessToken header if present
+  const accessToken = req.headers.get('accessToken');
+  if (accessToken) {
+    headers['accessToken'] = accessToken;
+  }
+
+  // Forward other important headers
+  const userAgent = req.headers.get('user-agent');
+  if (userAgent) {
+    headers['User-Agent'] = userAgent;
+  }
+
   return headers;
 }
 
