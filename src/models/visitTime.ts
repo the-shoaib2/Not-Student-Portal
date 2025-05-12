@@ -31,7 +31,7 @@ const visitTimeSchema = new Schema<VisitTimeDocument>({
   sessionId: {
     type: String,
     required: true,
-    unique: true
+    index: true
   },
   pagePath: {
     type: String,
@@ -64,7 +64,7 @@ const visitTimeSchema = new Schema<VisitTimeDocument>({
 })
 
 visitTimeSchema.index({ userId: 1, startTime: -1 })
-visitTimeSchema.index({ sessionId: 1 })
+// Removing duplicate sessionId index since it's already defined in the schema
 visitTimeSchema.index({ pagePath: 1, startTime: -1 })
 
 export const VisitTime = mongoose.models.VisitTime || mongoose.model<VisitTimeDocument>('VisitTime', visitTimeSchema)
