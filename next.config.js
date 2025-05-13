@@ -8,7 +8,15 @@ const nextConfig = {
   output: 'standalone',
   distDir: '.next',
   poweredByHeader: false,
-  reactStrictMode: true
+  reactStrictMode: true,
+  async rewrites() {
+    return [
+      {
+        source: '/proxy/:path*',
+        destination: process.env.API_BASE_URL || 'http://peoplepulse.diu.edu.bd:8189/:path*'
+      }
+    ];
+  }
 }
 
 module.exports = nextConfig

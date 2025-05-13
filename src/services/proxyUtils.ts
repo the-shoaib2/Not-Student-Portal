@@ -13,7 +13,7 @@ export const API_BASE_URL = process.env.API_BASE_URL || 'http://peoplepulse.diu.
 // Create a proxy client instance
 const proxyClient = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 100000, // 100 seconds timeout
+  timeout: 100000, // 100 seconds timeout  
   headers: {
     'Accept': 'application/json',
     'Content-Type': 'application/json'
