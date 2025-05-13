@@ -12,7 +12,7 @@ export const API_BASE_URL = process.env.API_BASE_URL || 'http://peoplepulse.diu.
 
 // Create a proxy client instance
 const proxyClient = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: PROXY_BASE, // Use the proxy base URL instead of direct API URL
   timeout: 100000, // 100 seconds timeout  
   headers: {
     'Accept': 'application/json',
@@ -34,11 +34,6 @@ proxyClient.interceptors.request.use(
 
 // Add response interceptor
 proxyClient.interceptors.response.use(
-  // (response) => {
-    // console.log('[Proxy] Response:', {
-    //   status: response.status,
-    //   data: response.data
-    // });
   (response) => {
     return response;
   },
@@ -112,15 +107,19 @@ export const proxyRequest = async ({
 }) => {
   const makeRequest = async (retryCount: number = 0): Promise<any> => {
     try {
+      // Ensure requests go through the proxy by prefixing the URL
+      const proxyUrl = url.startsWith('/') ? url : `/${url}`;
+      
       const response = await proxyClient.request({
         method,
-        url,
+        url: proxyUrl,
         data,
         responseType,
         timeout,
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
+          'X-Target-URL': API_BASE_URL, // Add the target URL header
           ...headers
         }
       });

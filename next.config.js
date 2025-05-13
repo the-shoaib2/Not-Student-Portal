@@ -13,7 +13,7 @@ const nextConfig = {
     return [
       {
         source: '/proxy/:path*',
-        destination: process.env.API_BASE_URL || 'http://peoplepulse.diu.edu.bd:8189/:path*'
+        destination: `${process.env.API_BASE_URL || 'http://peoplepulse.diu.edu.bd:8189'}/:path*`
       }
     ];
   }
