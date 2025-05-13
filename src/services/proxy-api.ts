@@ -266,6 +266,9 @@ const api = proxyClient;
 api.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {
     // Get stored user data
+    if (typeof window === 'undefined') {
+      return config;
+    }
     const userJson = localStorage.getItem('user');
     if (userJson) {
       const user = JSON.parse(userJson);
@@ -308,8 +311,10 @@ api.interceptors.response.use(
     }
 
     if (error.response?.status === 401) {
-      localStorage.removeItem('user');
-      localStorage.removeItem('isAuthenticated');
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('user');
+        localStorage.removeItem('isAuthenticated');
+      }
       return Promise.reject(error);
     }
 
@@ -596,18 +601,19 @@ export interface PaymentSummary {
 
 // Auth Service
 export const authService = {
-  login: async (credentials: LoginCredentials): Promise<LoginResponse> => {
+  async login(credentials: LoginCredentials): Promise<LoginResponse> {
     try {
       const response = await proxyRequest({
         method: 'POST',
         url: '/login',
-        data: {
-          ...credentials,
-        }
+        data: credentials,
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        maxRetries: 3,
+        retryDelay: 1000
       });
-
-      // console.log('Login response:', response);
-
       if (!response.accessToken) {
         // Check for specific error messages from the API
         if (response.responseMessage) {
@@ -619,15 +625,19 @@ export const authService = {
         }
       }
 
-      // Store user data and authentication state
-      localStorage.setItem('user', JSON.stringify(response));
-      localStorage.setItem('isAuthenticated', 'true');
+      // Only store in localStorage if we're in a browser environment
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('user', JSON.stringify(response));
+        localStorage.setItem('isAuthenticated', 'true');
+      }
 
       return response;
     } catch (error: any) {
-      // Clear auth data
-      localStorage.removeItem('user');
-      localStorage.removeItem('isAuthenticated');
+      // Only clear localStorage if we're in a browser environment
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('user');
+        localStorage.removeItem('isAuthenticated');
+      }
 
       // Extract error message from the response if available
       if (error.response?.data?.message) {
@@ -644,8 +654,10 @@ export const authService = {
     try {
       await api.post('/logout');
     } finally {
-      localStorage.removeItem('user');
-      localStorage.removeItem('isAuthenticated');
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('user');
+        localStorage.removeItem('isAuthenticated');
+      }
     }
   },
 
@@ -755,6 +767,9 @@ export const profileService = {
   },
   // Helper function to get auth token
   getAuthToken: () => {
+    if (typeof window === 'undefined') {
+      return '';
+    }
     const userJson = localStorage.getItem('user');
     let token = '';
     if (userJson) {
@@ -1830,6 +1845,3 @@ export const dashboardService = {
     return response || null;
   }
 };
-
-
-
