@@ -42,9 +42,9 @@ export default function PaymentLedger({ ledgerItems }: PaymentLedgerProps) {
   const [filters, setFilters] = useState({
     collectedBy: "",
     headDescription: "",
-    receivable: "",
-    paid: "",
-    other: "",
+    receivable: { min: "", max: "" },
+    paid: { min: "", max: "" },
+    other: { min: "", max: "" }
   })
 
   // Filter items
@@ -54,12 +54,15 @@ export default function PaymentLedger({ ledgerItems }: PaymentLedgerProps) {
         (item.collectedBy && item.collectedBy.toLowerCase().includes(filters.collectedBy.toLowerCase()))) &&
       (filters.headDescription === "" ||
         item.headDescription.toLowerCase().includes(filters.headDescription.toLowerCase())) &&
-      (filters.receivable === "" ||
-        (filters.receivable === "greater" ? item.debit > 0 : item.debit < Number.parseFloat(filters.receivable))) &&
-      (filters.paid === "" ||
-        (filters.paid === "greater" ? item.credit > 0 : item.credit < Number.parseFloat(filters.paid))) &&
-      (filters.other === "" ||
-        (filters.other === "greater" ? item.others > 0 : item.others < Number.parseFloat(filters.other)))
+      (!filters.receivable.min && !filters.receivable.max || 
+        (filters.receivable.min ? item.debit >= parseFloat(filters.receivable.min) : true) &&
+        (filters.receivable.max ? item.debit <= parseFloat(filters.receivable.max) : true)) &&
+      (!filters.paid.min && !filters.paid.max || 
+        (filters.paid.min ? item.credit >= parseFloat(filters.paid.min) : true) &&
+        (filters.paid.max ? item.credit <= parseFloat(filters.paid.max) : true)) &&
+      (!filters.other.min && !filters.other.max || 
+        (filters.other.min ? item.others >= parseFloat(filters.other.min) : true) &&
+        (filters.other.max ? item.others <= parseFloat(filters.other.max) : true))
     )
   })
 
@@ -272,7 +275,7 @@ export default function PaymentLedger({ ledgerItems }: PaymentLedgerProps) {
                         <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-3.5 w-3.5 text-teal-400" />
                         <Input
                           placeholder="Filter..."
-                          className="h-7 pl-8 text-xs border-teal-300 focus:border-teal-500 focus:ring-teal-500"
+                          className="h-7 pl-8 pr-2 text-xs border-teal-500 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 placeholder:text-white placeholder:opacity-100 placeholder:text-xs"
                           value={filters.collectedBy}
                           onChange={(e) => handleFilterChange("collectedBy", e.target.value)}
                           onClick={(e) => e.stopPropagation()}
@@ -354,7 +357,7 @@ export default function PaymentLedger({ ledgerItems }: PaymentLedgerProps) {
                         <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-3.5 w-3.5 text-teal-400" />
                         <Input
                           placeholder="Filter..."
-                          className="h-7 pl-8 text-xs border-teal-300 focus:border-teal-500 focus:ring-teal-500"
+                          className="h-7 pl-8 pr-2 text-xs border-teal-500 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 placeholder:text-white placeholder:opacity-100 placeholder:text-xs"
                           value={filters.headDescription}
                           onChange={(e) => handleFilterChange("headDescription", e.target.value)}
                           onClick={(e) => e.stopPropagation()}
@@ -440,24 +443,26 @@ export default function PaymentLedger({ ledgerItems }: PaymentLedgerProps) {
                         <Input
                           type="number"
                           placeholder="Greater than..."
-                          className="h-7 pl-8 text-xs border-teal-300 focus:border-teal-500 focus:ring-teal-500"
-                          value={filters.receivable === "greater" ? "" : filters.receivable || ""}
+                          className="h-7 pl-8 pr-2 text-xs border-teal-500 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 placeholder:text-white placeholder:opacity-100 placeholder:text-xs [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          value={filters.receivable.min}
                           onChange={(e) => {
                             e.stopPropagation()
-                            if (e.target.value) {
-                              handleFilterChange("receivable", e.target.value)
-                            } else {
-                              handleFilterChange("receivable", "")
-                            }
+                            setFilters(prev => ({
+                              ...prev,
+                              receivable: { ...prev.receivable, min: e.target.value }
+                            }))
                           }}
                           onClick={(e) => e.stopPropagation()}
                         />
-                        {filters.receivable && filters.receivable !== "greater" && filters.receivable !== "less" && (
+                        {filters.receivable.min && (
                           <button
                             className="absolute right-2 top-1/2 transform -translate-y-1/2"
                             onClick={(e) => {
                               e.stopPropagation()
-                              handleFilterChange("receivable", "")
+                              setFilters(prev => ({
+                                ...prev,
+                                receivable: { ...prev.receivable, min: "" }
+                              }))
                             }}
                           >
                             <X className="h-3.5 w-3.5 text-teal-400 hover:text-teal-600" />
@@ -469,24 +474,26 @@ export default function PaymentLedger({ ledgerItems }: PaymentLedgerProps) {
                         <Input
                           type="number"
                           placeholder="Less than..."
-                          className="h-7 pl-8 text-xs border-teal-300 focus:border-teal-500 focus:ring-teal-500"
-                          value={filters.receivable === "less" ? "" : filters.receivable || ""}
+                          className="h-7 pl-8 pr-2 text-xs border-teal-500 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 placeholder:text-white placeholder:opacity-100 placeholder:text-xs [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          value={filters.receivable.max}
                           onChange={(e) => {
                             e.stopPropagation()
-                            if (e.target.value) {
-                              handleFilterChange("receivable", e.target.value)
-                            } else {
-                              handleFilterChange("receivable", "")
-                            }
+                            setFilters(prev => ({
+                              ...prev,
+                              receivable: { ...prev.receivable, max: e.target.value }
+                            }))
                           }}
                           onClick={(e) => e.stopPropagation()}
                         />
-                        {filters.receivable && filters.receivable !== "greater" && filters.receivable !== "less" && (
+                        {filters.receivable.max && (
                           <button
                             className="absolute right-2 top-1/2 transform -translate-y-1/2"
                             onClick={(e) => {
                               e.stopPropagation()
-                              handleFilterChange("receivable", "")
+                              setFilters(prev => ({
+                                ...prev,
+                                receivable: { ...prev.receivable, max: "" }
+                              }))
                             }}
                           >
                             <X className="h-3.5 w-3.5 text-teal-400 hover:text-teal-600" />
@@ -562,24 +569,26 @@ export default function PaymentLedger({ ledgerItems }: PaymentLedgerProps) {
                         <Input
                           type="number"
                           placeholder="Greater than..."
-                          className="h-7 pl-8 text-xs border-teal-300 focus:border-teal-500 focus:ring-teal-500"
-                          value={filters.paid === "greater" ? "" : filters.paid || ""}
+                          className="h-7 pl-8 pr-2 text-xs border-teal-500 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 placeholder:text-white placeholder:opacity-100 placeholder:text-xs [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          value={filters.paid.min}
                           onChange={(e) => {
                             e.stopPropagation()
-                            if (e.target.value) {
-                              handleFilterChange("paid", e.target.value)
-                            } else {
-                              handleFilterChange("paid", "")
-                            }
+                            setFilters(prev => ({
+                              ...prev,
+                              paid: { ...prev.paid, min: e.target.value }
+                            }))
                           }}
                           onClick={(e) => e.stopPropagation()}
                         />
-                        {filters.paid && filters.paid !== "greater" && filters.paid !== "less" && (
+                        {filters.paid.min && (
                           <button
                             className="absolute right-2 top-1/2 transform -translate-y-1/2"
                             onClick={(e) => {
                               e.stopPropagation()
-                              handleFilterChange("paid", "")
+                              setFilters(prev => ({
+                                ...prev,
+                                paid: { ...prev.paid, min: "" }
+                              }))
                             }}
                           >
                             <X className="h-3.5 w-3.5 text-teal-400 hover:text-teal-600" />
@@ -591,24 +600,26 @@ export default function PaymentLedger({ ledgerItems }: PaymentLedgerProps) {
                         <Input
                           type="number"
                           placeholder="Less than..."
-                          className="h-7 pl-8 text-xs border-teal-300 focus:border-teal-500 focus:ring-teal-500"
-                          value={filters.paid === "less" ? "" : filters.paid || ""}
+                          className="h-7 pl-8 pr-2 text-xs border-teal-500 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 placeholder:text-white placeholder:opacity-100 placeholder:text-xs [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          value={filters.paid.max}
                           onChange={(e) => {
                             e.stopPropagation()
-                            if (e.target.value) {
-                              handleFilterChange("paid", e.target.value)
-                            } else {
-                              handleFilterChange("paid", "")
-                            }
+                            setFilters(prev => ({
+                              ...prev,
+                              paid: { ...prev.paid, max: e.target.value }
+                            }))
                           }}
                           onClick={(e) => e.stopPropagation()}
                         />
-                        {filters.paid && filters.paid !== "greater" && filters.paid !== "less" && (
+                        {filters.paid.max && (
                           <button
                             className="absolute right-2 top-1/2 transform -translate-y-1/2"
                             onClick={(e) => {
                               e.stopPropagation()
-                              handleFilterChange("paid", "")
+                              setFilters(prev => ({
+                                ...prev,
+                                paid: { ...prev.paid, max: "" }
+                              }))
                             }}
                           >
                             <X className="h-3.5 w-3.5 text-teal-400 hover:text-teal-600" />
@@ -684,24 +695,26 @@ export default function PaymentLedger({ ledgerItems }: PaymentLedgerProps) {
                         <Input
                           type="number"
                           placeholder="Greater than..."
-                          className="h-7 pl-8 text-xs border-teal-300 focus:border-teal-500 focus:ring-teal-500"
-                          value={filters.other === "greater" ? "" : filters.other || ""}
+                          className="h-7 pl-8 pr-2 text-xs border-teal-500 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 placeholder:text-white placeholder:opacity-100 placeholder:text-xs [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          value={filters.other.min}
                           onChange={(e) => {
                             e.stopPropagation()
-                            if (e.target.value) {
-                              handleFilterChange("other", e.target.value)
-                            } else {
-                              handleFilterChange("other", "")
-                            }
+                            setFilters(prev => ({
+                              ...prev,
+                              other: { ...prev.other, min: e.target.value }
+                            }))
                           }}
                           onClick={(e) => e.stopPropagation()}
                         />
-                        {filters.other && filters.other !== "greater" && filters.other !== "less" && (
+                        {filters.other.min && (
                           <button
                             className="absolute right-2 top-1/2 transform -translate-y-1/2"
                             onClick={(e) => {
                               e.stopPropagation()
-                              handleFilterChange("other", "")
+                              setFilters(prev => ({
+                                ...prev,
+                                other: { ...prev.other, min: "" }
+                              }))
                             }}
                           >
                             <X className="h-3.5 w-3.5 text-teal-400 hover:text-teal-600" />
@@ -713,24 +726,26 @@ export default function PaymentLedger({ ledgerItems }: PaymentLedgerProps) {
                         <Input
                           type="number"
                           placeholder="Less than..."
-                          className="h-7 pl-8 text-xs border-teal-300 focus:border-teal-500 focus:ring-teal-500"
-                          value={filters.other === "less" ? "" : filters.other || ""}
+                          className="h-7 pl-8 pr-2 text-xs border-teal-500 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 placeholder:text-white placeholder:opacity-100 placeholder:text-xs [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          value={filters.other.max}
                           onChange={(e) => {
                             e.stopPropagation()
-                            if (e.target.value) {
-                              handleFilterChange("other", e.target.value)
-                            } else {
-                              handleFilterChange("other", "")
-                            }
+                            setFilters(prev => ({
+                              ...prev,
+                              other: { ...prev.other, max: e.target.value }
+                            }))
                           }}
                           onClick={(e) => e.stopPropagation()}
                         />
-                        {filters.other && filters.other !== "greater" && filters.other !== "less" && (
+                        {filters.other.max && (
                           <button
                             className="absolute right-2 top-1/2 transform -translate-y-1/2"
                             onClick={(e) => {
                               e.stopPropagation()
-                              handleFilterChange("other", "")
+                              setFilters(prev => ({
+                                ...prev,
+                                other: { ...prev.other, max: "" }
+                              }))
                             }}
                           >
                             <X className="h-3.5 w-3.5 text-teal-400 hover:text-teal-600" />
