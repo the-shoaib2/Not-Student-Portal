@@ -629,132 +629,6 @@ export default function PaymentLedger({ ledgerItems }: PaymentLedgerProps) {
                     </div>
                   </div>
                 </TableHead>
-                <TableHead className="cursor-pointer transition-colors">
-                  <div className="flex flex-col">
-                    <div
-                      className="flex items-center justify-between  p-1.5 rounded-md"
-                      onClick={() => handleSort("others")}
-                    >
-                      <span className="font-medium text-sm flex items-center">
-                        <CircleDollarSign className="h-3.5 w-3.5 mr-1" />
-                        Other
-                      </span>
-                      <div className="flex items-center space-x-1">
-                        {sortField === "others" ? (
-                          sortDirection === "asc" ? (
-                            <ChevronUp className="h-3.5 w-3.5 text-teal-600" />
-                          ) : (
-                            <ChevronDown className="h-3.5 w-3.5 text-teal-600" />
-                          )
-                        ) : (
-                          <div className="h-3.5 w-3.5 opacity-0">•</div>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex justify-between mt-1">
-                      <div className="flex space-x-1">
-                        <button
-                          className="p-0.5 rounded "
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            setSortField("others")
-                            setSortDirection("asc")
-                          }}
-                          title="Sort ascending"
-                        >
-                          <ChevronUp className="h-3 w-3" />
-                        </button>
-                        <button
-                          className="p-0.5 rounded "
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            setSortField("others")
-                            setSortDirection("desc")
-                          }}
-                          title="Sort descending"
-                        >
-                          <ChevronDown className="h-3 w-3" />
-                        </button>
-                        <button
-                          className="p-0.5 rounded "
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            if (sortField === "others") {
-                              setSortField(null)
-                            }
-                          }}
-                          title="Clear sorting"
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
-                      </div>
-                    </div>
-                    <div className="flex flex-col gap-1 mt-1">
-                      <div className="relative">
-                        <ArrowUpCircle className="absolute left-2 top-1/2 transform -translate-y-1/2 h-3.5 w-3.5 text-teal-400" />
-                        <Input
-                          type="number"
-                          placeholder="Greater than..."
-                          className="h-7 pl-8 pr-2 text-xs border-teal-500 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 placeholder:text-white placeholder:opacity-100 placeholder:text-xs [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                          value={filters.other.min}
-                          onChange={(e) => {
-                            e.stopPropagation()
-                            setFilters(prev => ({
-                              ...prev,
-                              other: { ...prev.other, min: e.target.value }
-                            }))
-                          }}
-                          onClick={(e) => e.stopPropagation()}
-                        />
-                        {filters.other.min && (
-                          <button
-                            className="absolute right-2 top-1/2 transform -translate-y-1/2"
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              setFilters(prev => ({
-                                ...prev,
-                                other: { ...prev.other, min: "" }
-                              }))
-                            }}
-                          >
-                            <X className="h-3.5 w-3.5 text-teal-400 hover:text-teal-600" />
-                          </button>
-                        )}
-                      </div>
-                      <div className="relative">
-                        <ArrowDownCircle className="absolute left-2 top-1/2 transform -translate-y-1/2 h-3.5 w-3.5 text-teal-400" />
-                        <Input
-                          type="number"
-                          placeholder="Less than..."
-                          className="h-7 pl-8 pr-2 text-xs border-teal-500 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 placeholder:text-white placeholder:opacity-100 placeholder:text-xs [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                          value={filters.other.max}
-                          onChange={(e) => {
-                            e.stopPropagation()
-                            setFilters(prev => ({
-                              ...prev,
-                              other: { ...prev.other, max: e.target.value }
-                            }))
-                          }}
-                          onClick={(e) => e.stopPropagation()}
-                        />
-                        {filters.other.max && (
-                          <button
-                            className="absolute right-2 top-1/2 transform -translate-y-1/2"
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              setFilters(prev => ({
-                                ...prev,
-                                other: { ...prev.other, max: "" }
-                              }))
-                            }}
-                          >
-                            <X className="h-3.5 w-3.5 text-teal-400 hover:text-teal-600" />
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -768,7 +642,6 @@ export default function PaymentLedger({ ledgerItems }: PaymentLedgerProps) {
                   <TableCell>{item.headDescription}</TableCell>
                   <TableCell>{item.debit > 0 ? item.debit.toLocaleString() : 0}</TableCell>
                   <TableCell>{item.credit > 0 ? item.credit.toLocaleString() : 0}</TableCell>
-                  <TableCell>{item.others > 0 ? item.others.toLocaleString() : 0}</TableCell>
                 </TableRow>
               ))}
               <TableRow className="bg-gradient-to-r from-teal-600 to-teal-600 text-white font-medium">
@@ -777,7 +650,6 @@ export default function PaymentLedger({ ledgerItems }: PaymentLedgerProps) {
                 </TableCell>
                 <TableCell className="font-bold">{pageTotals.debit.toLocaleString()}</TableCell>
                 <TableCell className="font-bold">{pageTotals.credit.toLocaleString()}</TableCell>
-                <TableCell className="font-bold">{pageTotals.others.toLocaleString()}</TableCell>
               </TableRow>
             </TableBody>
           </Table>
