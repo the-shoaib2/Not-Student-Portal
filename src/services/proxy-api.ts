@@ -606,7 +606,9 @@ export const authService = {
         }
       });
 
-      console.log('Login response:', response);
+      if (process.env.DEV === 'development') {
+        console.log('Login response:', response);
+      }
 
       if (!response.accessToken) {
         // Check for specific error messages from the API
@@ -1041,7 +1043,7 @@ export const profileService = {
     try {
       const token = profileService.getAuthToken();
       const response = await proxyRequest({
-        method: 'GET' ,
+        method: 'GET',
         url: '/profileUpdate/personalInfo',
         headers: {
           Authorization: `Bearer ${token}`,
