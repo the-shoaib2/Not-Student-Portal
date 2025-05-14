@@ -577,6 +577,14 @@ export interface CGPAData {
   // Add other CGPA graph related fields
 }
 
+// Payment Scheme Interface
+export interface PaymentScheme {
+  schemeId: number
+  headDescription: string
+  paymentAmount: number
+  multiple: string
+  courseType: string
+}
 
 // Payment Data Interfaces
 export interface PaymentData {
@@ -1400,16 +1408,37 @@ export const resultService = {
 
 // Payment Service
 export const paymentService = {
-  getPaymentScheme: async (): Promise<PaymentScheme> => {
-    const response = await api.get<PaymentScheme>('/paymentScheme');
-    return response.data;
+
+  //Payment Scheme
+  getPaymentScheme: async (): Promise<PaymentScheme[]> => {
+    const token = profileService.getAuthToken();
+    const response = await proxyRequest({
+      method: 'GET',
+      url: '/paymentScheme',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        accessToken: token,
+        'Accept': '*/*'
+      }
+    });
+    return response;
   },
 
+  //Payment Ledger
   getPaymentLedger: async (): Promise<PaymentLedger> => {
-    const response = await api.get<PaymentLedger>('/paymentLedger/paymentLedgerSummery');
-    return response.data;
+    const response = await proxyRequest({
+      method: 'GET',
+      url: '/paymentLedger/paymentLedgerSummery',
+      headers: {
+        Authorization: `Bearer ${profileService.getAuthToken()}`,
+        accessToken: profileService.getAuthToken(),
+        'Accept': '*/*'
+      }
+    });
+    return response;
   },
 
+  //Payment Ledger
   semesterList: async (): Promise<Semester[] | null> => {
     try {
       const token = profileService.getAuthToken();
@@ -1434,7 +1463,6 @@ export const paymentService = {
   },
 
   //Student info
-
   studentInfo: async (): Promise<Student | null> => {
     try {
       const token = profileService.getAuthToken();

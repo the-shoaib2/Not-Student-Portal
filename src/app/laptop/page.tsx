@@ -2,7 +2,6 @@
 
 import React from 'react';
 import PageTitle from '@/components/PageTitle';
-import MainContent from '@/components/MainContent';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function LaptopPage() {
@@ -13,7 +12,7 @@ export default function LaptopPage() {
   }
 
   return (
-    <MainContent>
+    <div>
       <PageTitle title="Laptop Management" />
       <div className="p-4">
         <h2 className="text-xl font-semibold mb-4">Laptop Management</h2>
@@ -21,6 +20,6 @@ export default function LaptopPage() {
           <p>Manage laptop allocation and status here.</p>
         </div>
       </div>
-    </MainContent>
+    </div>
   );
 }

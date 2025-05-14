@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 const Footer: React.FC = () => {
   return (
-    <footer className="bg-gray-800 text-gray-300 p-4 text-sm text-center mt-auto">
+    <footer className="bg-gray-800 text-gray-300 p-2 text-sm text-center mt-auto">
       <div className="flex flex-col sm:flex-row justify-center items-center space-y-2 sm:space-y-0 sm:space-x-4">
         <p> {new Date().getFullYear()} Daffodil International University. All Rights Reserved.</p>
         <div className="flex space-x-4">

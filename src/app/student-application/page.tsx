@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import PageTitle from "@/components/PageTitle"
-import MainContent from "@/components/MainContent"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { FileText } from "lucide-react"
@@ -24,7 +23,7 @@ export default function StudentApplicationPage() {
   }
 
   return (
-    <MainContent>
+    <div>
       <PageTitle 
         title="Student Application" 
         icon={<FileText className="h-6 w-6" />}
@@ -50,6 +49,6 @@ export default function StudentApplicationPage() {
           </CardContent>
         </Card>
       </div>
-    </MainContent>
+    </div>
   )
 }

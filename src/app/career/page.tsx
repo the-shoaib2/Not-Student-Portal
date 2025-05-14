@@ -2,7 +2,6 @@
 
 import React from 'react';
 import PageTitle from '@/components/PageTitle';
-import MainContent from '@/components/MainContent';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function CareerPage() {
@@ -13,7 +12,7 @@ export default function CareerPage() {
   }
 
   return (
-    <MainContent>
+    <div>
       <PageTitle title="Career Opportunities" />
       <div className="p-4">
         <h2 className="text-xl font-semibold mb-4">Career Opportunities</h2>
@@ -21,6 +20,6 @@ export default function CareerPage() {
           <p>Career opportunities and job listings will be available here.</p>
         </div>
       </div>
-    </MainContent>
+    </div>
   );
 }

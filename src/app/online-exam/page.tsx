@@ -2,7 +2,6 @@
 
 import React from 'react';
 import PageTitle from '@/components/PageTitle';
-import MainContent from '@/components/MainContent';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function OnlineExamPage() {

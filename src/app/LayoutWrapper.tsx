@@ -1,11 +1,10 @@
 "use client"
 
 import { useState } from 'react';
-import Navbar from '../components/Navbar';
-import Sidebar from '../components/Sidebar';
-import MainContent from '../components/MainContent';
-import Footer from '../components/Footer';
-import { LoadingBar } from '../components/LoadingBar';
+import Navbar from '@/components/Navbar';
+import Sidebar from '@/components/Sidebar';
+import Footer from '@/components/Footer';
+import { LoadingBar } from '@/components/LoadingBar';
 
 export default function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);

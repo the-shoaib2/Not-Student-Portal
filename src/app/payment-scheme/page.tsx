@@ -1,188 +1,170 @@
 'use client'
 
-import { useEffect, useState, useMemo } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { InfoIcon, ReceiptIcon } from "lucide-react"
-import StudentInfo from "@/components/payment-ledger/student-info"
-import PaymentSummary from "@/components/payment-ledger/payment-summary"
-import PaymentLedger from "@/components/payment-ledger/payment-ledger"
-import SemesterSelector from "@/components/payment-ledger/semester-selector"
-import { Semester, Student, PaymentSummaryData, PaymentLedgerItem } from "@/services/proxy-api"
-import { paymentService } from "@/services/proxy-api"
-import PageTitle from '@/components/PageTitle';
-import toast from 'react-hot-toast';
-import { Skeleton } from "@/components/ui/skeleton"
+import { useEffect, useState, Suspense } from "react"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { InfoIcon, ReceiptIcon, RefreshCw, AlertCircle } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { PaymentScheme, paymentService } from "@/services/proxy-api"
+import { PaymentSchemeTable } from "@/components/payment-scheme/payment-scheme-table"
+import { PaymentSchemeTableSkeleton } from "@/components/payment-scheme/payment-scheme-table-skeleton"
+import PageTitle from '@/components/PageTitle'
+import toast from 'react-hot-toast'
+
 
 export default function PaymentSchemePage() {
-  const memoizedPaymentService = useMemo(() => paymentService, []);
-  const [semesters, setSemesters] = useState<Semester[]>([])
-  const [selectedSemester, setSelectedSemester] = useState<string>("")
-  const [student, setStudent] = useState<Student | null>(null)
-  const [paymentSummary, setPaymentSummary] = useState<PaymentSummaryData | null>(null)
-  const [paymentLedger, setPaymentLedger] = useState<PaymentLedgerItem[]>([])
+  const [paymentData, setPaymentData] = useState<PaymentScheme[]>([])
   const [loading, setLoading] = useState(true)
-  const [hasLoadedData, setHasLoadedData] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [activeTab, setActiveTab] = useState('all')
+  const [refreshing, setRefreshing] = useState(false)
 
-  let hasFetchedData = false
+  const fetchPaymentData = async () => {
+    try {
+      setLoading(true)
+      setError(null)
+      const response = await paymentService.getPaymentScheme()
+      setPaymentData(response)
+    } catch (err) {
+      console.error('Error fetching payment scheme:', err)
+      setError('Failed to load payment scheme data. Please try again.')
+      toast.error('Failed to load payment scheme data')
+    } finally {
+      setLoading(false)
+      setRefreshing(false)
+    }
+  }
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (hasFetchedData) return
-      hasFetchedData = true
-  
-      setLoading(true)
-      try {
-        const [semestersData, studentData, summaryData, ledgerData] = await Promise.all([
-          paymentService.semesterList(),
-          paymentService.studentInfo(),
-          paymentService.paymentLedgerSummery(),
-          paymentService.paymentLedger()
-        ])
-  
-        if (semestersData) {
-          setSemesters(semestersData)
-          setSelectedSemester(semestersData[0]?.semesterId || "")
-        }
-        setStudent(studentData || null)
-        setPaymentSummary(summaryData || null)
-        setPaymentLedger(ledgerData || [])
-      } catch (error) {
-        console.error('Error fetching data:', error)
-        toast.error('Failed to load payment ledger data')
-      } finally {
-        setLoading(false)
-      }
-    }
-  
-    fetchData()
+    fetchPaymentData()
   }, [])
-  
 
-  // Handle semester change (only updates selected semester)
-  const handleSemesterChange = (semesterId: string) => {
-    setSelectedSemester(semesterId)
+  const handleRefresh = () => {
+    setRefreshing(true)
+    fetchPaymentData()
   }
-  
 
- 
 
-  // if (loading) {
-  //   return (
-  //     <div className="flex justify-center items-center min-h-screen">
-  //       <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
-  //     </div>
-  //   )
-  // }
+  // console.log(paymentData)
+
+
+  // Filter data based on active tab
+  const getFilteredData = () => {
+    return paymentData.filter((item) => {
+      if (activeTab === 'all') return true
+      if (activeTab === 'one-time') return item.multiple === 'N'
+      if (activeTab === 'recurring') return item.multiple === 'Y'
+      return true
+    })
+  }
+
+  // Calculate totals
+  const totalOneTime = paymentData
+    .filter(item => item.multiple === 'N')
+    .reduce((sum, item) => sum + item.paymentAmount, 0)
+
+  const totalRecurring = paymentData
+    .filter(item => item.multiple === 'Y')
+    .reduce((sum, item) => sum + item.paymentAmount, 0)
+
+  const totalAmount = totalOneTime + totalRecurring
+
+  // Filter data based on active tab
+  const filteredData = activeTab === 'all'
+    ? paymentData
+    : paymentData.filter(item =>
+      activeTab === 'one-time' ? item.multiple === 'N' : item.multiple === 'Y'
+    )
 
   return (
     <div className="w-full">
       {/* Page Title */}
       <div className="w-full bg-white border-b">
-        <PageTitle 
-          title={"Payment Scheme"}
-          icon={<ReceiptIcon />}
-        />
+        <div className="flex justify-between items-center">
+          <PageTitle
+            title={"Payment Scheme"}
+            icon={<ReceiptIcon />}
+          />
+        </div>
       </div>
-      <div className="mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {/* Content Container */}
-        <div className="mb-6 bg-green-50 p-3 sm:p-4 rounded-md border border-green-200">
-          <div className="flex flex-col sm:flex-row gap-2">
-            <InfoIcon className="h-5 w-5 text-green-700 mt-0.5 hidden sm:block" />
+      <div className="mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-7xl">
+        {/* Info Banner */}
+        <div className="mb-6 bg-blue-50 p-4 rounded-lg border border-blue-200">
+          <div className="flex items-start gap-3">
+            <InfoIcon className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
             <div>
-              <p className="text-green-800 text-sm sm:text-base">
-                N.B: To enjoy scholarship and tuition fee waiver undergraduate students must take at least 12 credits and
+              <h4 className="text-sm font-medium text-blue-800 mb-1">Payment Information</h4>
+              <p className="text-sm text-blue-700">
+                To enjoy scholarship and tuition fee waiver, undergraduate students must take at least 12 credits and
                 postgraduate students must take at least 9 credits in each semester.
               </p>
-              <p className="text-green-800 text-sm sm:text-base mt-2">
-                For more details please visit DIU website or{" "}
-                <a
-                  href="https://daffodilvarsity.edu.bd/scholarship/diu-scholarship"
-                  className="text-blue-600 hover:underline break-words"
-                >
-                  https://daffodilvarsity.edu.bd/scholarship/diu-scholarship
-                </a>
-              </p>
+              <a
+                href="https://daffodilvarsity.edu.bd/scholarship/diu-scholarship"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center text-sm text-blue-600 hover:underline mt-2"
+              >
+                Learn more about scholarships
+                <svg className="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+              </a>
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-4 sm:gap-5 md:gap-6 mb-6">
-          <Card className="h-full shadow-sm hover:shadow-md transition-shadow duration-300">
-            <CardHeader className="pb-2 bg-gradient-to-r from-green-50 to-green-100 rounded-t-lg">
-              <CardTitle className="text-lg text-green-700 flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-                Student Info
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-4">
-              {loading ? (
-                <div className="space-y-2">
-                  {[...Array(4)].map((_, i) => (
-                    <div key={i} className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                      <Skeleton className="h-5 w-24" />
-                      <Skeleton className="h-5 w-32 col-span-1 sm:col-span-2" />
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                student && <StudentInfo student={student} loading={loading} />
-              )}
-            </CardContent>
-          </Card>
 
-          <Card className="h-full shadow-sm hover:shadow-md transition-shadow duration-300">
-            <CardHeader className="pb-2 bg-gradient-to-r from-green-50 to-green-100 rounded-t-lg">
-              <CardTitle className="text-lg text-green-700 flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2z" />
-                </svg>
-                Payment Ledger Summary
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-4">
-              {loading ? (
-                <div className="space-y-2">
-                  {[...Array(7)].map((_, i) => (
-                    <div key={i} className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                      <Skeleton className="h-5 w-24" />
-                      <Skeleton className="h-5 w-32 col-span-1 sm:col-span-2" />
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                paymentSummary && <PaymentSummary summary={paymentSummary} loading={loading} />
-              )}
-            </CardContent>
-          </Card>
-        </div>
-
+        {/* Payment Scheme Table */}
         <Card className="mb-6">
-          <CardHeader className="pb-2 bg-gradient-to-r from-green-50 to-green-100 rounded-t-lg">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-              <CardTitle className="text-lg text-green-700">Student Ledger</CardTitle>
-              <SemesterSelector
-                semesters={semesters}
-                selectedSemester={selectedSemester}
-                onSemesterChange={handleSemesterChange}
-              />
+          <CardHeader className="pb-2 bg-gradient-to-r from-teal-50 to-teal-50 border-b">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <CardTitle className="text-lg font-semibold text-gray-900">Payment Scheme Details</CardTitle>
+                <CardDescription className="text-sm text-gray-500">
+                  {activeTab === 'all' 
+                    ? 'All payment items' 
+                    : activeTab === 'one-time' 
+                      ? 'One-time payments' 
+                      : 'Recurring payments'}
+                </CardDescription>
+              </div>
+              <div className="flex items-center gap-4">
+                <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full sm:w-auto">
+                  <TabsList className="grid w-full grid-cols-3">
+                    <TabsTrigger value="all">All</TabsTrigger>
+                    <TabsTrigger value="one-time">One-time</TabsTrigger>
+                    <TabsTrigger value="recurring">Recurring</TabsTrigger>
+                  </TabsList>
+                </Tabs>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleRefresh}
+                  disabled={refreshing || loading}
+                  className="flex items-center gap-2 whitespace-nowrap"
+                >
+                  {refreshing ? (
+                    <RefreshCw className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <RefreshCw className="h-4 w-4" />
+                  )}
+                  Refresh
+                </Button>
+              </div>
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-2">
             {loading ? (
-              <div className="space-y-2">
-                {[...Array(5)].map((_, i) => (
-                  <div key={i} className="grid grid-cols-4 gap-2">
-                    <Skeleton className="h-8 w-24" />
-                    <Skeleton className="h-8 w-32" />
-                    <Skeleton className="h-8 w-24" />
-                    <Skeleton className="h-8 w-24" />
-                  </div>
-                ))}
+              <PaymentSchemeTableSkeleton />
+            ) : error ? (
+              <div className="p-6 text-center text-red-500">
+                <AlertCircle className="mx-auto h-8 w-8 mb-2" />
+                {error}
               </div>
             ) : (
-              <PaymentLedger ledgerItems={paymentLedger} />
+              <Suspense fallback={<PaymentSchemeTableSkeleton />}>
+                <PaymentSchemeTable data={getFilteredData()} />
+              </Suspense>
             )}
           </CardContent>
         </Card>

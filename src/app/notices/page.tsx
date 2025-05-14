@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react"
 import PageTitle from "@/components/PageTitle"
-import MainContent from "@/components/MainContent"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Bell } from "lucide-react"
 
@@ -44,7 +43,7 @@ export default function NoticesPage() {
   }, [])
 
   return (
-    <MainContent>
+    <div>
       <PageTitle 
         title="Notices" 
         icon={<Bell className="h-6 w-6" />}
@@ -88,6 +87,6 @@ export default function NoticesPage() {
           </Card>
         )}
       </div>
-    </MainContent>
+    </div>
   )
 }

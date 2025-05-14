@@ -2,7 +2,6 @@
 
 import React from 'react';
 import PageTitle from '@/components/PageTitle';
-import MainContent from '@/components/MainContent';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function CalendarPage() {
@@ -13,7 +12,7 @@ export default function CalendarPage() {
   }
 
   return (
-    <MainContent>
+    <div>
       <PageTitle title="Academic Calendar" />
       <div className="p-4">
         <h2 className="text-xl font-semibold mb-4">Academic Calendar</h2>
@@ -21,6 +20,6 @@ export default function CalendarPage() {
           <p>Academic calendar and important dates will be displayed here.</p>
         </div>
       </div>
-    </MainContent>
+    </div>
   );
 }

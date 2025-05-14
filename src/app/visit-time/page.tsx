@@ -1,9 +1,9 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from 'react'
-import { ActivityTracker } from '@/services/activity'
-import { VisitTime } from '@/models/visitTime'
-import type { Document } from 'mongoose'
+import { useEffect, useState } from "react"
+import { ActivityTracker } from "@/services/activity"
+import { VisitTime } from "@/models/visitTime"
+import type { Document } from "mongoose"
 
 interface VisitTimeDocument extends Document {
   _id: string

@@ -2,7 +2,6 @@
 
 import React from 'react';
 import PageTitle from '@/components/PageTitle';
-import MainContent from '@/components/MainContent';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function CertificateVerifyPage() {
@@ -13,7 +12,7 @@ export default function CertificateVerifyPage() {
   }
 
   return (
-    <MainContent>
+    <div>
       <PageTitle title="Certificate Verification" />
       <div className="p-4">
         <h2 className="text-xl font-semibold mb-4">Certificate Verification</h2>
@@ -21,6 +20,6 @@ export default function CertificateVerifyPage() {
           <p>Verify your certificates and transcripts here.</p>
         </div>
       </div>
-    </MainContent>
+    </div>
   );
 }

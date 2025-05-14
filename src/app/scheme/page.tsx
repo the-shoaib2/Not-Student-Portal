@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import PageTitle from "@/components/PageTitle"
-import MainContent from "@/components/MainContent"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { CreditCard, DollarSign, Calendar } from "lucide-react"
@@ -39,7 +38,7 @@ export default function PaymentSchemePage() {
   ])
 
   return (
-    <MainContent>
+    <div>
       <PageTitle title="Payment Scheme" />
       <div className="p-4 space-y-4">
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -79,6 +78,6 @@ export default function PaymentSchemePage() {
           ))}
         </div>
       </div>
-    </MainContent>
+    </div>
   )
 }
