@@ -1,34 +1,54 @@
 "use client"
-import React, { useState } from 'react';
-import { LogOut, User } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import toast from 'react-hot-toast';
-import { useAuth } from '@/contexts/AuthContext';
+import type React from "react"
+import { useState } from "react"
+import { LogOut, User } from "lucide-react"
+import { useRouter } from "next/navigation"
+import toast from "react-hot-toast"
+import { useAuth } from "@/contexts/AuthContext"
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import { Button } from "@/components/ui/button"
 
 const UserCard: React.FC = () => {
-  const router = useRouter();
-  const { user, logout } = useAuth();
-  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+  const router = useRouter()
+  const { user, logout } = useAuth()
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const [isOpen, setIsOpen] = useState(false)
 
-  const handleLogoutClick = () => {
-    setShowLogoutDialog(true);
-  };
+  const confirmLogout = async () => {
+    if (isLoggingOut) return
 
-  const confirmLogout = () => {
-    setShowLogoutDialog(false);
-    logout();
-    toast.success('Logged out successfully');
-    router.push('/login');
-  };
+    try {
+      setIsLoggingOut(true)
+      await logout()
+      toast.success("Logged out successfully")
+      router.push("/login")
+    } catch (error) {
+      console.error("Logout failed:", error)
+      toast.error("Failed to log out. Please try again.")
+
+      // Even if there's an error, we should still redirect to login
+      // since we've cleared the local auth state
+      router.push("/login")
+    } finally {
+      setIsLoggingOut(false)
+      setIsOpen(false)
+    }
+  }
+
+  const handleLogout = (e: React.MouseEvent) => {
+    e.preventDefault()
+    setIsOpen(true)
+  }
 
   return (
     <div className="absolute right-0 top-12 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200">
@@ -43,44 +63,43 @@ const UserCard: React.FC = () => {
             <p className="text-xs text-gray-500">Role: {user?.commaSeparatedRoles}</p>
           </div>
         </div>
-        <div
-          onClick={handleLogoutClick}
-          className="w-full flex items-center justify-center space-x-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200 cursor-pointer"
-        >
-          <LogOut className="w-4 h-4" />
-          <span>Logout</span>
-        </div>
+
+        <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
+          <AlertDialogTrigger asChild>
+            <Button
+              onClick={handleLogout}
+              className="w-full flex items-center bg-red-500 hover:bg-red-700 justify-center space-x-2 px-4 py-2 text-sm text-white rounded-lg transition-colors duration-200 cursor-pointer"
+            >
+              <LogOut className="w-4 h-4" />
+              <span>Logout</span>
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent className="sm:max-w-[300px]">
+            <AlertDialogHeader>
+              <AlertDialogTitle className="flex items-center gap-2">
+                <LogOut className="h-5 w-5 text-red-600" />
+                Confirm Logout
+              </AlertDialogTitle>
+              <AlertDialogDescription>Are you sure you want to log out?</AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter className="flex gap-2 justify-end">
+              <AlertDialogCancel disabled={isLoggingOut}>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={(e) => {
+                  e.preventDefault()
+                  confirmLogout()
+                }}
+                disabled={isLoggingOut}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                {isLoggingOut ? "Logging out..." : "Logout"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
-
-      <Dialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
-        <DialogContent className="sm:max-w-[300px]">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <LogOut className="h-5 w-5 text-red-600" />
-              Confirm Logout
-            </DialogTitle>
-            <DialogDescription>
-              Are you sure you want to log out?
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="flex gap-2 justify-end">
-            <Button
-              variant="outline"
-              onClick={() => setShowLogoutDialog(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={confirmLogout}
-            >
-              Logout
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
-  );
-};
+  )
+}
 
-export default UserCard;
+export default UserCard
