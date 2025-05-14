@@ -18,6 +18,7 @@ export default function PaymentSchemePage() {
   const [error, setError] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState('all')
   const [refreshing, setRefreshing] = useState(false)
+  const [selectedSemester, setSelectedSemester] = useState<string | null>(null)
 
   const fetchPaymentData = async () => {
     try {
@@ -43,38 +44,35 @@ export default function PaymentSchemePage() {
     setRefreshing(true)
     fetchPaymentData()
   }
+  
 
-
-  // console.log(paymentData)
-
-
-  // Filter data based on active tab
-  const getFilteredData = () => {
-    return paymentData.filter((item) => {
-      if (activeTab === 'all') return true
-      if (activeTab === 'one-time') return item.multiple === 'N'
-      if (activeTab === 'recurring') return item.multiple === 'Y'
-      return true
-    })
+  // Handle semester change (only updates selected semester)
+  const handleSemesterChange = (semesterId: string) => {
+    setSelectedSemester(semesterId)
   }
 
-  // Calculate totals
-  const totalOneTime = paymentData
-    .filter(item => item.multiple === 'N')
-    .reduce((sum, item) => sum + item.paymentAmount, 0)
+  const getFilteredData = () => {
+    let filteredData = paymentData;
 
-  const totalRecurring = paymentData
-    .filter(item => item.multiple === 'Y')
-    .reduce((sum, item) => sum + item.paymentAmount, 0)
+    // Filter by tab
+    if (activeTab !== 'all') {
+      filteredData = filteredData.filter(item => 
+        activeTab === 'one-time' 
+          ? item.multiple === 'ONE_TIME' 
+          : item.multiple === 'RECURRING'
+      );
+    }
 
-  const totalAmount = totalOneTime + totalRecurring
+    return filteredData;
+  }
 
-  // Filter data based on active tab
-  const filteredData = activeTab === 'all'
-    ? paymentData
-    : paymentData.filter(item =>
-      activeTab === 'one-time' ? item.multiple === 'N' : item.multiple === 'Y'
-    )
+  // if (loading) {
+  //   return (
+  //     <div className="flex justify-center items-center min-h-screen">
+  //       <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
+  //     </div>
+  //   )
+  // }
 
   return (
     <div className="w-full">
