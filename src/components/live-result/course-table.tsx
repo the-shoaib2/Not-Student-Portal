@@ -26,9 +26,9 @@ export function CourseTable({ courses, isLoading, selectedCourseId, onSelectCour
           </Badge>
         </CardTitle>
       </CardHeader>
-      <CardContent className="p-4">
+      <CardContent className="px-2 py-0">
         <div className="overflow-x-auto -mx-4">
-          <div className="inline-block min-w-full align-middle p-4">
+          <div className="inline-block min-w-full align-middle px-4 p-2">
             <Table className="min-w-full border-collapse">
               <TableHeader>
                 <TableRow className="bg-gray-50">

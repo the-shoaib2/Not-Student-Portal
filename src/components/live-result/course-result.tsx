@@ -15,11 +15,11 @@ interface CourseResultProps {
 
 function getScoreColor(score: number, maxScore: number): string {
   const percentage = (score / maxScore) * 100
-  if (percentage >= 90) return "bg-green-600 text-white hover:bg-green-700 border-green-800"
-  if (percentage >= 80) return "bg-blue-600 text-white hover:bg-blue-700 border-blue-800"
-  if (percentage >= 70) return "bg-yellow-600 text-black hover:bg-yellow-700 border-yellow-800"
-  if (percentage >= 60) return "bg-orange-600 text-white hover:bg-orange-700 border-orange-800"
-  return "bg-red-600 text-white hover:bg-red-700 border-red-800"
+  if (percentage >= 90) return "bg-green-600 text-white hover:bg-green-700 "
+  if (percentage >= 80) return "bg-blue-600 text-white hover:bg-blue-700 "
+  if (percentage >= 70) return "bg-yellow-600 text-black hover:bg-yellow-700 "
+  if (percentage >= 60) return "bg-orange-600 text-white hover:bg-orange-700 "
+  return "bg-red-600 text-white hover:bg-red-700 "
 }
 
 export function CourseResultDisplay({ course, courseResult, isLoading }: CourseResultProps) {
@@ -38,7 +38,7 @@ export function CourseResultDisplay({ course, courseResult, isLoading }: CourseR
           {course.courseTitle} ({course.totalCredit} credits)
         </CardDescription>
       </CardHeader>
-      <CardContent className="p-3">
+      <CardContent className="p-2">
         <div className="rounded-md overflow-hidden border border-gray-200 shadow-sm">
           {isLoading ? (
             <div className="p-4 space-y-3 bg-gray-50">

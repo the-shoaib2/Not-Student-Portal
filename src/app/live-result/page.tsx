@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useMemo, useEffect } from "react"
 import type { Course, CourseResult, Semester } from "@/services/proxy-api"
 import { SemesterSelector } from "@/components/live-result/semester-selector"
 import { CourseTable } from "@/components/live-result/course-table"
@@ -30,7 +30,7 @@ export default function LiveResultPage() {
         const data = await liveResultService.getLiveResultSemesterList()
         setSemesters(data)
       } catch (error) {
-        console.error("Failed to fetch semesters:", error)
+        // console.error("Failed to fetch semesters:", error)
       } finally {
         setIsLoadingSemesters(false)
       }
