@@ -1,12 +1,11 @@
 "use client";
 
 import React from 'react';
-import MainContent from '@/components/MainContent';
 // import DataTable from '@/components/DataTable';
 
 const ProfessionalPage = () => {
   return (
-    <MainContent>
+    <>
       <div className="container mx-auto p-4">
         <h1 className="text-2xl font-bold mb-6">Professional Information</h1>
         {/* <DataTable */}
@@ -17,7 +16,7 @@ const ProfessionalPage = () => {
           </div>
         </div>
       </div>
-    </MainContent>
+    </>
   );
 };
 

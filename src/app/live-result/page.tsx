@@ -101,13 +101,13 @@ export default function LiveResultPage() {
       : "Select a Semester"
 
   return (
-    <div className="container mx-auto ">
+    <>
       {/* Page Title */}
       <div className="w-full">
-      <PageTitle
-        title={"Live Result"}
-        icon={<Award />}
-      />
+        <PageTitle
+          title={"Live Result"}
+          icon={<Award />}
+        />
       </div>
       <div className="mx-auto px-4 sm:px-6 lg:px-8 py-6">
       <SemesterSelector
@@ -133,6 +133,6 @@ export default function LiveResultPage() {
         />
       )}
     </div>
-    </div>
+    </>
   )
 }
