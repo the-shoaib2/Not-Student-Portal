@@ -21,7 +21,7 @@ export function CourseTable({ courses, isLoading, selectedCourseId, onSelectCour
       <CardHeader className="bg-stone-600 text-white p-4 rounded-t-md">
         <CardTitle className="flex items-center justify-between">
           <span>Registered Course List</span>
-          <Badge variant="outline" className="bg-white/10 text-white border-white/20 rounded-full  mx-auto">
+          <Badge variant="outline" className="bg-white/10 text-white border-white/20 rounded-full ml-auto">
             {isLoading ? "Loading..." : `${courses.length} Courses`}
           </Badge>
         </CardTitle>
@@ -102,7 +102,7 @@ export function CourseTable({ courses, isLoading, selectedCourseId, onSelectCour
                         </Button>
                       </TableCell>
                       <TableCell className="text-center">
-                        <Badge variant="outline" className="bg-gray-100 hover:bg-gray-200 mx-auto rounded-full ">
+                        <Badge variant="outline" className="bg-gray-100 hover:bg-gray-200 ml-auto rounded-full ">
                           {course.customCourseId}
                         </Badge>
                       </TableCell>
@@ -130,7 +130,7 @@ export function CourseTable({ courses, isLoading, selectedCourseId, onSelectCour
                           </Button>
                         </TableCell>
                         <TableCell className="text-center">
-                          <Badge variant="outline" className="bg-gray-50 mx-auto">
+                          <Badge variant="outline" className="bg-gray-50 ml-auto">
                             ---
                           </Badge>
                         </TableCell>
