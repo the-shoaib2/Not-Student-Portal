@@ -38,11 +38,12 @@ proxyClient.interceptors.response.use(
     return response;
   },
   (error) => {
+    if(process.env.DEV === 'development') {
     console.error('[Proxy] Response Error:', {
       status: error.response?.status,
       data: error.response?.data,
       message: error.message
-    });
+    });}
     return Promise.reject(error);
   }
 );

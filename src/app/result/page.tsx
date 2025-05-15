@@ -5,7 +5,6 @@ import { resultService } from '@/services/proxy-api';
 import { Search, Loader, BookOpen, Award, LayoutDashboard } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { Confetti } from '@/components/magicui/confetti';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import PageTitle from '@/components/PageTitle';
 
@@ -53,9 +52,6 @@ interface StudentInfo {
 
 const Result: React.FC<ResultProps> = () => {
 
-  const pageTitle = 'Academic Result';
-  const pageIcon = <Award />;
-    
   const [studentId, setStudentId] = useState('');
   const [semester, setSemester] = useState('');
   const [selectedSemesterName, setSelectedSemesterName] = useState('');
@@ -292,8 +288,8 @@ const Result: React.FC<ResultProps> = () => {
 
       {/* Page Title */}
       <PageTitle
-        title={pageTitle}
-        icon={pageIcon}
+        title={'Academic Result'}
+        icon={<Award />}
       />
 
       

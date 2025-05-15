@@ -201,7 +201,7 @@ const ProfileComponent: React.FC = () => {
   return (
     <div className="w-full">
       {/* Page Title */}
-      <div className="w-full bg-white border-b">
+      <div className="w-full">
           <PageTitle 
             title={"Student Profile"}
             icon={<UserCircle2/>}

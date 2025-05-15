@@ -1,333 +1,7 @@
 import { proxyClient, proxyRequest } from '@/services/proxyUtils';
 import { InternalAxiosRequestConfig, AxiosResponse, AxiosError, AxiosHeaders } from 'axios';
 
-interface ApiResponse<T> {
-  data: T;
-  message?: string;
-  status: number;
-}
 
-interface ErrorResponse {
-  message: string;
-  status: number;
-}
-
-// Add specific types for API responses
-interface ApiError {
-  responseMessage?: string;
-  message?: string;
-  status?: number;
-}
-
-interface ApiSuccess<T> {
-  data: T;
-  message?: string;
-  status: number;
-}
-
-// Add type for request body
-interface RequestBody {
-  [key: string]: unknown;
-}
-
-// Add type for metadata
-export interface ActivityMetadata {
-  userAgent?: string;
-  screenResolution?: string;
-  pageLoadTime?: number;
-  referrer?: string;
-  [key: string]: unknown;
-}
-
-// Add type for form data
-export interface FormData {
-  [key: string]: string | number | boolean | null;
-}
-
-// Add type for API call metadata
-interface ApiCallMetadata {
-  endpoint: string;
-  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
-  path: string;
-  metadata?: ActivityMetadata;
-}
-
-// Add type for login metadata
-interface LoginMetadata {
-  studentId?: string;
-  email?: string;
-  name?: string;
-  sessionDuration?: number;
-}
-
-// Add type for logout metadata
-interface LogoutMetadata {
-  reason?: string;
-  timestamp?: Date;
-  [key: string]: unknown;
-}
-
-// Add type for activity data
-interface ActivityData {
-  type: string;
-  details: Record<string, unknown>;
-  timestamp: Date;
-  metadata?: ActivityMetadata;
-}
-
-// Add type for user config
-interface UserConfig {
-  enabled: {
-    pageViews: boolean;
-    buttonClicks: boolean;
-    formSubmissions: boolean;
-    apiCalls: boolean;
-    loginLogout: boolean;
-    formInputs: boolean;
-    visitTime: boolean;
-  };
-}
-
-// Add type for activity tracker
-interface ActivityTracker {
-  getInstance(): ActivityTracker;
-  getUserConfig(userId: string): Promise<UserConfig>;
-  updateActivityConfig(userId: string, config: UserConfig): Promise<void>;
-  trackPageView(path: string, metadata?: ActivityMetadata): Promise<void>;
-  trackButtonClick(elementId: string, path: string, metadata?: ActivityMetadata): Promise<void>;
-  trackFormSubmission(formId: string, path: string, formData: FormData, metadata?: ActivityMetadata): Promise<void>;
-  trackFormInput(formId: string, path: string, inputName: string, inputValue: string, metadata?: ActivityMetadata): Promise<void>;
-  trackApiCall(endpoint: string, method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH', path: string, metadata?: ActivityMetadata): Promise<void>;
-  trackLogin(username: string, metadata?: LoginMetadata): Promise<void>;
-  trackLogout(metadata?: LogoutMetadata): Promise<void>;
-}
-
-// Semester Exam Clearance Interfaces
-export interface SemesterExamClearance {
-  studentId: string | null;
-  semesterId: string;
-  semesterName: string;
-  registration: boolean;
-  midTermExam: boolean;
-  finalExam: boolean;
-}
-
-export interface SemesterExamClearanceTabProps {
-  data: SemesterExamClearance[] | null;
-  loading: boolean;
-}
-
-
-export interface Semester {
-  semesterId: string
-  semesterYear: number
-  semesterName: string
-}
-
-export interface Student {
-  email: string
-  name: string
-  studentId: string
-  semesterId: string
-  personId: number
-  batchNo: number
-  programId: string
-}
-
-export interface PaymentSummaryData {
-  totalCredit: number
-  totalDebit: number
-  totalOther: number
-}
-
-export interface PaymentLedgerItem {
-  transactionDate: string;
-  semesterId: string;
-  collectedBy: string | null;
-  headDescription: string;
-  debit: number;
-  credit: number;
-  others: number;
-  showLedger: string;
-}
-
-export interface DivisionListResponse {
-  id: string;
-  name: string;
-}
-
-export interface CountryListResponse {
-  id: string;
-  name: string;
-}
-
-export interface EducationResponse {
-  id: string;
-  institute: string;
-  degree: string;
-  major: string;
-  result: string;
-  scale: string;
-  passingYear: string;
-  duration: string;
-}
-
-export interface DegreeListResponse {
-  id: string;
-  name: string;
-}
-
-export interface PhotographResponse {
-  photoUrl: string;
-  photoData: string;
-  image?: string;
-}
-
-export interface InsuranceResponse {
-  id: string;
-  policyNumber: string;
-  provider: string;
-  coverage: string;
-  expiryDate: string;
-}
-
-export interface GuardianResponse {
-  id: string;
-  name: string;
-  relation: string;
-  contact: string;
-  address: string;
-}
-
-export interface CourseRoutine {
-  courseId: string;
-  courseTitle: string;
-  section: string;
-  schedule: Array<{
-    day: string;
-    time: string;
-    room: string;
-  }>;
-}
-
-export interface RegisteredCourse {
-  courseId: string;
-  courseTitle: string;
-  credit: number;
-  section: string;
-  instructor: string;
-}
-
-export interface DropSemester {
-  semesterId: string;
-  semesterName: string;
-  status: string;
-}
-
-export interface PaymentData {
-  totalDue: number;
-  totalPaid: number;
-  balance: number;
-}
-
-export interface CGPAData {
-  cgpa: number;
-  creditsCompleted: number;
-  creditsAttempted: number;
-}
-
-export interface Semester {
-  id: string;
-  name: string;
-  year: number;
-}
-
-export interface TevalSubmitCheck {
-  submitted: boolean;
-  message: string;
-}
-
-export interface LiveResult {
-  courseId: string;
-  courseTitle: string;
-  section: string;
-  instructor: string;
-  grade: string;
-  marks: number;
-}
-
-// Export proxyRequest directly
-export { proxyRequest };
-
-// Create API instance with configuration
-const api = proxyClient;
-
-// Add request interceptor to handle authentication and proxy
-api.interceptors.request.use(
-  async (config: InternalAxiosRequestConfig) => {
-    // Get stored user data
-    const userJson = localStorage.getItem('user');
-    if (userJson) {
-      const user = JSON.parse(userJson);
-      if (!config.headers) {
-        config.headers = new AxiosHeaders();
-      }
-      config.headers.set('Authorization', `Bearer ${user.accessToken}`);
-    }
-
-    // Handle URL formatting
-    if (config.url) {
-      // Remove any leading slash to prevent double slashes
-      config.url = config.url.replace(/^\/+/, '');
-    }
-
-    return config;
-  },
-  (error: AxiosError) => {
-    return Promise.reject(error);
-  }
-);
-
-// Add response interceptor to handle common errors and retry logic
-api.interceptors.response.use(
-  (response: AxiosResponse) => {
-    return response;
-  },
-  (error: AxiosError) => {
-    const originalRequest = error.config;
-
-    // Check if we should retry based on the endpoint
-    const shouldRetry =
-      originalRequest?.url?.includes('/result') ||
-      originalRequest?.url?.includes('/studentInfo') ||
-      originalRequest?.url?.includes('/semesterList');
-
-    // Check if we've already retried
-    if (!originalRequest || (originalRequest as any)._retry) {
-      return Promise.reject(error);
-    }
-
-    if (error.response?.status === 401) {
-      localStorage.removeItem('user');
-      localStorage.removeItem('isAuthenticated');
-      return Promise.reject(error);
-    }
-
-    if (shouldRetry) {
-      // Add retry flag to request config
-      (originalRequest as any)._retry = true;
-
-      // Wait for a short delay before retrying
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve(api(originalRequest));
-        }, 1000);
-      });
-    }
-
-    return Promise.reject(error);
-  }
-);
 
 // Auth Interfaces
 export interface LoginCredentials {
@@ -600,10 +274,404 @@ export interface PaymentSummary {
   totalOthers: string;
 }
 
+interface ApiResponse<T> {
+  data: T;
+  message?: string;
+  status: number;
+}
+
+interface ErrorResponse {
+  message: string;
+  status: number;
+}
+
+// Add specific types for API responses
+interface ApiError {
+  responseMessage?: string;
+  message?: string;
+  status?: number;
+}
+
+interface ApiSuccess<T> {
+  data: T;
+  message?: string;
+  status: number;
+}
+
+// Add type for request body
+interface RequestBody {
+  [key: string]: unknown;
+}
+
+// Add type for metadata
+export interface ActivityMetadata {
+  userAgent?: string;
+  screenResolution?: string;
+  pageLoadTime?: number;
+  referrer?: string;
+  [key: string]: unknown;
+}
+
+// Add type for form data
+export interface FormData {
+  [key: string]: string | number | boolean | null;
+}
+
+// Add type for API call metadata
+interface ApiCallMetadata {
+  endpoint: string;
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+  path: string;
+  metadata?: ActivityMetadata;
+}
+
+// Add type for login metadata
+interface LoginMetadata {
+  studentId?: string;
+  email?: string;
+  name?: string;
+  sessionDuration?: number;
+}
+
+// Add type for logout metadata
+interface LogoutMetadata {
+  reason?: string;
+  timestamp?: Date;
+  [key: string]: unknown;
+}
+
+// Add type for activity data
+interface ActivityData {
+  type: string;
+  details: Record<string, unknown>;
+  timestamp: Date;
+  metadata?: ActivityMetadata;
+}
+
+// Add type for user config
+interface UserConfig {
+  enabled: {
+    pageViews: boolean;
+    buttonClicks: boolean;
+    formSubmissions: boolean;
+    apiCalls: boolean;
+    loginLogout: boolean;
+    formInputs: boolean;
+    visitTime: boolean;
+  };
+}
+
+// Add type for activity tracker
+interface ActivityTracker {
+  getInstance(): ActivityTracker;
+  getUserConfig(userId: string): Promise<UserConfig>;
+  updateActivityConfig(userId: string, config: UserConfig): Promise<void>;
+  trackPageView(path: string, metadata?: ActivityMetadata): Promise<void>;
+  trackButtonClick(elementId: string, path: string, metadata?: ActivityMetadata): Promise<void>;
+  trackFormSubmission(formId: string, path: string, formData: FormData, metadata?: ActivityMetadata): Promise<void>;
+  trackFormInput(formId: string, path: string, inputName: string, inputValue: string, metadata?: ActivityMetadata): Promise<void>;
+  trackApiCall(endpoint: string, method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH', path: string, metadata?: ActivityMetadata): Promise<void>;
+  trackLogin(username: string, metadata?: LoginMetadata): Promise<void>;
+  trackLogout(metadata?: LogoutMetadata): Promise<void>;
+}
+
+// Semester Exam Clearance Interfaces
+export interface SemesterExamClearance {
+  studentId: string | null;
+  semesterId: string;
+  semesterName: string;
+  registration: boolean;
+  midTermExam: boolean;
+  finalExam: boolean;
+}
+
+export interface SemesterExamClearanceTabProps {
+  data: SemesterExamClearance[] | null;
+  loading: boolean;
+}
+
+
+export interface Semester {
+  semesterId: string
+  semesterYear: number
+  semesterName: string
+}
+
+export interface Student {
+  email: string
+  name: string
+  studentId: string
+  semesterId: string
+  personId: number
+  batchNo: number
+  programId: string
+}
+
+export interface PaymentSummaryData {
+  totalCredit: number
+  totalDebit: number
+  totalOther: number
+}
+
+export interface PaymentLedgerItem {
+  transactionDate: string;
+  semesterId: string;
+  collectedBy: string | null;
+  headDescription: string;
+  debit: number;
+  credit: number;
+  others: number;
+  showLedger: string;
+}
+
+export interface DivisionListResponse {
+  id: string;
+  name: string;
+}
+
+export interface CountryListResponse {
+  id: string;
+  name: string;
+}
+
+export interface EducationResponse {
+  id: string;
+  institute: string;
+  degree: string;
+  major: string;
+  result: string;
+  scale: string;
+  passingYear: string;
+  duration: string;
+}
+
+export interface DegreeListResponse {
+  id: string;
+  name: string;
+}
+
+export interface PhotographResponse {
+  photoUrl: string;
+  photoData: string;
+  image?: string;
+}
+
+export interface InsuranceResponse {
+  id: string;
+  policyNumber: string;
+  provider: string;
+  coverage: string;
+  expiryDate: string;
+}
+
+export interface GuardianResponse {
+  id: string;
+  name: string;
+  relation: string;
+  contact: string;
+  address: string;
+}
+
+export interface CourseRoutine {
+  courseId: string;
+  courseTitle: string;
+  section: string;
+  schedule: Array<{
+    day: string;
+    time: string;
+    room: string;
+  }>;
+}
+
+export interface RegisteredCourse {
+  courseId: string;
+  courseTitle: string;
+  credit: number;
+  section: string;
+  instructor: string;
+}
+
+export interface DropSemester {
+  semesterId: string;
+  semesterName: string;
+  status: string;
+}
+
+export interface PaymentData {
+  totalDue: number;
+  totalPaid: number;
+  balance: number;
+}
+
+export interface CGPAData {
+  cgpa: number;
+  creditsCompleted: number;
+  creditsAttempted: number;
+}
+
+export interface Semester {
+  id: string;
+  name: string;
+  year: number;
+}
+
+export interface TevalSubmitCheck {
+  submitted: boolean;
+  message: string;
+}
+
+export interface LiveResult {
+  courseId: string;
+  courseTitle: string;
+  section: string;
+  instructor: string;
+  grade: string;
+  marks: number;
+}
+
+export interface Semester {
+  semesterId: string
+  semesterYear: number
+  semesterName: string
+}
+
+export interface Course {
+  customCourseId: string
+  courseTitle: string
+  courseSectionId: number
+  advisedStatus: string
+  designation: string
+  employeeName: string
+  regClearenc: string
+  sectionName: string
+  semesterId: string
+  semesterName: string
+  semesterYear: number
+  studentId: string
+  totalCredit: number
+}
+
+export interface CourseResult {
+  att: number
+  q1: number
+  q2: number
+  q3: number
+  quiz: number
+  mid1: number
+  mid2: number
+}
+export interface Semester {
+  semesterId: string
+  semesterYear: number
+  semesterName: string
+}
+
+export interface Student {
+  email: string
+  name: string
+  studentId: string
+  semesterId: string
+  personId: number
+  batchNo: number
+  programId: string
+}
+
+export interface PaymentSummaryData {
+  totalCredit: number
+  totalDebit: number
+  totalOther: number
+}
+
+export interface PaymentLedgerItem {
+  transactionDate: string
+  semesterId: string
+  collectedBy: string | null
+  headDescription: string
+  debit: number
+  credit: number
+  others: number
+  showLedger: string
+}
+
+
+// Export proxyRequest directly
+export { proxyRequest };
+
+// Create API instance with configuration
+const api = proxyClient;
+
+// Add request interceptor to handle authentication and proxy
+api.interceptors.request.use(
+  async (config: InternalAxiosRequestConfig) => {
+    // Get stored user data
+    const userJson = localStorage.getItem('user');
+    if (userJson) {
+      const user = JSON.parse(userJson);
+      if (!config.headers) {
+        config.headers = new AxiosHeaders();
+      }
+      config.headers.set('Authorization', `Bearer ${user.accessToken}`);
+    }
+
+    // Handle URL formatting
+    if (config.url) {
+      // Remove any leading slash to prevent double slashes
+      config.url = config.url.replace(/^\/+/, '');
+    }
+
+    return config;
+  },
+  (error: AxiosError) => {
+    return Promise.reject(error);
+  }
+);
+
+// Add response interceptor to handle common errors and retry logic
+api.interceptors.response.use(
+  (response: AxiosResponse) => {
+    return response;
+  },
+  (error: AxiosError) => {
+    const originalRequest = error.config;
+
+    // Check if we should retry based on the endpoint
+    const shouldRetry =
+      originalRequest?.url?.includes('/result') ||
+      originalRequest?.url?.includes('/studentInfo') ||
+      originalRequest?.url?.includes('/semesterList');
+
+    // Check if we've already retried
+    if (!originalRequest || (originalRequest as any)._retry) {
+      return Promise.reject(error);
+    }
+
+    if (error.response?.status === 401) {
+      localStorage.removeItem('user');
+      localStorage.removeItem('isAuthenticated');
+      return Promise.reject(error);
+    }
+
+    if (shouldRetry) {
+      // Add retry flag to request config
+      (originalRequest as any)._retry = true;
+
+      // Wait for a short delay before retrying
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve(api(originalRequest));
+        }, 1000);
+      });
+    }
+
+    return Promise.reject(error);
+  }
+);
+
 
 
 // Auth Service
 export const authService = {
+  // Login
   login: async (credentials: LoginCredentials): Promise<LoginResponse> => {
     try {
       const response = await proxyRequest({
@@ -1354,9 +1422,6 @@ export const profileService = {
 };
 
 
-
-
-
 // Result Service
 export const resultService = {
   getSemesterList: async (): Promise<Semester[]> => {
@@ -1369,10 +1434,6 @@ export const resultService = {
     // }
   },
 
-  getLiveResultSemesterList: async (): Promise<Semester[]> => {
-    const response = await api.get<Semester[]>('/liveResult/semesterList');
-    return response.data;
-  },
 
   getStudentResult: async (semesterId: string, studentId: string): Promise<Result> => {
     // try {
@@ -1402,8 +1463,68 @@ export const resultService = {
 };
 
 
+// Live Result Service
+export const liveResultService = {
 
+  getLiveResultSemesterList: async (): Promise<Semester[]> => {
+    const token = profileService.getAuthToken();
+    const response = await proxyRequest({
+      method: 'GET',
+      url: '/liveResult/semesterList',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        accessToken: token,
+        'Accept': '*/*'
+      }
+    });
+    if(process.env.DEV === 'development') {
+      console.log("Fetched Semesters:",response)
+    }
+    return response;
+  },
 
+  getTevalSubmitCheck: async (courseSectionId: number): Promise<TevalSubmitCheck> => {
+    const token = profileService.getAuthToken();
+    const response = await proxyRequest({
+      method: 'GET',
+      url: `/liveResult/tevalSubmitCheck?courseSectionId=${courseSectionId}`,
+      headers: {
+        Authorization: `Bearer ${token}`,
+        accessToken: token,
+        'Accept': '*/*'
+      }
+    });
+    return response;
+  },
+
+  getRegisteredCourseList: async (semesterId: string): Promise<Course[]> => {
+    const token = profileService.getAuthToken();
+    const response = await proxyRequest({
+      method: 'GET',
+      url: `/liveResult/registeredCourseList?semesterId=${semesterId}`,
+      headers: {
+        Authorization: `Bearer ${token}`,
+        accessToken: token,
+        'Accept': '*/*'
+      }
+    });
+    return response;
+  },
+
+  getLiveResult: async (courseSectionId: number): Promise<CourseResult> => {
+    const token = profileService.getAuthToken();
+    const response = await proxyRequest({
+      method: 'GET',
+      url: `/liveResult?courseSectionId=${courseSectionId}`,
+      headers: {
+        Authorization: `Bearer ${token}`,
+        accessToken: token,
+        'Accept': '*/*'
+      }
+    });
+    return response;
+  },
+};
 
 
 // Payment Service
@@ -1860,6 +1981,3 @@ export const dashboardService = {
     return response || null;
   }
 };
-
-
-
