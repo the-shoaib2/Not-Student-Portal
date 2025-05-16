@@ -8,6 +8,7 @@ import DropSemesterCard from '@/components/dashboard/DropSemesterCard';
 import StudentProfileSummaryCard from '@/components/dashboard/StudentProfileSummaryCard';
 import PaymentBanner from '@/components/dashboard/payment-banner';
 import PaymentSchemeChart from '@/components/dashboard/payment-scheme-chart';
+import UsefulLinks from '@/components/dashboard/useful-links';
 import Comments from '@/components/dashboard/comments';
 import TemperatureChart from '@/components/dashboard/temperature-chart';
 import { LayoutDashboard } from 'lucide-react';
@@ -57,7 +58,7 @@ export default function DashboardPage() {
         console.error('Student profile fetch error:', err);
         errors.push('Failed to load student profile');
       }
-      
+
       // 3. Payment Scheme
       try {
         const paymentScheme = await paymentService.getPaymentScheme();
@@ -101,33 +102,38 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6 mb-6">
+          <div className="grid md:grid-cols-1 gap-6">
 
             {/* CGPA Progression Card */}
-            <CGPAProgressionCard 
-              cgpaData={cgpaData} 
+            <CGPAProgressionCard
+              cgpaData={cgpaData}
               loading={loading}
               error={error}
             />
 
-           
+            <div className="grid md:grid-cols-3 gap-6">
+              {/* Student Profile Summary */}
+              <StudentProfileSummaryCard
+                studentInfo={studentInfo}
+                loading={loading}
+              />
 
-             {/* Student Profile Summary */}
-            <StudentProfileSummaryCard
-             studentInfo={studentInfo} 
-             loading={loading} 
-             />
               {/* Drop Semester Card */}
-            <DropSemesterCard 
-            dropSemesters={dropSemesters}
-             />
+              <DropSemesterCard
+                dropSemesters={dropSemesters}
+              />
 
-             {/* Comments */}
-             <Comments />
+              {/* Useful Links */}
+              <UsefulLinks />
+            </div>
 
-             {/* Temperature Chart */}
-             <TemperatureChart />
+            <div className="grid md:grid-cols-2 gap-6">  
+            {/* Comments */}
+            <Comments />
 
+            {/* Temperature Chart */}
+            <TemperatureChart />
+            </div>
           </div>
         </div>
       </div>
