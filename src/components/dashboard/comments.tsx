@@ -1,15 +1,25 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { useEffect, useState } from "react"
 
 export default function Comments() {
+  const [activeTab, setActiveTab] = useState("part-one")
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveTab(prevTab => prevTab === "part-one" ? "part-two" : "part-one")
+    }, 3000)
+
+    return () => clearInterval(interval)
+  }, [])
   return (
     <Card>
       <CardHeader>
         <CardTitle>Comments</CardTitle>
       </CardHeader>
       <CardContent>
-        <Tabs defaultValue="part-one">
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="part-one">PART ONE</TabsTrigger>
             <TabsTrigger value="part-two">PART TWO</TabsTrigger>
@@ -17,7 +27,7 @@ export default function Comments() {
           <TabsContent value="part-one" className="space-y-4 mt-4">
             <div className="flex items-start space-x-4">
               <Avatar>
-                <AvatarImage src="/placeholder.svg?height=40&width=40" alt="Al-Hadith" />
+                <AvatarImage src="/dashbord/socrates.jpg" alt="Al-Hadith" />
                 <AvatarFallback>AH</AvatarFallback>
               </Avatar>
               <div className="space-y-1">
@@ -31,7 +41,7 @@ export default function Comments() {
 
             <div className="flex items-start space-x-4">
               <Avatar>
-                <AvatarImage src="/placeholder.svg?height=40&width=40" alt="Muhammad Ali" />
+                <AvatarImage src="/dashbord/muhammadAli.jpg" alt="Muhammad Ali" />
                 <AvatarFallback>MA</AvatarFallback>
               </Avatar>
               <div className="space-y-1">
@@ -45,7 +55,7 @@ export default function Comments() {
 
             <div className="flex items-start space-x-4">
               <Avatar>
-                <AvatarImage src="/placeholder.svg?height=40&width=40" alt="Steve Jobs" />
+                <AvatarImage src="/dashbord/steveJobs.png" alt="Steve Jobs" />
                 <AvatarFallback>SJ</AvatarFallback>
               </Avatar>
               <div className="space-y-1">
@@ -58,8 +68,45 @@ export default function Comments() {
             </div>
           </TabsContent>
 
-          <TabsContent value="part-two" className="mt-4">
-            <p className="text-muted-foreground text-center py-8">No comments in part two.</p>
+          <TabsContent value="part-two" className="space-y-4 mt-4">
+            <div className="flex items-start space-x-4">
+              <Avatar>
+                <AvatarImage src="/dashbord/albertEinestine.jpg" alt="Albert Einstein" />
+                <AvatarFallback>AE</AvatarFallback>
+              </Avatar>
+              <div className="space-y-1">
+                <h4 className="font-semibold">Albert Einstein</h4>
+                <p className="text-sm">
+                  Life is like riding a bicycle. To keep your balance, you must keep moving.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start space-x-4">
+              <Avatar>
+                <AvatarImage src="/dashbord/socrates.jpg" alt="Socrates" />
+                <AvatarFallback>SC</AvatarFallback>
+              </Avatar>
+              <div className="space-y-1">
+                <h4 className="font-semibold">Socrates</h4>
+                <p className="text-sm">
+                  Know Thyself.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start space-x-4">
+              <Avatar>
+                <AvatarImage src="/dashbord/abdulKalam.jpg" alt="Abdul Kalam" />
+                <AvatarFallback>AK</AvatarFallback>
+              </Avatar>
+              <div className="space-y-1">
+                <h4 className="font-semibold">Abdul Kalam</h4>
+                <p className="text-sm">
+                  Don't read success stories, you will only get a message. Read failure stories, you will get some ideas to get success.
+                </p>
+              </div>
+            </div>
           </TabsContent>
         </Tabs>
       </CardContent>
