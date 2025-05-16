@@ -6,16 +6,21 @@ import StatCards from '@/components/dashboard/StatCards';
 import CGPAProgressionCard from '@/components/dashboard/CGPAProgressionCard';
 import DropSemesterCard from '@/components/dashboard/DropSemesterCard';
 import StudentProfileSummaryCard from '@/components/dashboard/StudentProfileSummaryCard';
+import PaymentBanner from '@/components/dashboard/payment-banner';
+import PaymentSchemeChart from '@/components/dashboard/payment-scheme-chart';
+import Comments from '@/components/dashboard/comments';
+import TemperatureChart from '@/components/dashboard/temperature-chart';
 import { LayoutDashboard } from 'lucide-react';
 import {
   dashboardService,
   calculatePaymentSummary,
-  PaymentSummary,
+  paymentService,
   CGPAData,
   SGPAData,
   profileService,
   StudentInfo
 } from '@/services/proxy-api';
+import type { PaymentSchemeData } from '@/types/payment';
 
 export default function DashboardPage() {
   const pageTitle = 'Student Dashboard';
@@ -26,6 +31,7 @@ export default function DashboardPage() {
   const [dropSemesters] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [paymentScheme, setPaymentScheme] = useState<PaymentSchemeData[] | null>(null);
 
   const fetchDashboardData = React.useCallback(async () => {
     setLoading(true);
@@ -50,6 +56,15 @@ export default function DashboardPage() {
       } catch (err) {
         console.error('Student profile fetch error:', err);
         errors.push('Failed to load student profile');
+      }
+      
+      // 3. Payment Scheme
+      try {
+        const paymentScheme = await paymentService.getPaymentScheme();
+        setPaymentScheme(paymentScheme);
+      } catch (err) {
+        console.error('Payment scheme fetch error:', err);
+        errors.push('Failed to load payment scheme');
       }
 
       // Set error if any errors occurred
@@ -76,17 +91,46 @@ export default function DashboardPage() {
         <div className="container mx-auto">
           <StatCards />
 
+          {/* Payment Banner and Chart Row */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+            <div className="lg:col-span-1">
+              <PaymentBanner />
+            </div>
+            <div className="md:col-span-1 lg:col-span-2">
+              <PaymentSchemeChart data={paymentScheme || []} />
+            </div>
+          </div>
+
           <div className="grid md:grid-cols-2 gap-6 mb-6">
+
+            {/* CGPA Progression Card */}
             <CGPAProgressionCard 
               cgpaData={cgpaData} 
               loading={loading}
               error={error}
             />
-            <DropSemesterCard dropSemesters={dropSemesters} />
-            <StudentProfileSummaryCard studentInfo={studentInfo} loading={loading} />
+
+           
+
+             {/* Student Profile Summary */}
+            <StudentProfileSummaryCard
+             studentInfo={studentInfo} 
+             loading={loading} 
+             />
+              {/* Drop Semester Card */}
+            <DropSemesterCard 
+            dropSemesters={dropSemesters}
+             />
+
+             {/* Comments */}
+             <Comments />
+
+             {/* Temperature Chart */}
+             <TemperatureChart />
+
           </div>
         </div>
       </div>
     </>
   );
-} 
+}

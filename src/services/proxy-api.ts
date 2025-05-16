@@ -1928,56 +1928,5 @@ export const dashboardService = {
     //   throw error;
     // }
   },
-  getLiveResultSemesterList: async (): Promise<Semester[]> => {
-    const token = await profileService.getAuthToken();
-    const response = await proxyRequest({
-      method: 'GET',
-      url: '/liveResult/semesterList',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        accessToken: token,
-        'Accept': '*/*',
-      },
-    });
-    return response || [];
-  },
-  getTevalSubmitCheck: async (courseSectionId: string): Promise<TevalSubmitCheck | null> => {
-    const token = await profileService.getAuthToken();
-    const response = await proxyRequest({
-      method: 'GET',
-      url: `/liveResult/tevalSubmitCheck?courseSectionId=${courseSectionId}`,
-      headers: {
-        Authorization: `Bearer ${token}`,
-        accessToken: token,
-        'Accept': '*/*',
-      },
-    });
-    return response || null;
-  },
-  getLiveRegisteredCourseList: async (semesterId: string): Promise<RegisteredCourse[]> => {
-    const token = await profileService.getAuthToken();
-    const response = await proxyRequest({
-      method: 'GET',
-      url: `/liveResult/registeredCourseList?semesterId=${semesterId}`,
-      headers: {
-        Authorization: `Bearer ${token}`,
-        accessToken: token,
-        'Accept': '*/*',
-      },
-    });
-    return response || [];
-  },
-  getLiveResult: async (courseSectionId: string): Promise<LiveResult | null> => {
-    const token = await profileService.getAuthToken();
-    const response = await proxyRequest({
-      method: 'GET',
-      url: `/liveResult?courseSectionId=${courseSectionId}`,
-      headers: {
-        Authorization: `Bearer ${token}`,
-        accessToken: token,
-        'Accept': '*/*',
-      },
-    });
-    return response || null;
-  }
+
 };
