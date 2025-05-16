@@ -7,7 +7,7 @@ export default function PaymentBanner() {
       <CardContent className="p-0">
         <div className="w-full h-0 pb-[80%] relative overflow-hidden aspect-[5/4]">
           <Image
-            src="/account.jpg"
+            src="/dashbord/account.jpg"
             alt="Payment Banner"
             fill
             className="object-cover"

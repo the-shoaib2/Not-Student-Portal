@@ -5,7 +5,7 @@ import Link from "next/link"
 export default function UsefulLinks() {
   // Mock data - in a real app, this would come from an API
   const links = [
-    { name: "Daffodil University", url: "#", image: "/placeholder.svg?height=50&width=150" },
+    { name: "Daffodil University", url: "#", image: "/dashbord/placeholder.svg?height=50&width=150" },
     { name: "IQAC", url: "#", image: "/placeholder.svg?height=50&width=150" },
     { name: "HRDI", url: "#", image: "/placeholder.svg?height=50&width=150" },
     { name: "Academic Calendar", url: "#", image: "/placeholder.svg?height=50&width=150" },
