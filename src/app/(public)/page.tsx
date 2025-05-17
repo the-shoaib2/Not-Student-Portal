@@ -72,13 +72,14 @@ const Home: React.FC = () => {
           </h1>
           {/* Logo */}
           <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-3 relative z-10">
-            <Image
-              src="/diuLogo.png"
-              alt="DIU Logo"
-              width={80}
-              height={80}
-              className="w-full h-full object-contain"
-            />
+          <Image
+  src="/diuLogo.png"
+  alt="DIU Logo"
+  fill
+  sizes="(max-width: 768px) 100vw, 33vw"
+  className="object-contain"
+/>
+
           </div>
           {/* Text Content */}
           <div className="relative z-10 space-y-1 sm:space-y-2">

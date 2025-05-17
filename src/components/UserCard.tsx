@@ -1,10 +1,11 @@
 "use client"
-import type React from "react"
 import { useState } from "react"
-import { LogOut, User } from "lucide-react"
+import { LogOut, User, BadgeCheck, Bell } from "lucide-react"
 import { useRouter } from "next/navigation"
 import toast from "react-hot-toast"
 import { useAuth } from "@/contexts/AuthContext"
+import { Button } from "@/components/ui/button"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,63 +17,98 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { Button } from "@/components/ui/button"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
-const UserCard: React.FC = () => {
+export default function UserCard() {
   const router = useRouter()
   const { user, logout } = useAuth()
   const [isLoggingOut, setIsLoggingOut] = useState(false)
-  const [isOpen, setIsOpen] = useState(false)
 
-  const confirmLogout = async () => {
-    if (isLoggingOut) return
+  const handleLogout = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    if (isLoggingOut) return;
 
     try {
       setIsLoggingOut(true)
       await logout()
-      toast.success("Logged out successfully")
-      router.push("/login")
+      toast.success("Successfully logged out")
+      // Use replace instead of push to prevent going back to the previous page
+      router.replace("/login")
     } catch (error) {
       console.error("Logout failed:", error)
       toast.error("Failed to log out. Please try again.")
-
-      // Even if there's an error, we should still redirect to login
-      // since we've cleared the local auth state
-      router.push("/login")
     } finally {
       setIsLoggingOut(false)
-      setIsOpen(false)
     }
   }
 
-  const handleLogout = (e: React.MouseEvent) => {
-    e.preventDefault()
-    setIsOpen(true)
-  }
+  // Get user initials for fallback
+  const getInitials = (name?: string) => {
+    if (!name) return 'U';
+    return name
+      .split(' ')
+      .map(part => part[0])
+      .join('')
+      .toUpperCase()
+      .substring(0, 2);
+  };
 
   return (
-    <div className="absolute right-0 top-12 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200">
-      <div className="p-4">
-        <div className="flex items-center space-x-3 mb-4">
-          <div className="w-10 h-10 rounded-full bg-teal-100 flex items-center justify-center">
-            <User className="w-5 h-5 text-teal-600" />
-          </div>
-          <div>
-            <h3 className="text-sm font-medium text-gray-900">{user?.name}</h3>
-            <p className="text-xs text-gray-500">ID: {user?.userName}</p>
-            <p className="text-xs text-gray-500">Role: {user?.commaSeparatedRoles}</p>
-          </div>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild className="relative p-0 transition-all duration-300 rounded-full flex items-center justify-center cursor-pointer outline-none ring-0 focus:ring-0 focus:ring-offset-0 focus:outline-none">
+        <div className="w-8 h-8 rounded-full bg-teal-50/70 dark:bg-teal-900/20 hover:bg-teal-100/50 dark:hover:bg-teal-900/30 transition-colors flex items-center justify-center">
+          <User size={20} className="text-teal-600/90 dark:text-teal-400/90" />
         </div>
-
-        <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-56" align="end">
+        <DropdownMenuLabel className="font-normal">
+          <div className="flex items-center space-x-3">
+            <Avatar className="h-8 w-8">
+              <AvatarImage alt={user?.name || 'User'} />
+              <AvatarFallback className="bg-teal-100 text-teal-800">
+                {getInitials(user?.name)}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex flex-col space-y-1">
+              <p className="text-sm font-medium leading-none">{user?.name}</p>
+              <p className="text-xs leading-none text-muted-foreground">
+                ID: {user?.userName}
+              </p>
+              {/* <p className="text-xs leading-none text-muted-foreground">
+                Role: {user?.commaSeparatedRoles}
+              </p> */}
+            </div>
+          </div>
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuGroup>
+          <DropdownMenuItem onSelect={() => router.push('/settings')}>
+            <BadgeCheck className="mr-2 h-4 w-4" />
+            <span>Account</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem onSelect={() => router.push('/settings/notifications')}>
+            <Bell className="mr-2 h-4 w-4" />
+            <span>Notifications</span>
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <AlertDialog>
           <AlertDialogTrigger asChild>
-            <Button
-              onClick={handleLogout}
-              className="w-full flex items-center bg-red-500 hover:bg-red-700 justify-center space-x-2 px-4 py-2 text-sm text-white rounded-lg transition-colors duration-200 cursor-pointer"
+            <DropdownMenuItem
+              className="text-red-600 focus:bg-red-50 focus:text-red-600"
+              onSelect={(e: Event) => e.preventDefault()}
             >
-              <LogOut className="w-4 h-4" />
-              <span>Logout</span>
-            </Button>
+              <LogOut className="mr-2 h-4 w-4" />
+              <span>Log out</span>
+            </DropdownMenuItem>
           </AlertDialogTrigger>
           <AlertDialogContent className="sm:max-w-[300px]">
             <AlertDialogHeader>
@@ -80,26 +116,33 @@ const UserCard: React.FC = () => {
                 <LogOut className="h-5 w-5 text-red-600" />
                 Confirm Logout
               </AlertDialogTitle>
-              <AlertDialogDescription>Are you sure you want to log out?</AlertDialogDescription>
+              <AlertDialogDescription>
+                Are you sure you want to log out?
+              </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter className="flex gap-2 justify-end">
               <AlertDialogCancel disabled={isLoggingOut}>Cancel</AlertDialogCancel>
               <AlertDialogAction
-                onClick={(e) => {
-                  e.preventDefault()
-                  confirmLogout()
-                }}
+                onClick={handleLogout}
                 disabled={isLoggingOut}
                 className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               >
-                {isLoggingOut ? "Logging out..." : "Logout"}
+                {isLoggingOut ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Logging out...
+                  </>
+                ) : (
+                  'Logout'
+                )}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
-      </div>
-    </div>
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }
-
-export default UserCard

@@ -44,7 +44,7 @@ const Login: React.FC = () => {
       // Store user data and token
       login(response);
 
-      toast.success(`Welcome back, ${response.name}!`);
+      toast.success(`Welcome back, ${response.name}!`, { duration: 2000 });
       router.push('/');
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Login failed';
