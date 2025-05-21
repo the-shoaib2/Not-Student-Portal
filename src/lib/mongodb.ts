@@ -1,11 +1,17 @@
 import mongoose, { Connection, ConnectOptions } from 'mongoose';
 
-const MONGODB_URI = process.env.DATABASE_URI!
-const MONGODB_NAME = process.env.DATABASE_NAME!
+const MONGODB_URI = process.env.DATABASE_URI!;
+const MONGODB_NAME = process.env.DATABASE_NAME!;
 
 if (!MONGODB_URI || !MONGODB_NAME) {
-  throw new Error('Please define the MONGODB_URI and MONGODB_NAME environment variable inside .env')
+  throw new Error('Please define the MONGODB_URI and MONGODB_NAME environment variables inside .env');
 }
+
+// Connection configuration
+const MAX_POOL_SIZE = 50; // Adjust based on your server capacity
+const SERVER_SELECTION_TIMEOUT_MS = 5000;
+const SOCKET_TIMEOUT_MS = 30000;
+const CONNECT_TIMEOUT_MS = 10000;
 
 interface Cached {
   conn: Connection | null;
@@ -29,20 +35,47 @@ async function connectDB() {
 
   if (!cached.promise) {
     const opts: ConnectOptions = {
-      bufferCommands: false,
+      dbName: MONGODB_NAME,
+      maxPoolSize: MAX_POOL_SIZE,
+      serverSelectionTimeoutMS: SERVER_SELECTION_TIMEOUT_MS,
+      socketTimeoutMS: SOCKET_TIMEOUT_MS,
+      connectTimeoutMS: CONNECT_TIMEOUT_MS,
+      retryWrites: true,
+      retryReads: true,
     };
 
-    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => mongoose.connection)
+    // Enable query optimization
+    mongoose.set('bufferCommands', false);
+    mongoose.set('bufferTimeoutMS', 2000);
+    
+    // Performance optimizations
+    mongoose.set('toJSON', { virtuals: true, getters: true });
+    mongoose.set('toObject', { virtuals: true, getters: true });
+
+    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
+      return mongoose.connection;
+    });
   }
 
   try {
-    cached.conn = await cached.promise
+    cached.conn = await cached.promise;
   } catch (e) {
-    cached.promise = null
-    throw e
+    cached.promise = null;
+    throw e;
   }
 
-  return cached.conn
+  return cached.conn;
 }
 
-export { connectDB } 
+// Handle process termination
+process.on('SIGINT', async () => {
+  try {
+    await mongoose.connection.close();
+    process.exit(0);
+  } catch (err) {
+    console.error('Error closing MongoDB connection:', err);
+    process.exit(1);
+  }
+});
+
+export { connectDB }

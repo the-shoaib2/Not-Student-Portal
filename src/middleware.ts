@@ -37,7 +37,8 @@ const protectedRoutes = [
   '/student-application',
   '/library',
   '/calendar',
-  '/skill-jobs'
+  '/skill-jobs',
+  '/settings'
 ];
 
 export function middleware(request: NextRequest) {
