@@ -1,4 +1,4 @@
-import Activity from '@/models/activity'
+import { Activity } from '@/models/activity'
 import { ActivityConfig } from '@/models/activityConfig'
 import { VisitTime, VisitTimeInterface } from '@/models/visitTime'
 import { getCookie } from 'cookies-next'

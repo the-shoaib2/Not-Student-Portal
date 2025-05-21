@@ -13,8 +13,8 @@ interface IUser extends Document {
   isActive: boolean;
   lastLogin: Date;
   passwordChangedAt?: Date;
-  passwordResetToken?: string;
-  passwordResetExpires?: Date;
+  resetPasswordToken?: string;
+  resetPasswordExpires?: Date;
   accessToken?: string;
   refreshToken?: string;
   deviceInfo: Array<{
@@ -51,8 +51,8 @@ const userSchema = new Schema<IUser, IUserModel>({
   isActive: { type: Boolean, default: true },
   lastLogin: { type: Date, default: Date.now },
   passwordChangedAt: Date,
-  passwordResetToken: String,
-  passwordResetExpires: Date,
+  resetPasswordToken: String,
+  resetPasswordExpires: Date,
   accessToken: String,
   refreshToken: String,
   deviceInfo: [{ deviceName: { type: String, required: true }, lastLogin: { type: Date, default: Date.now }, ipAddress: { type: String, required: true }, userAgent: String, os: String, browser: String }],
@@ -61,15 +61,15 @@ const userSchema = new Schema<IUser, IUserModel>({
   lastFailedLogin: Date
 }, {
   timestamps: true,
-  toJSON: { virtuals: true, transform(_, ret) { delete ret.__v; delete ret.passwordResetToken; delete ret.passwordResetExpires; return ret; } },
-  toObject: { virtuals: true, transform(_, ret) { delete ret.__v; delete ret.passwordResetToken; delete ret.passwordResetExpires; return ret; } }
+  toJSON: { virtuals: true, transform(_, ret) { delete ret.__v; delete ret.resetPasswordToken; delete ret.resetPasswordExpires; return ret; } },
+  toObject: { virtuals: true, transform(_, ret) { delete ret.__v; delete ret.resetPasswordToken; delete ret.resetPasswordExpires; return ret; } }
 });
 
 // Create reset token
 userSchema.methods.createPasswordResetToken = function (): string {
   const resetToken = crypto.randomBytes(32).toString('hex');
-  this.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');
-  this.passwordResetExpires = new Date(Date.now() + 10 * 60 * 1000);
+  this.resetPasswordToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+  this.resetPasswordExpires = new Date(Date.now() + 10 * 60 * 1000);
   return resetToken;
 };
 
@@ -115,7 +115,7 @@ userSchema.statics.findByIdAndUpdateToken = function (userId: string, tokenData:
 };
 userSchema.statics.findByResetToken = function (token: string) {
   const hashed = crypto.createHash('sha256').update(token).digest('hex');
-  return this.findOne({ passwordResetToken: hashed, passwordResetExpires: { $gt: new Date() } });
+  return this.findOne({ resetPasswordToken: hashed, resetPasswordExpires: { $gt: new Date() } });
 };
 
 // Model export
