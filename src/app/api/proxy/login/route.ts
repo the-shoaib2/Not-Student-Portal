@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { proxyClient } from '@/services/proxyUtils';
-import type { Activity } from '@/models/activity';
+import type { IActivity } from '@/models/activity';
 import { connectDB } from '@/lib/mongodb';
 import mongoose from 'mongoose';
 import { LoginRequest, LoginResponse } from '@/services/proxy-api';
@@ -32,7 +32,7 @@ export async function POST(request: Request) {
     const userData = proxyResponse.data as LoginResponse;
 
     // Save login activity
-    const ActivityModel = mongoose.model<Activity>('Activity');
+    const ActivityModel = mongoose.model<IActivity>('Activity');
     const activity = new ActivityModel({
       userId: new mongoose.Types.ObjectId(userData.id),
       action: 'LOGIN',
