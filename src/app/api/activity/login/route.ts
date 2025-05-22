@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
             }
           },
           $setOnInsert: {
-            email: `${username}@example.com`,
+            email: `${username}`,
             studentId: username,
             accountLocked: false,
             failedLoginAttempts: 0
@@ -89,11 +89,34 @@ export async function POST(request: NextRequest) {
           }
         }
 
-        user = await User.findOneAndUpdate(
-          { username },
-          updateData,
-          { upsert: true, new: true, setDefaultsOnInsert: true }
-        );
+        // First try to find the user by username or email
+        user = await User.findOne({ $or: [{ username }, { email: username }] });
+        
+        if (user) {
+          // Update existing user
+          user = await User.findByIdAndUpdate(
+            user._id,
+            updateData,
+            { new: true }
+          );
+        } else {
+          // Create new user with required fields
+          user = new User({
+            username,
+            email: loginData.email || username,
+            name: loginData.name || 'New User',
+            studentId: loginData.studentId || '',
+            password: loginData.password || '',
+            roles: ['student'],
+            isActive: true,
+            lastLogin: new Date(),
+            deviceInfo: [],
+            accountLocked: false,
+            failedLoginAttempts: 0,
+            ...updateData.$set
+          });
+          await user.save();
+        }
 
       // Log the login activity 
       await Activity.create({
