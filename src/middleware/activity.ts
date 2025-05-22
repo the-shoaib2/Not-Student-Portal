@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { connectDB } from '@/lib/mongodb'
-import Activity from '@/models/activity'
+import { Activity } from '@/models/activity'
 
 
 const NEXTAUTH_URL = process.env.NEXTAUTH_URL || 'http://localhost:3000'
