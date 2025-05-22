@@ -3,11 +3,11 @@
 import React from 'react';
 import PageTitle from '@/components/PageTitle';
 import { useAuth } from '@/contexts/AuthContext';
-import { Briefcase } from 'lucide-react';
+import { Award } from 'lucide-react';
 import { ComingSoonCard } from '@/components/coming-soon/coming-soon-card';
 
 
-const ProfessionalComponent: React.FC = () => {
+const AlumniCardApplyComponent: React.FC = () => {
   const { user } = useAuth();
 
 
@@ -16,27 +16,25 @@ const ProfessionalComponent: React.FC = () => {
       {/* Page Title */}
       <div className="w-full">
         <PageTitle
-          title={"Professional"}
-          icon={<Briefcase />}
+          title={"Alumni Card Apply"}
+          icon={<Award />}
         />
       </div>
 
       {/* Main Content */}
       <div className="mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-3xl">
-        
         <ComingSoonCard
-          title="Professional Network"
-          description="Connect with fellow alumni and explore professional opportunities in our growing network. This feature is coming soon!"
+          title="Alumni Card Application"
+          description="We're working on making it easier for our alumni to apply for their alumni cards. Stay tuned for updates!"
           expectedLaunch="Q3 2025"
         />
-        
       </div>
     </div>
   );
 };
 
-const ProfessionalPage = () => {
-  return <ProfessionalComponent />;
+const   AlumniCardApplyPage = () => {
+  return <AlumniCardApplyComponent />;
 };
 
-export default ProfessionalPage;
+export default AlumniCardApplyPage;

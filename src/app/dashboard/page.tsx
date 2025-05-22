@@ -88,7 +88,7 @@ export default function DashboardPage() {
         icon={pageIcon}
       />
 
-      <div className="p-6 bg-gray-50 min-h-screen">
+      <div className="p-6 min-h-screen">
         <div className="container mx-auto">
           <StatCards />
 
