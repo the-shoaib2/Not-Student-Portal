@@ -2,6 +2,7 @@
 
 import React from "react"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
 import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table"
 import { ArrowUpDown } from "lucide-react"
 import {
@@ -99,9 +100,14 @@ const RegisteredCoursesCard: React.FC<RegisteredCoursesCardProps> = ({
   return (
     <Card className="max-w-5xl w-full mx-auto">
       <CardHeader className="pb-0 px-4 pt-4">
-        <CardTitle className="text-sm sm:text-base font-medium text-teal-700 border-b pb-2 sm:pb-3">
-          Registered Courses
-        </CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-sm sm:text-base font-medium text-teal-700 border-b pb-2 sm:pb-3 flex-1">
+            Registered Courses
+          </CardTitle>
+          <Badge variant="outline" className="bg-teal-50 text-teal-700 border-teal-300 rounded-full ml-4">
+            {loading ? "Loading..." : `${registeredCourses?.length || 0} Courses`}
+          </Badge>
+        </div>
       </CardHeader>
       <CardContent className="px-2 sm:px-2 pb-4 pt-2">
         <div className="w-full overflow-x-auto rounded-md">

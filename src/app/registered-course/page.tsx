@@ -32,16 +32,24 @@ export interface RegisteredCourse extends ApiRegisteredCourse {
 // Column Definitions
 const routineColumns: ColumnDef<CourseRoutine>[] = [
   {
-    accessorKey: "courseId",
-    header: "Course ID",
+    accessorKey: "roomNo",
+    header: "Room No",
   },
   {
-    accessorKey: "courseTitle",
-    header: "Course Title",
+    accessorKey: "day",
+    header: "Day",
   },
   {
-    accessorKey: "routine",
-    header: "Routine",
+    accessorKey: "levelTerm",
+    header: "Level Term",
+  },
+  {
+    accessorKey: "timeSlot",
+    header: "Time Slot",
+  },
+  {
+    accessorKey: "teacher",
+    header: "Teacher",
   },
 ]
 
@@ -159,6 +167,11 @@ const RegisteredCourse: React.FC = () => {
                 courseId: r.courseId || "",
                 courseTitle: r.courseTitle || "",
                 routine: r.routine || "",
+                roomNo: r.roomNo || "-",
+                day: r.day || "-",
+                levelTerm: `${r.level || "-"} ${r.term || "-"}`.trim(),
+                timeSlot: r.timeSlot || "-",
+                teacher: r.teacher || "-",
               }) as CourseRoutine,
           ),
         )
@@ -178,9 +191,7 @@ const RegisteredCourse: React.FC = () => {
     setRoutineSortDirection(direction)
   }, [])
 
-  // Debug log to check current state
-  console.log("Current semesters state:", semesters)
-  console.log("Semester loading state:", semesterLoading)
+
 
   return (
     <>

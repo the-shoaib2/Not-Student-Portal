@@ -19,6 +19,13 @@ export interface CourseRoutine {
   courseId: string
   courseTitle: string
   routine: string
+  roomNo?: string
+  day?: string
+  level?: string
+  term?: string
+  levelTerm?: string
+  timeSlot?: string
+  teacher?: string
 }
 
 interface RoutineProps {
@@ -96,8 +103,9 @@ const Routine = React.memo(({ title, data, columns, sortColumn, sortDirection, o
               ))}
             </TableHeader>
             <TableBody>
-              {!data ? (
-                Array.from({ length: 5 }).map((_, index) => (
+              {data === null ? (
+                // Loading state - show skeleton
+                Array.from({ length: 3 }).map((_, index) => (
                   <TableRow key={index}>
                     {Array.from({ length: columns.length }).map((_, colIndex) => (
                       <TableCell key={colIndex} className="text-center">
@@ -106,30 +114,37 @@ const Routine = React.memo(({ title, data, columns, sortColumn, sortDirection, o
                     ))}
                   </TableRow>
                 ))
-              ) : table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    className={row.index % 2 === 0 ? "bg-teal-50 hover:bg-teal-100" : "bg-white hover:bg-teal-100"}
-                  >
-                    {row.getVisibleCells().map((cell) => {
-                      const isLeftAligned = ["courseId", "courseTitle"].includes(cell.column.id)
-                      return (
-                        <TableCell
-                          key={cell.id}
-                          className={`whitespace-nowrap ${isLeftAligned ? "text-left" : "text-center"}`}
-                        >
-                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                        </TableCell>
-                      )
-                    })}
-                  </TableRow>
-                ))
+              ) : data.length > 0 ? (
+                // Data exists - show actual data
+                table
+                  .getRowModel()
+                  .rows.map((row) => (
+                    <TableRow
+                      key={row.id}
+                      className={row.index % 2 === 0 ? "bg-teal-50 hover:bg-teal-100" : "bg-white hover:bg-teal-100"}
+                    >
+                      {row.getVisibleCells().map((cell) => {
+                        const isLeftAligned = ["teacher"].includes(cell.column.id)
+                        return (
+                          <TableCell
+                            key={cell.id}
+                            className={`whitespace-nowrap ${isLeftAligned ? "text-left" : "text-center"}`}
+                          >
+                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                          </TableCell>
+                        )
+                      })}
+                    </TableRow>
+                  ))
               ) : (
+                // Empty state - show "No course" row
                 <TableRow>
-                  <TableCell colSpan={columns.length} className="text-center py-6">
-                    No routine selected
-                  </TableCell>
+                  <TableCell className="text-center">-</TableCell>
+                  <TableCell className="text-center">-</TableCell>
+                  <TableCell className="text-center">-</TableCell>
+                  <TableCell className="text-center">-</TableCell>
+                  <TableCell className="text-center">-</TableCell>
+                  
                 </TableRow>
               )}
             </TableBody>
