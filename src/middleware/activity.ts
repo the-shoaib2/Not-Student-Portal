@@ -46,4 +46,4 @@ async function getSession(req: NextRequest) {
     console.error('Session error:', error)
     return null
   }
-} 
+}

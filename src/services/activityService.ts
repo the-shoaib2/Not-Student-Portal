@@ -216,4 +216,4 @@ class ActivityService {
   }
 }
 
-export const activityService = ActivityService.getInstance(); 
+export const activityService = ActivityService.getInstance();
