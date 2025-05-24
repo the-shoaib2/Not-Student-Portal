@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useMemo } from "react"
+import React, { useEffect, useCallback, useState } from "react"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table"
 import { ArrowUpDown } from "lucide-react"
@@ -14,124 +14,132 @@ import {
   type OnChangeFn,
 } from "@tanstack/react-table"
 
+// Types
 export interface CourseRoutine {
   courseId: string
   courseTitle: string
   routine: string
 }
 
-interface RoutineCardProps {
+interface RoutineProps {
   title: string
   data: CourseRoutine[] | null
+  columns: ColumnDef<CourseRoutine>[]
   sortColumn: string | null
   sortDirection: "asc" | "desc"
   onSort: (column: string | null, direction: "asc" | "desc") => void
 }
 
-const columns: ColumnDef<CourseRoutine>[] = [
-  {
-    accessorKey: "courseId",
-    header: "Course ID",
-  },
-  {
-    accessorKey: "courseTitle",
-    header: "Course Title",
-  },
-  {
-    accessorKey: "routine",
-    header: "Routine",
-  },
-]
+const Routine = React.memo(({ title, data, columns, sortColumn, sortDirection, onSort }: RoutineProps) => {
+  const initialSorting: SortingState = sortColumn ? [{ id: sortColumn, desc: sortDirection === "desc" }] : []
+  const [routineSorting, setRoutineSorting] = useState<SortingState>(initialSorting)
 
-export const RoutineCard = React.memo<RoutineCardProps>(({
-  title,
-  data = [],
-  sortColumn,
-  sortDirection,
-  onSort,
-}) => {
-  const sorting = useMemo<SortingState>(
-    () => (sortColumn ? [{ id: sortColumn, desc: sortDirection === "desc" }] : []),
-    [sortColumn, sortDirection]
+  useEffect(() => {
+    if (sortColumn) {
+      setRoutineSorting([{ id: sortColumn, desc: sortDirection === "desc" }])
+    } else {
+      setRoutineSorting([])
+    }
+  }, [sortColumn, sortDirection])
+
+  const handleSortingChange: OnChangeFn<SortingState> = useCallback(
+    (updaterOrValue) => {
+      const updatedSorting = typeof updaterOrValue === "function" ? updaterOrValue(routineSorting) : updaterOrValue
+
+      setRoutineSorting(updatedSorting)
+
+      if (updatedSorting.length > 0) {
+        const { id, desc } = updatedSorting[0]
+        onSort(id, desc ? "desc" : "asc")
+      } else {
+        onSort(null, "asc")
+      }
+    },
+    [onSort, routineSorting],
   )
 
   const table = useReactTable({
     data: data || [],
     columns,
-    state: {
-      sorting,
-    },
-    onSortingChange: (updater) => {
-      const newSorting = typeof updater === 'function' ? updater(sorting) : updater
-      const sortItem = newSorting[0]
-      onSort(sortItem?.id || null, sortItem?.desc ? 'desc' : 'asc')
-    },
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
+    onSortingChange: handleSortingChange,
+    state: {
+      sorting: routineSorting,
+    },
   })
 
   return (
     <Card className="w-full">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-lg font-medium">{title}</CardTitle>
+      <CardHeader className="pb-0 px-4 pt-4">
+        <CardTitle className="text-sm sm:text-base font-medium text-teal-700 border-b pb-2 sm:pb-3">{title}</CardTitle>
       </CardHeader>
-      <CardContent>
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead
-                    key={header.id}
-                    onClick={header.column.getToggleSortingHandler()}
-                    className="cursor-pointer hover:bg-gray-50"
-                  >
-                    <div className="flex items-center">
-                      {flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
-                      {header.column.getIsSorted() && (
-                        <ArrowUpDown className="ml-2 h-4 w-4" />
-                      )}
-                    </div>
-                  </TableHead>
-                ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
+      <CardContent className="px-2 sm:px-2 pb-4 pt-2">
+        <div className="w-full overflow-x-auto rounded-md">
+          <Table>
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <TableHead
+                      key={header.id}
+                      className="cursor-pointer whitespace-nowrap text-center"
+                      onClick={() => header.column.toggleSorting()}
+                    >
+                      <div className="flex items-center justify-center">
+                        {flexRender(header.column.columnDef.header, header.getContext())}
+                        {header.column.getIsSorted() && <ArrowUpDown className="ml-2 h-4 w-4" />}
+                      </div>
+                    </TableHead>
                   ))}
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {!data ? (
+                Array.from({ length: 5 }).map((_, index) => (
+                  <TableRow key={index}>
+                    {Array.from({ length: columns.length }).map((_, colIndex) => (
+                      <TableCell key={colIndex} className="text-center">
+                        <div className="h-4 w-full bg-muted rounded animate-pulse" />
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    className={row.index % 2 === 0 ? "bg-teal-50 hover:bg-teal-100" : "bg-white hover:bg-teal-100"}
+                  >
+                    {row.getVisibleCells().map((cell) => {
+                      const isLeftAligned = ["courseId", "courseTitle"].includes(cell.column.id)
+                      return (
+                        <TableCell
+                          key={cell.id}
+                          className={`whitespace-nowrap ${isLeftAligned ? "text-left" : "text-center"}`}
+                        >
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </TableCell>
+                      )
+                    })}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={columns.length} className="text-center py-6">
+                    No routine selected
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </CardContent>
     </Card>
   )
 })
 
-RoutineCard.displayName = 'RoutineCard'
+Routine.displayName = "Routine"
+
+export default Routine
