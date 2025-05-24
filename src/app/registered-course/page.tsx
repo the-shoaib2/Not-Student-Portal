@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useCallback, useState } from "react"
+import React, { useEffect, useCallback, useState, useRef } from "react"
 import { registeredCourseService } from "@/services/proxy-api"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import PageTitle from "@/components/PageTitle"
@@ -16,17 +16,9 @@ import {
   createColumnHelper,
   type OnChangeFn,
 } from "@tanstack/react-table"
-import { useRegisteredCourseStore } from "@/store/registeredCourseStore"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { ChevronDown } from "lucide-react"
-import { type RegisteredCourse as ApiRegisteredCourse, type CourseRoutine as ApiCourseRoutine } from "@/services/proxy-api"
-
-
+import type { RegisteredCourse as ApiRegisteredCourse } from "@/services/proxy-api"
 
 // Types
 export interface SemesterInfo {
@@ -36,19 +28,19 @@ export interface SemesterInfo {
 }
 
 export interface CourseRoutine {
-  courseId: string;
-  courseTitle: string;
-  routine: string;
+  courseId: string
+  courseTitle: string
+  routine: string
 }
 
 export interface RegisteredCourse extends ApiRegisteredCourse {
-  courseId: string;
-  courseTitle: string;
-  credit: number;
-  section: string;
-  instructor: string;
-  advisedStatus: string;
-  regClearenc: string;
+  courseId: string
+  courseTitle: string
+  credit: number
+  section: string
+  instructor: string
+  advisedStatus: string
+  regClearenc: string
 }
 
 // Column Helpers
@@ -84,40 +76,43 @@ const SemesterSelector = React.memo(
     onChange: (semester: SemesterInfo) => void
     loading: boolean
   }) => {
-    const [isChanging, setIsChanging] = useState(false);
+    const [isChanging, setIsChanging] = useState(false)
 
     const handleSemesterChange = async (semester: SemesterInfo) => {
-      setIsChanging(true);
+      setIsChanging(true)
       try {
-        await onChange(semester);
+        await onChange(semester)
       } finally {
-        setIsChanging(false);
+        setIsChanging(false)
       }
-    };
+    }
 
     // Group semesters by year
-    const groupedSemesters = semesters.reduce((acc, semester) => {
-      const year = semester.semesterYear;
-      if (!acc[year]) {
-        acc[year] = [];
-      }
-      acc[year].push(semester);
-      return acc;
-    }, {} as Record<number, SemesterInfo[]>);
+    const groupedSemesters = semesters.reduce(
+      (acc, semester) => {
+        const year = semester.semesterYear
+        if (!acc[year]) {
+          acc[year] = []
+        }
+        acc[year].push(semester)
+        return acc
+      },
+      {} as Record<number, SemesterInfo[]>,
+    )
 
     // Sort years in descending order
-    const sortedYears = Object.keys(groupedSemesters).sort((a, b) => Number(b) - Number(a));
+    const sortedYears = Object.keys(groupedSemesters).sort((a, b) => Number(b) - Number(a))
 
     return (
       <div className="w-full sm:w-auto flex-shrink-0 mb-2 sm:mb-0">
         {loading ? (
           <div className="w-full max-w-xs min-w-[200px] px-4 py-2 rounded border border-teal-300 text-teal-700 bg-white flex items-center justify-center">
             <div className="h-5 w-5 border-2 border-teal-500 border-t-transparent rounded-full animate-spin mr-2"></div>
-            <span>Loading...</span>
+            <span>Loading semesters...</span>
           </div>
         ) : semesters.length > 0 ? (
           <DropdownMenu>
-            <DropdownMenuTrigger 
+            <DropdownMenuTrigger
               className="w-full max-w-xs min-w-[200px] px-4 py-2 rounded border border-teal-300 text-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 text-base bg-white flex items-center justify-between"
               disabled={isChanging}
             >
@@ -125,20 +120,22 @@ const SemesterSelector = React.memo(
                 {isChanging && (
                   <div className="h-4 w-4 border-2 border-teal-500 border-t-transparent rounded-full animate-spin mr-2"></div>
                 )}
-                <span>{selectedSemester ? `${selectedSemester.semesterName} ${selectedSemester.semesterYear}` : 'Select semester'}</span>
+                <span>
+                  {selectedSemester
+                    ? `${selectedSemester.semesterName} ${selectedSemester.semesterYear}`
+                    : "Select semester"}
+                </span>
               </div>
               <ChevronDown className="h-4 w-4" />
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-[200px] max-h-[300px] overflow-y-auto">
               {sortedYears.map((year) => (
                 <React.Fragment key={year}>
-                  <div className="px-2 py-1.5 text-sm font-semibold text-teal-700 bg-teal-50">
-                    {year}
-                  </div>
+                  <div className="px-2 py-1.5 text-sm font-semibold text-teal-700 bg-teal-50">{year}</div>
                   {groupedSemesters[Number(year)]
                     .sort((a, b) => {
-                      const semesterOrder: Record<string, number> = { Fall: 4, Summer: 3, Spring: 2, Short: 1 };
-                      return (semesterOrder[b.semesterName] ?? 0) - (semesterOrder[a.semesterName] ?? 0);
+                      const semesterOrder: Record<string, number> = { Fall: 4, Summer: 3, Spring: 2, Short: 1 }
+                      return (semesterOrder[b.semesterName] ?? 0) - (semesterOrder[a.semesterName] ?? 0)
                     })
                     .map((sem) => (
                       <DropdownMenuItem
@@ -155,14 +152,14 @@ const SemesterSelector = React.memo(
             </DropdownMenuContent>
           </DropdownMenu>
         ) : (
-          <div className="w-full max-w-xs min-w-[200px] px-4 py-2 rounded border border-teal-300 text-teal-700 bg-white text-center">
+          <div className="w-full max-w-xs min-w-[200px] px-4 py-2 rounded border border-red-300 text-red-700 bg-white text-center">
             No semesters available
           </div>
         )}
       </div>
-    );
-  }
-);
+    )
+  },
+)
 
 const RoutineCard = React.memo(
   ({
@@ -193,9 +190,7 @@ const RoutineCard = React.memo(
 
     const handleSortingChange: OnChangeFn<SortingState> = useCallback(
       (updaterOrValue) => {
-        const updatedSorting = typeof updaterOrValue === 'function' 
-          ? updaterOrValue(routineSorting)
-          : updaterOrValue
+        const updatedSorting = typeof updaterOrValue === "function" ? updaterOrValue(routineSorting) : updaterOrValue
 
         setRoutineSorting(updatedSorting)
 
@@ -206,7 +201,7 @@ const RoutineCard = React.memo(
           onSort(null, "asc")
         }
       },
-      [onSort, routineSorting]
+      [onSort, routineSorting],
     )
 
     const table = useReactTable({
@@ -234,7 +229,7 @@ const RoutineCard = React.memo(
                 {table.getHeaderGroups().map((headerGroup) => (
                   <TableRow key={headerGroup.id}>
                     {headerGroup.headers.map((header) => (
-                      <TableHead 
+                      <TableHead
                         key={header.id}
                         className="cursor-pointer whitespace-nowrap text-center"
                         onClick={() => header.column.toggleSorting()}
@@ -261,20 +256,20 @@ const RoutineCard = React.memo(
                   ))
                 ) : table.getRowModel().rows?.length ? (
                   table.getRowModel().rows.map((row) => (
-                    <TableRow 
+                    <TableRow
                       key={row.id}
                       className={row.index % 2 === 0 ? "bg-teal-50 hover:bg-teal-100" : "bg-white hover:bg-teal-100"}
                     >
                       {row.getVisibleCells().map((cell) => {
-                        const isLeftAligned = ['courseId', 'courseTitle'].includes(cell.column.id);
+                        const isLeftAligned = ["courseId", "courseTitle"].includes(cell.column.id)
                         return (
-                          <TableCell 
-                            key={cell.id} 
-                            className={`whitespace-nowrap ${isLeftAligned ? 'text-left' : 'text-center'}`}
+                          <TableCell
+                            key={cell.id}
+                            className={`whitespace-nowrap ${isLeftAligned ? "text-left" : "text-center"}`}
                           >
                             {flexRender(cell.column.columnDef.cell, cell.getContext())}
                           </TableCell>
-                        );
+                        )
                       })}
                     </TableRow>
                   ))
@@ -291,152 +286,148 @@ const RoutineCard = React.memo(
         </CardContent>
       </Card>
     )
-  }
+  },
 )
 
 const RegisteredCourse: React.FC = () => {
-  const {
-    registeredCourses,
-    loading,
-    selectedSemester,
-    semesters,
-    semesterLoading,
-    selectedRoutine,
-    selectedRoutineCourseTitle,
-    sortColumn,
-    sortDirection,
-    routineSortColumn,
-    routineSortDirection,
-    setRegisteredCourses,
-    setLoading,
-    setSelectedSemester,
-    setSemesters,
-    setSemesterLoading,
-    setSelectedRoutine,
-    setSelectedRoutineCourseTitle,
-    setSorting,
-    setRoutineSorting,
-  } = useRegisteredCourseStore()
-
-
+  // Local state management replacing the Zustand store
+  const [registeredCourses, setRegisteredCourses] = useState<RegisteredCourse[] | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [selectedSemester, setSelectedSemester] = useState<SemesterInfo | null>(null)
+  const [semesters, setSemesters] = useState<SemesterInfo[]>([])
+  const [semesterLoading, setSemesterLoading] = useState(false)
+  const [selectedRoutine, setSelectedRoutine] = useState<CourseRoutine[] | null>(null)
+  const [selectedRoutineCourseTitle, setSelectedRoutineCourseTitle] = useState("")
+  const [sortColumn, setSortColumn] = useState<string | null>(null)
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc")
+  const [routineSortColumn, setRoutineSortColumn] = useState<string | null>(null)
+  const [routineSortDirection, setRoutineSortDirection] = useState<"asc" | "desc">("asc")
+  const [routineLoading, setRoutineLoading] = useState(false)
 
   const [courseSorting, setCourseSorting] = useState<SortingState>([])
-  const [isInitialLoad, setIsInitialLoad] = useState(true)
+
+  // Ref to track if semesters are currently being fetched
+  const isFetchingRef = useRef(false)
 
   // Function to fetch registered courses for a semester
-  const fetchRegisteredCourses = useCallback(
-    async (semesterId: string) => {
-      try {
-        setLoading(true)
-        const res = await registeredCourseService.getRegisteredCourses(semesterId)
-        
-        if (!res || res.length === 0) {
-          console.error("No courses found for this semester.")
-          setRegisteredCourses([])
-          return
-        }
-        
-        // Cast the API response to our component's type
-        setRegisteredCourses(res as RegisteredCourse[])
-      } catch (err) {
-        console.error("Error fetching registered courses:", err)
-        setRegisteredCourses([])
-      } finally {
-        setLoading(false)
-      }
-    },
-    [setLoading, setRegisteredCourses]
-  )
-
-  const fetchSemesters = useCallback(async () => {
+  const fetchRegisteredCourses = useCallback(async (semesterId: string) => {
     try {
-      setSemesterLoading(true)
-      const res = await registeredCourseService.getSemesterList()
-      
+      setLoading(true)
+      const res = await registeredCourseService.getRegisteredCourses(semesterId)
+
       if (!res || res.length === 0) {
-        console.error("No semesters found.")
-        setSemesters([])
+        console.error("No courses found for this semester.")
+        setRegisteredCourses([])
         return
       }
 
-      // Sort semesters by year and name
-      const sortedSemesters = res.sort((a, b) => {
-        if (a.semesterYear !== b.semesterYear) {
-          return b.semesterYear - a.semesterYear;
-        }
-        const semesterOrder: Record<string, number> = { Fall: 4, Summer: 3, Spring: 2, Short: 1 };
-        return (semesterOrder[b.semesterName] ?? 0) - (semesterOrder[a.semesterName] ?? 0);
-      });
+      // Transform API response to match component interface
+      const transformedCourses = res.map((course: any) => ({
+        ...course,
+        courseId: course.customCourseId,
+        credit: course.totalCredit,
+        section: course.sectionName,
+        instructor: course.employeeName,
+        advisedStatus: course.advisedStatus,
+        regClearenc: course.regClearenc,
+      })) as RegisteredCourse[]
 
-      setSemesters(sortedSemesters)
-      
-      // Don't auto-select the first semester, keep it as 'Select semester' by default
-      if (isInitialLoad) {
-        setIsInitialLoad(false)
-      }
+      setRegisteredCourses(transformedCourses)
     } catch (err) {
-      console.error("Error fetching semesters:", err)
-      setSemesters([])
+      console.error("Error fetching registered courses:", err)
+      setRegisteredCourses([])
     } finally {
-      setSemesterLoading(false)
+      setLoading(false)
     }
-  }, [setSemesters, setSemesterLoading, isInitialLoad])
+  }, [])
 
-  const handleSemesterChange = useCallback(
-    async (semester: SemesterInfo) => {
-      setSelectedSemester(semester);
-      setSelectedRoutine(null);
-      setSelectedRoutineCourseTitle("");
-      
-      setLoading(true);
-      
-      try {
-        const res = await registeredCourseService.getRegisteredCourses(semester.semesterId);
-        
-        if (!res || res.length === 0) {
-          console.error("No courses found for this semester.");
-          setRegisteredCourses([]);
-          return;
-        }
-        
-        // Cast the API response to our component's type
-        setRegisteredCourses(res as RegisteredCourse[]);
-      } catch (err) {
-        console.error("Error fetching registered courses:", err);
-        setRegisteredCourses([]);
-      } finally {
-        setLoading(false);
+  // Initial data fetch - Fixed to only run once
+  useEffect(() => {
+    const fetchSemesters = async () => {
+      // Prevent duplicate calls
+      if (isFetchingRef.current) {
+        console.log("Already fetching semesters, skipping...")
+        return
       }
-    },
-    [setSelectedSemester, setSelectedRoutine, setSelectedRoutineCourseTitle, setRegisteredCourses]
-  );
+
+      try {
+        isFetchingRef.current = true
+        setSemesterLoading(true)
+        console.log("Starting to fetch semesters...")
+
+        const res = await registeredCourseService.getSemesterList()
+
+        console.log("Raw API response:", res)
+
+        if (!res || res.length === 0) {
+          console.error("No semesters found in API response.")
+          setSemesters([])
+          return
+        }
+
+        // Sort semesters by year and name
+        const sortedSemesters = res.sort((a, b) => {
+          if (a.semesterYear !== b.semesterYear) {
+            return b.semesterYear - a.semesterYear
+          }
+          const semesterOrder: Record<string, number> = { Fall: 4, Summer: 3, Spring: 2, Short: 1 }
+          return (semesterOrder[b.semesterName] ?? 0) - (semesterOrder[a.semesterName] ?? 0)
+        })
+
+        console.log("Sorted semesters:", sortedSemesters)
+        setSemesters(sortedSemesters)
+        console.log("Semesters set in state successfully")
+      } catch (err) {
+        console.error("Error fetching semesters:", err)
+        setSemesters([])
+      } finally {
+        setSemesterLoading(false)
+        isFetchingRef.current = false
+        console.log("Semester loading completed")
+      }
+    }
+
+    fetchSemesters()
+  }, []) // Empty dependency array
+
+  const handleSemesterChange = useCallback(async (semester: SemesterInfo) => {
+    setSelectedSemester(semester)
+    setSelectedRoutine(null)
+    setSelectedRoutineCourseTitle("")
+
+    setLoading(true)
+
+    try {
+      const res = await registeredCourseService.getRegisteredCourses(semester.semesterId)
+
+      if (!res || res.length === 0) {
+        console.error("No courses found for this semester.")
+        setRegisteredCourses([])
+        return
+      }
+
+      // Transform API response to match component interface
+      const transformedCourses = res.map((course: any) => ({
+        ...course,
+        courseId: course.customCourseId,
+        credit: course.totalCredit,
+        section: course.sectionName,
+        instructor: course.employeeName,
+        advisedStatus: course.advisedStatus,
+        regClearenc: course.regClearenc,
+      })) as RegisteredCourse[]
+
+      setRegisteredCourses(transformedCourses)
+    } catch (err) {
+      console.error("Error fetching registered courses:", err)
+      setRegisteredCourses([])
+    } finally {
+      setLoading(false)
+    }
+  }, [])
 
   const registeredCourseColumns = React.useMemo(
     () => [
-      registeredCourseHelper.accessor("courseId", {
-        header: "Course Code",
-        cell: (info) => <div className="text-left">{info.getValue()}</div>
-      }),
-      registeredCourseHelper.accessor("courseTitle", {
-        header: "Course Title",
-        cell: (info) => <div className="text-left">{info.getValue()}</div>
-      }),
-      registeredCourseHelper.accessor("credit", {
-        header: "Credit",
-      }),
-      registeredCourseHelper.accessor("section", {
-        header: "Section",
-      }),
-      registeredCourseHelper.accessor("instructor", {
-        header: "Teacher",
-        cell: (info) => <div className="text-left">{info.getValue()}</div>
-      }),
-      registeredCourseHelper.accessor("advisedStatus", {
-        header: "Advised",
-      }),
-      registeredCourseHelper.accessor("regClearenc", {
-        header: "Reg. Clearance",
-      }),
       registeredCourseHelper.display({
         id: "actions",
         header: "Actions",
@@ -449,8 +440,32 @@ const RegisteredCourse: React.FC = () => {
           </button>
         ),
       }),
+      registeredCourseHelper.accessor("courseId", {
+        header: "Course Code",
+        cell: (info) => <div className="text-left">{info.getValue()}</div>,
+      }),
+      registeredCourseHelper.accessor("courseTitle", {
+        header: "Course Title",
+        cell: (info) => <div className="text-left">{info.getValue()}</div>,
+      }),
+      registeredCourseHelper.accessor("credit", {
+        header: "Credit",
+      }),
+      registeredCourseHelper.accessor("section", {
+        header: "Section",
+      }),
+      registeredCourseHelper.accessor("instructor", {
+        header: "Teacher",
+        cell: (info) => <div className="text-left">{info.getValue()}</div>,
+      }),
+      registeredCourseHelper.accessor("advisedStatus", {
+        header: "Advised",
+      }),
+      registeredCourseHelper.accessor("regClearenc", {
+        header: "Reg. Clearance",
+      }),
     ],
-    []
+    [],
   )
 
   const table = useReactTable({
@@ -464,58 +479,53 @@ const RegisteredCourse: React.FC = () => {
     },
   })
 
-  const handleRoutineClick = useCallback(
-    async (course: RegisteredCourse) => {
-      try {
-        setSelectedRoutine(null)
-        setSelectedRoutineCourseTitle("")
-        const routine = await registeredCourseService.getCourseRoutine(course.section)
-        // Handle the routine response
-        if (routine) {
-          const formattedRoutine = Array.isArray(routine) ? routine : [routine];
-          setSelectedRoutine(formattedRoutine.map(r => ({
-            courseId: r.courseId || '',
-            courseTitle: r.courseTitle || '',
-            routine: r.routine || ''
-          } as CourseRoutine)));
-        }
-        setSelectedRoutineCourseTitle(course.courseTitle)
-      } catch (err) {
-        setSelectedRoutine(null)
-        setSelectedRoutineCourseTitle("")
+  const handleRoutineClick = useCallback(async (course: RegisteredCourse) => {
+    try {
+      setRoutineLoading(true)
+      setSelectedRoutine(null)
+      setSelectedRoutineCourseTitle(course.courseTitle)
+
+      const routine = await registeredCourseService.getCourseRoutine(course.section)
+
+      if (routine) {
+        const formattedRoutine = Array.isArray(routine) ? routine : [routine]
+        setSelectedRoutine(
+          formattedRoutine.map(
+            (r) =>
+              ({
+                courseId: r.courseId || "",
+                courseTitle: r.courseTitle || "",
+                routine: r.routine || "",
+              }) as CourseRoutine,
+          ),
+        )
+      } else {
+        setSelectedRoutine([])
       }
-    },
-    [setSelectedRoutine, setSelectedRoutineCourseTitle]
-  )
-
-  const handleRoutineSort = useCallback(
-    (column: string | null, direction: "asc" | "desc") => {
-      setRoutineSorting(column, direction)
-    },
-    [setRoutineSorting]
-  )
-
-  // Initial data fetch
-  useEffect(() => {
-    const loadData = async () => {
-      await fetchSemesters()
+    } catch (err) {
+      console.error("Error fetching routine:", err)
+      setSelectedRoutine([])
+    } finally {
+      setRoutineLoading(false)
     }
-    loadData()
-  }, [fetchSemesters])
+  }, [])
+
+  const handleRoutineSort = useCallback((column: string | null, direction: "asc" | "desc") => {
+    setRoutineSortColumn(column)
+    setRoutineSortDirection(direction)
+  }, [])
+
+  // Debug log to check current state
+  console.log("Current semesters state:", semesters)
+  console.log("Semester loading state:", semesterLoading)
 
   return (
     <>
-
-      <PageTitle
-        title="Registered Courses"
-        icon= {
-        <Book/>
-        }
-      />
+      <PageTitle title="Registered Courses" icon={<Book />} />
 
       <div className="px-4 py-4 w-full flex flex-col items-center">
         <div className="flex flex-col sm:flex-row justify-between items-start gap-4 w-full max-w-5xl mb-6">
-          <SemesterSelector 
+          <SemesterSelector
             selectedSemester={selectedSemester}
             semesters={semesters}
             onChange={handleSemesterChange}
@@ -524,7 +534,7 @@ const RegisteredCourse: React.FC = () => {
           <div className="w-full sm:w-3/4 flex-1 min-w-0">
             <RoutineCard
               title={`Routine : ${selectedRoutineCourseTitle || "No routine selected"}`}
-              data={selectedRoutine}
+              data={routineLoading ? null : selectedRoutine}
               columns={routineColumns}
               sortColumn={routineSortColumn}
               sortDirection={routineSortDirection}
@@ -545,7 +555,7 @@ const RegisteredCourse: React.FC = () => {
                   {table.getHeaderGroups().map((headerGroup) => (
                     <TableRow key={headerGroup.id}>
                       {headerGroup.headers.map((header) => (
-                        <TableHead 
+                        <TableHead
                           key={header.id}
                           className="cursor-pointer whitespace-nowrap sticky top-0 z-10 text-center"
                           onClick={() => header.column.toggleSorting()}
@@ -560,7 +570,8 @@ const RegisteredCourse: React.FC = () => {
                   ))}
                 </TableHeader>
                 <TableBody>
-                  {loading || !table.getRowModel().rows?.length ? (
+                  {loading ? (
+                    // Show skeleton loading
                     Array.from({ length: 5 }).map((_, index) => (
                       <TableRow key={index}>
                         {Array.from({ length: registeredCourseColumns.length }).map((_, colIndex) => (
@@ -570,25 +581,39 @@ const RegisteredCourse: React.FC = () => {
                         ))}
                       </TableRow>
                     ))
+                  ) : !registeredCourses || registeredCourses.length === 0 ? (
+                    // Show empty state
+                    <TableRow>
+                      <TableCell colSpan={registeredCourseColumns.length} className="text-center py-8">
+                        {selectedSemester
+                          ? "No courses found for this semester"
+                          : "Please select a semester to view courses"}
+                      </TableCell>
+                    </TableRow>
                   ) : (
-                    table.getRowModel().rows.map((row) => (
-                      <TableRow 
-                        key={row.id}
-                        className={row.index % 2 === 0 ? "bg-teal-50 hover:bg-teal-100" : "bg-white hover:bg-teal-100"}
-                      >
-                        {row.getVisibleCells().map((cell) => {
-                          const isLeftAligned = ['courseId', 'courseTitle', 'instructor'].includes(cell.column.id);
-                          return (
-                            <TableCell 
-                              key={cell.id} 
-                              className={`whitespace-nowrap ${isLeftAligned ? 'text-left' : 'text-center'}`}
-                            >
-                              {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                            </TableCell>
-                          );
-                        })}
-                      </TableRow>
-                    ))
+                    // Show actual data
+                    table
+                      .getRowModel()
+                      .rows.map((row) => (
+                        <TableRow
+                          key={row.id}
+                          className={
+                            row.index % 2 === 0 ? "bg-teal-50 hover:bg-teal-100" : "bg-white hover:bg-teal-100"
+                          }
+                        >
+                          {row.getVisibleCells().map((cell) => {
+                            const isLeftAligned = ["courseId", "courseTitle", "instructor"].includes(cell.column.id)
+                            return (
+                              <TableCell
+                                key={cell.id}
+                                className={`whitespace-nowrap ${isLeftAligned ? "text-left" : "text-center"}`}
+                              >
+                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                              </TableCell>
+                            )
+                          })}
+                        </TableRow>
+                      ))
                   )}
                 </TableBody>
               </Table>
