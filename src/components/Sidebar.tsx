@@ -180,26 +180,28 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
       </aside>
 
       <Dialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
-        <DialogContent className="sm:max-w-[300px]">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <LogOut className="h-5 w-5 text-red-600" />
-              Confirm Logout
+        <DialogContent className="w-[calc(100%-2rem)] sm:max-w-[300px] mx-auto rounded-lg border-0 shadow-xl p-4">
+          <DialogHeader className="space-y-2">
+            <DialogTitle className="flex items-center gap-2 text-sm sm:text-base">
+              <LogOut className="h-4 w-4 sm:h-5 sm:w-5 text-red-600 flex-shrink-0" />
+              <span>Confirm Logout</span>
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="text-xs sm:text-sm text-left">
               Are you sure you want to log out?
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="flex gap-2 justify-end">
+          <DialogFooter className="flex flex-col sm:flex-row gap-2 w-full mt-2 sm:mt-0">
             <Button
               variant="outline"
               onClick={() => setShowLogoutDialog(false)}
+              className="w-full sm:w-auto h-9 px-4 text-sm"
             >
               Cancel
             </Button>
             <Button
               variant="destructive"
               onClick={confirmLogout}
+              className="w-full sm:w-auto h-9 px-4 text-sm"
             >
               Logout
             </Button>

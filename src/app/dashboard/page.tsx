@@ -88,8 +88,8 @@ export default function DashboardPage() {
         icon={pageIcon}
       />
 
-      <div className="p-6 min-h-screen">
-        <div className="container mx-auto">
+      {/* Main Content */}
+      <div className="mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <StatCards />
 
           {/* Payment Banner and Chart Row */}
@@ -136,7 +136,6 @@ export default function DashboardPage() {
             </div>
           </div>
         </div>
-      </div>
     </>
   );
 }

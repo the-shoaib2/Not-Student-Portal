@@ -110,22 +110,27 @@ export default function UserCard() {
               <span>Log out</span>
             </DropdownMenuItem>
           </AlertDialogTrigger>
-          <AlertDialogContent className="sm:max-w-[300px]">
-            <AlertDialogHeader>
-              <AlertDialogTitle className="flex items-center gap-2">
-                <LogOut className="h-5 w-5 text-red-600" />
-                Confirm Logout
+          <AlertDialogContent className="w-[calc(100%-2rem)] sm:max-w-[300px] mx-auto rounded-lg border-0 shadow-xl p-4">
+            <AlertDialogHeader className="space-y-2">
+              <AlertDialogTitle className="flex items-center gap-2 text-sm sm:text-base">
+                <LogOut className="h-4 w-4 sm:h-5 sm:w-5 text-red-600 flex-shrink-0" />
+                <span>Confirm Logout</span>
               </AlertDialogTitle>
-              <AlertDialogDescription>
+              <AlertDialogDescription className="text-xs sm:text-sm text-left">
                 Are you sure you want to log out?
               </AlertDialogDescription>
             </AlertDialogHeader>
-            <AlertDialogFooter className="flex gap-2 justify-end">
-              <AlertDialogCancel disabled={isLoggingOut}>Cancel</AlertDialogCancel>
+            <AlertDialogFooter className="flex flex-col sm:flex-row gap-2 w-full mt-2 sm:mt-0">
+              <AlertDialogCancel 
+                disabled={isLoggingOut}
+                className="w-full sm:w-auto h-9 px-4 text-sm"
+              >
+                Cancel
+              </AlertDialogCancel>
               <AlertDialogAction
                 onClick={handleLogout}
                 disabled={isLoggingOut}
-                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                className="w-full sm:w-auto h-9 px-4 text-sm bg-destructive text-destructive-foreground hover:bg-destructive/90"
               >
                 {isLoggingOut ? (
                   <>
