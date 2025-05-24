@@ -90,4 +90,4 @@ const ForgotPasswordDialog: React.FC<ForgotPasswordDialogProps> = ({
   );
 };
 
-export default ForgotPasswordDialog; 
+export default ForgotPasswordDialog;

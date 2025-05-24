@@ -236,4 +236,4 @@ export function VerifyCodeForm({ userId, method, type, onSuccess, onResend, mask
       </Form>
     </div>
   );
-} 
+}

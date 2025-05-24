@@ -286,4 +286,4 @@ export async function DELETE(req: NextRequest) {
   }
 }
 
-type RequestBody = Record<string, unknown>; 
+type RequestBody = Record<string, unknown>;

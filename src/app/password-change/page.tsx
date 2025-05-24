@@ -242,4 +242,4 @@ const PasswordChange: React.FC = () => {
   );
 };
 
-export default PasswordChange; 
+export default PasswordChange;
