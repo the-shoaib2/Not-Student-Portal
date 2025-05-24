@@ -3,6 +3,7 @@
 import React, { useState } from "react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { ChevronDown } from "lucide-react"
+import { Skeleton } from "@/components/ui/skeleton"
 
 // Types
 export interface SemesterInfo {
@@ -49,10 +50,12 @@ const SemesterSelector = React.memo(({ selectedSemester, semesters, onChange, lo
   return (
     <div className="w-full sm:w-auto flex-shrink-0 mb-2 sm:mb-0">
       {loading ? (
-        <div className="w-full max-w-xs min-w-[200px] px-4 py-2 rounded border border-teal-300 text-teal-700 bg-white flex items-center justify-center">
-          <div className="h-5 w-5 border-2 border-teal-500 border-t-transparent rounded-full animate-spin mr-2"></div>
-          <span>Loading semesters...</span>
-        </div>
+        <Skeleton className="w-full max-w-xs min-w-[200px] px-4 py-4 rounded flex items-center justify-between animate-pulse">
+          <div className="flex items-center flex-1">
+            <div className="h-4 w-24 rounded"></div>
+          </div>
+          <div className="h-4 w-4 rounded"></div>
+        </Skeleton>
       ) : semesters.length > 0 ? (
         <DropdownMenu>
           <DropdownMenuTrigger
