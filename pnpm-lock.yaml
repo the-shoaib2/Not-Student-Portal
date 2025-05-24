@@ -115,7 +115,7 @@ importers:
         version: 8.21.3(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       autoprefixer:
         specifier: ^10.4.20
-        version: 10.4.20(postcss@8.0.0)
+        version: 10.4.20(postcss@8.4.31)
       axios:
         specifier: latest
         version: 1.9.0
@@ -230,7 +230,7 @@ importers:
         version: 19.0.0
       postcss:
         specifier: ^8
-        version: 8.0.0
+        version: 8.4.31
       tailwindcss:
         specifier: ^3.4.17
         version: 3.4.17
@@ -1523,9 +1523,6 @@ packages:
     resolution: {integrity: sha512-1rXeuUUiGGrykh+CeBdu5Ie7OJwinCgQY0bc7GCRxy5xVHy+moaqkpL/jqQq0MtQOeYcrqEz4abc5f0KtU7W4A==}
     engines: {node: '>=12.5.0'}
 
-  colorette@1.4.0:
-    resolution: {integrity: sha512-Y2oEozpomLn7Q3HFP7dpww7AtMJplbM9lGZP6RDfHqmbeRjiwRg4n6VM6j4KLmRke85uWEI7JqF17f3pqdRA0g==}
-
   combined-stream@1.0.8:
     resolution: {integrity: sha512-FQN4MRfuJeHf7cBbBMJFXhKSDq+2kAArBlmRBvcvFE5BB1HZKXtSFASDhdlz9zOYwxh8lDdnvmMOe/+5cdoEdg==}
     engines: {node: '>= 0.8'}
@@ -1852,15 +1849,8 @@ packages:
     resolution: {integrity: sha512-41Cifkg6e8TylSpdtTpeLVMqvSBEVzTttHvERD741+pnZ8ANv0004MRL43QKPDlK9cGvNp6NZWZUBlbGXYxxng==}
     engines: {node: '>=0.12.0'}
 
-  isarray@1.0.0:
-    resolution: {integrity: sha512-VLghIWNM6ELQzo7zwmcg0NmTVyWKYjvIeM83yjp0wRDTmUnrM678fQbcKBo6n2CJEF0szoG//ytg+TKla89ALQ==}
-
   isexe@2.0.0:
     resolution: {integrity: sha512-RHxMLp9lnKHGHRng9QFhRCMbYAcVpn69smSGcq3f36xjgVVWThj4qqLbTLlq7Ssj8B+fIQ1EuCEGI2lKsyQeIw==}
-
-  isobject@2.1.0:
-    resolution: {integrity: sha512-+OUdGJlgjOBZDfxnDjYYG6zp487z0JGNQq3cYQYg5f5hKR+syHMsaztzGeml/4kGG55CSpKSpWTY+jYGgsHLgA==}
-    engines: {node: '>=0.10.0'}
 
   jackspeak@3.4.3:
     resolution: {integrity: sha512-OGlZQpz2yfahA/Rd1Y8Cd9SIEsqvXkLVoSw/cgwhnhFMDbsQFeZYoJJ7bIZBS9BcamUW96asq/npPWugM+RQBw==}
@@ -1896,9 +1886,6 @@ packages:
   lilconfig@3.1.3:
     resolution: {integrity: sha512-/vlFKAoH5Cgt3Ie+JLhRbwOsCQePABiU3tJ1egGvyQ+33R/vcwM2Zl2QR/LzjsBeItPt3oSVXapn+m4nQDvpzw==}
     engines: {node: '>=14'}
-
-  line-column@1.0.2:
-    resolution: {integrity: sha512-Ktrjk5noGYlHsVnYWh62FLVs4hTb8A3e+vucNZMgPeAOITdshMSgv4cCZQeRDjm7+goqmo6+liZwTXo+U3sVww==}
 
   lines-and-columns@1.2.4:
     resolution: {integrity: sha512-7ylylesZQ/PV29jhEDl3Ufjo6ZX7gCqJr5F7PKrqc93v7fzSymt1BpwEU8nAUXs8qzzvqhbjhK5QZg6Mt/HkBg==}
@@ -2167,10 +2154,6 @@ packages:
   postcss-value-parser@4.2.0:
     resolution: {integrity: sha512-1NNCs6uurfkVbeXG4S8JFT9t19m45ICnif8zWLd5oPSZ50QnwMfK+H3jv408d4jw/7Bttv5axS5IiHoLaVNHeQ==}
 
-  postcss@8.0.0:
-    resolution: {integrity: sha512-BriaW5AeZHfyuuKhK3Z6yRDKI6NR2TdRWyZcj3+Pk2nczQsMBqavggAzTledsbyexPthW3nFA6XfgCWjZqmVPA==}
-    engines: {node: ^10 || ^12 || >=14}
-
   postcss@8.4.31:
     resolution: {integrity: sha512-PS08Iboia9mts/2ygV3eLpY5ghnUcfLV/EXTOW1E2qYxJKGGBUtNjN76FYHnMs36RmARn41bC0AZmn+rR0OVpQ==}
     engines: {node: ^10 || ^12 || >=14}
@@ -2411,10 +2394,6 @@ packages:
 
   source-map-js@1.2.1:
     resolution: {integrity: sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==}
-    engines: {node: '>=0.10.0'}
-
-  source-map@0.6.1:
-    resolution: {integrity: sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g==}
     engines: {node: '>=0.10.0'}
 
   sparse-bitfield@3.0.3:
@@ -3771,14 +3750,14 @@ snapshots:
 
   asynckit@0.4.0: {}
 
-  autoprefixer@10.4.20(postcss@8.0.0):
+  autoprefixer@10.4.20(postcss@8.4.31):
     dependencies:
       browserslist: 4.24.5
       caniuse-lite: 1.0.30001718
       fraction.js: 4.3.7
       normalize-range: 0.1.2
       picocolors: 1.1.1
-      postcss: 8.0.0
+      postcss: 8.4.31
       postcss-value-parser: 4.2.0
 
   axios@1.9.0:
@@ -3888,8 +3867,6 @@ snapshots:
       color-convert: 2.0.1
       color-string: 1.9.1
     optional: true
-
-  colorette@1.4.0: {}
 
   combined-stream@1.0.8:
     dependencies:
@@ -4171,13 +4148,7 @@ snapshots:
 
   is-number@7.0.0: {}
 
-  isarray@1.0.0: {}
-
   isexe@2.0.0: {}
-
-  isobject@2.1.0:
-    dependencies:
-      isarray: 1.0.0
 
   jackspeak@3.4.3:
     dependencies:
@@ -4204,11 +4175,6 @@ snapshots:
   kareem@2.6.3: {}
 
   lilconfig@3.1.3: {}
-
-  line-column@1.0.2:
-    dependencies:
-      isarray: 1.0.0
-      isobject: 2.1.0
 
   lines-and-columns@1.2.4: {}
 
@@ -4438,13 +4404,6 @@ snapshots:
       util-deprecate: 1.0.2
 
   postcss-value-parser@4.2.0: {}
-
-  postcss@8.0.0:
-    dependencies:
-      colorette: 1.4.0
-      line-column: 1.0.2
-      nanoid: 3.3.11
-      source-map: 0.6.1
 
   postcss@8.4.31:
     dependencies:
@@ -4705,8 +4664,6 @@ snapshots:
       react-dom: 19.0.0(react@19.0.0)
 
   source-map-js@1.2.1: {}
-
-  source-map@0.6.1: {}
 
   sparse-bitfield@3.0.3:
     dependencies:
