@@ -13,9 +13,9 @@ import {
   createColumnHelper,
 } from "@tanstack/react-table"
 import type { RegisteredCourse as ApiRegisteredCourse } from "@/services/proxy-api"
-import SemesterSelector, { type SemesterInfo } from "@/components/registered-course/SemesterSelector"
-import Routine, { type CourseRoutine } from "@/components/registered-course/RoutineCard"
-import RegisteredCoursesCard from "@/components/registered-course/RegisteredCoursesCard"
+import SemesterSelector, { type SemesterInfo } from "@/components/registered-course/semester-selector"
+import Routine, { type CourseRoutine } from "@/components/registered-course/routine-card"
+import RegisteredCoursesCard from "@/components/registered-course/registered-courses-card"
 
 // Types
 export interface RegisteredCourse extends ApiRegisteredCourse {

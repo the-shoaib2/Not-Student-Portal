@@ -13,7 +13,8 @@ import {
   useReactTable,
   createColumnHelper,
 } from "@tanstack/react-table"
-import type { SemesterInfo } from "@/components/registered-course/SemesterSelector"
+import { Skeleton } from "@/components/Skeleton"
+import type { SemesterInfo } from "@/components/registered-course/semester-selector"
 
 // Types
 export interface RegisteredCourse {
@@ -99,15 +100,19 @@ const RegisteredCoursesCard: React.FC<RegisteredCoursesCardProps> = ({
 
   return (
     <Card className="max-w-5xl w-full mx-auto">
-      <CardHeader className="pb-0 px-4 pt-4">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-sm sm:text-base font-medium text-teal-700 border-b pb-2 sm:pb-3 flex-1">
-            Registered Courses
-          </CardTitle>
-          <Badge variant="outline" className="bg-teal-50 text-teal-700 border-teal-300 rounded-full ml-4">
-            {loading ? "Loading..." : `${registeredCourses?.length || 0} Courses`}
-          </Badge>
-        </div>
+      <CardHeader className="bg-stone-600 text-white p-4 rounded-t-md">
+        <CardTitle className="flex items-center justify-between">
+          <span>Registered Course List</span>
+          <div className="flex items-center gap-2">
+            {loading ? (
+              <Skeleton className="w-22 h-5 rounded-full bg-white/10" />
+            ) : (
+              <Badge variant="outline" className="bg-white/10 text-white border-white/20 rounded-full ml-auto">
+                {`${registeredCourses?.length || 0} Courses`}
+              </Badge>
+            )}
+          </div>
+        </CardTitle>
       </CardHeader>
       <CardContent className="px-2 sm:px-2 pb-4 pt-2">
         <div className="w-full overflow-x-auto rounded-md">
