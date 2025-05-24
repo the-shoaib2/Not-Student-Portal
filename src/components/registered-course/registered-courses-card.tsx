@@ -5,6 +5,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table"
 import { ArrowUpDown } from "lucide-react"
+import { Eye, EyeOff } from "lucide-react"
 import {
   type SortingState,
   flexRender,
@@ -15,6 +16,7 @@ import {
 } from "@tanstack/react-table"
 import { Skeleton } from "@/components/Skeleton"
 import type { SemesterInfo } from "@/components/registered-course/semester-selector"
+import { Button } from "@/components/ui/button"
 
 // Types
 export interface RegisteredCourse {
@@ -44,6 +46,16 @@ const RegisteredCoursesCard: React.FC<RegisteredCoursesCardProps> = ({
   onRoutineClick,
 }) => {
   const [courseSorting, setCourseSorting] = React.useState<SortingState>([])
+  const [selectedCourseId, setSelectedCourseId] = React.useState<string | null>(null)
+
+  const handleRoutineClick = (course: RegisteredCourse) => {
+    if (selectedCourseId === course.courseId) {
+      setSelectedCourseId(null)
+    } else {
+      setSelectedCourseId(course.courseId)
+      onRoutineClick(course)
+    }
+  }
 
   const registeredCourseColumns = React.useMemo(
     () => [
@@ -51,17 +63,34 @@ const RegisteredCoursesCard: React.FC<RegisteredCoursesCardProps> = ({
         id: "actions",
         header: "Actions",
         cell: ({ row }) => (
-          <button
-            onClick={() => onRoutineClick(row.original)}
-            className="px-3 py-1 text-xs bg-teal-500 text-white rounded hover:bg-teal-600 transition-colors"
-          >
-            Routine
-          </button>
+          <div className="flex justify-center">
+            <Button
+              className={`
+                mx-auto rounded-full transition-all duration-300 transform active:scale-95 shadow-sm
+                ${
+                  selectedCourseId === row.original.courseId
+                    ? "bg-amber-600 hover:bg-amber-700 text-white"
+                    : "bg-green-600 hover:bg-green-700 text-white"
+                } 
+                text-xs flex items-center gap-1 px-2
+              `}
+              onClick={() => handleRoutineClick(row.original)}
+            >
+              <span className="flex items-center justify-center w-5 h-5 mr-0">
+                {selectedCourseId === row.original.courseId ? (
+                  <EyeOff className="h-3 w-3" />
+                ) : (
+                  <Eye className="h-3 w-3" />
+                )}
+              </span>
+              {selectedCourseId === row.original.courseId ? "HIDE ROUTINE" : "VIEW ROUTINE"}
+            </Button>
+          </div>
         ),
       }),
       registeredCourseHelper.accessor("courseId", {
         header: "Course Code",
-        cell: (info) => <div className="text-left">{info.getValue()}</div>,
+        cell: (info) => <div className="text-center">{info.getValue()}</div>,
       }),
       registeredCourseHelper.accessor("courseTitle", {
         header: "Course Title",
@@ -69,9 +98,11 @@ const RegisteredCoursesCard: React.FC<RegisteredCoursesCardProps> = ({
       }),
       registeredCourseHelper.accessor("credit", {
         header: "Credit",
+        cell: (info) => <div className="text-center">{info.getValue()}</div>,
       }),
       registeredCourseHelper.accessor("section", {
         header: "Section",
+        cell: (info) => <div className="text-center">{info.getValue()}</div>,
       }),
       registeredCourseHelper.accessor("instructor", {
         header: "Teacher",
@@ -79,12 +110,14 @@ const RegisteredCoursesCard: React.FC<RegisteredCoursesCardProps> = ({
       }),
       registeredCourseHelper.accessor("advisedStatus", {
         header: "Advised",
+        cell: (info) => <div className="text-center">{info.getValue()}</div>,
       }),
       registeredCourseHelper.accessor("regClearenc", {
         header: "Reg. Clearance",
+        cell: (info) => <div className="text-center">{info.getValue()}</div>,
       }),
     ],
-    [onRoutineClick],
+    [onRoutineClick, selectedCourseId],
   )
 
   const table = useReactTable({
@@ -148,7 +181,7 @@ const RegisteredCoursesCard: React.FC<RegisteredCoursesCardProps> = ({
                   </TableRow>
                 ))
               ) : !registeredCourses || registeredCourses.length === 0 ? (
-                // Show empty state
+                // Show empty state with single row
                 <TableRow>
                   <TableCell colSpan={registeredCourseColumns.length} className="text-center py-8">
                     {selectedSemester
@@ -165,17 +198,11 @@ const RegisteredCoursesCard: React.FC<RegisteredCoursesCardProps> = ({
                       key={row.id}
                       className={row.index % 2 === 0 ? "bg-teal-50 hover:bg-teal-100" : "bg-white hover:bg-teal-100"}
                     >
-                      {row.getVisibleCells().map((cell) => {
-                        const isLeftAligned = ["courseId", "courseTitle", "instructor"].includes(cell.column.id)
-                        return (
-                          <TableCell
-                            key={cell.id}
-                            className={`whitespace-nowrap ${isLeftAligned ? "text-left" : "text-center"}`}
-                          >
-                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                          </TableCell>
-                        )
-                      })}
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id} className="whitespace-nowrap text-center">
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </TableCell>
+                      ))}
                     </TableRow>
                   ))
               )}

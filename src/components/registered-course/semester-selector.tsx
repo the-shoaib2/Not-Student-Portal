@@ -83,7 +83,8 @@ const SemesterSelector = React.memo(({ selectedSemester, semesters, onChange, lo
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent 
-              className="w-[200px] max-h-[300px] overflow-y-auto"
+              align="center" 
+              className="w-[var(--radix-dropdown-menu-trigger-width)] max-h-[300px] overflow-y-auto"
               style={{
                 scrollbarWidth: 'thin',
                 scrollbarColor: 'rgba(13, 148, 136, 0.5) transparent'

@@ -105,7 +105,7 @@ const Routine = React.memo(({ title, data, columns, sortColumn, sortDirection, o
             <TableBody>
               {data === null ? (
                 // Loading state - show skeleton
-                Array.from({ length: 3 }).map((_, index) => (
+                Array.from({ length: 5 }).map((_, index) => (
                   <TableRow key={index}>
                     {Array.from({ length: columns.length }).map((_, colIndex) => (
                       <TableCell key={colIndex} className="text-center">
@@ -137,15 +137,14 @@ const Routine = React.memo(({ title, data, columns, sortColumn, sortDirection, o
                     </TableRow>
                   ))
               ) : (
-                // Empty state - show "No course" row
-                <TableRow>
-                  <TableCell className="text-center">-</TableCell>
-                  <TableCell className="text-center">-</TableCell>
-                  <TableCell className="text-center">-</TableCell>
-                  <TableCell className="text-center">-</TableCell>
-                  <TableCell className="text-center">-</TableCell>
-                  
-                </TableRow>
+                // Empty state - show 5 rows with "-" in each cell
+                Array.from({ length: 5 }).map((_, index) => (
+                  <TableRow key={index}>
+                    {Array.from({ length: 5 }).map((_, cellIndex) => (
+                      <TableCell key={cellIndex} className="text-center">-</TableCell>
+                    ))}
+                  </TableRow>
+                ))
               )}
             </TableBody>
           </Table>

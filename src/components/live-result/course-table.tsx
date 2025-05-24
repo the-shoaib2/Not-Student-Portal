@@ -119,7 +119,7 @@ export function CourseTable({ courses, isLoading, selectedCourseId, onSelectCour
                         <TableCell>
                           <Button
                             variant="default"
-                            className="bg-gray-100 hover:bg-gray-200 text-gray-400 text-xs flex items-center gap-1.5 cursor-not-allowed opacity-50 mx-auto"
+                            className="bg-gray-100 hover:bg-gray-200 rounded-full text-gray-400 text-xs flex items-center gap-1.5 cursor-not-allowed opacity-50 mx-auto"
                             disabled
                             size="sm"
                           >
@@ -130,7 +130,7 @@ export function CourseTable({ courses, isLoading, selectedCourseId, onSelectCour
                           </Button>
                         </TableCell>
                         <TableCell className="text-center">
-                          <Badge variant="outline" className="bg-gray-50 ml-auto">
+                          <Badge variant="outline" className="bg-gray-50 ml-auto rounded-full">
                             ---
                           </Badge>
                         </TableCell>
