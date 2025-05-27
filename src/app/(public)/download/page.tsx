@@ -5,6 +5,7 @@ import { Download, Smartphone, Monitor, Apple, Check, Loader2 } from 'lucide-rea
 import PageTitle from '@/components/PageTitle';
 import Image from 'next/image';
 import Link from 'next/link';
+import { ComingSoonCard } from '@/components/coming-soon/coming-soon-card';
 
 const DownloadPage: React.FC = () => {
   const [deviceType, setDeviceType] = useState<string | null>(null);
@@ -19,7 +20,7 @@ const DownloadPage: React.FC = () => {
     // Detect device type
     const detectDevice = () => {
       const userAgent = navigator.userAgent.toLowerCase();
-      
+
       if (/android/i.test(userAgent)) {
         setDeviceType('android');
       } else if (/iphone|ipad|ipod/i.test(userAgent)) {
@@ -29,7 +30,7 @@ const DownloadPage: React.FC = () => {
       } else {
         setDeviceType('unknown');
       }
-      
+
       setIsLoading(false);
     };
 
@@ -38,58 +39,58 @@ const DownloadPage: React.FC = () => {
   }, []);
 
   // Define app versions with platform identifiers matching device detection
-  const appVersions = [
-    {
-      platform: 'Android',
-      icon: <Smartphone size={24} />,
-      iconBg: 'bg-green-100',
-      iconColor: 'text-green-600',
-      recommendedBg: 'bg-green-500',
-      description: 'Download our Android app for a seamless mobile experience on your Android device.',
-      downloadUrl: '/api/download/android',
-      version: '1.0.0',
-      size: '15 MB',
-      instructions: [
-        'Download the APK file',
-        'Open the file from your downloads',
-        'If prompted, allow installation from unknown sources',
-        'Follow the on-screen instructions to complete installation'
-      ]
-    },
-    {
-      platform: 'iOS',
-      icon: <Apple size={24} />,
-      iconBg: 'bg-blue-100',
-      iconColor: 'text-blue-600',
-      recommendedBg: 'bg-blue-500',
-      description: 'Get our iOS app for your iPhone or iPad for the best experience on Apple devices.',
-      downloadUrl: '/api/download/ios',
-      version: '1.0.0',
-      size: '18 MB',
-      instructions: [
-        'Download the IPA file',
-        'Use AltStore or similar to install on your device',
-        'Trust the developer in Settings > General > Device Management'
-      ]
-    },
-    {
-      platform: 'Windows',
-      icon: <Monitor size={24} />,
-      iconBg: 'bg-purple-100',
-      iconColor: 'text-purple-600',
-      recommendedBg: 'bg-purple-500',
-      description: 'Install our Windows app for a desktop experience with offline capabilities.',
-      downloadUrl: '/api/download/windows',
-      version: '1.0.0',
-      size: '25 MB',
-      instructions: [
-        'Download the installer (.exe file)',
-        'Run the installer as administrator',
-        'Follow the installation wizard',
-        'Launch the app from your Start menu'
-      ]
-    }
-  ];
+  // const appVersions = [
+  //   {
+  //     platform: 'Android',
+  //     icon: <Smartphone size={24} />,
+  //     iconBg: 'bg-green-100',
+  //     iconColor: 'text-green-600',
+  //     recommendedBg: 'bg-green-500',
+  //     description: 'Download our Android app for a seamless mobile experience on your Android device.',
+  //     downloadUrl: '/api/download/android',
+  //     version: '1.0.0',
+  //     size: '15 MB',
+  //     instructions: [
+  //       'Download the APK file',
+  //       'Open the file from your downloads',
+  //       'If prompted, allow installation from unknown sources',
+  //       'Follow the on-screen instructions to complete installation'
+  //     ]
+  //   },
+  //   {
+  //     platform: 'iOS',
+  //     icon: <Apple size={24} />,
+  //     iconBg: 'bg-blue-100',
+  //     iconColor: 'text-blue-600',
+  //     recommendedBg: 'bg-blue-500',
+  //     description: 'Get our iOS app for your iPhone or iPad for the best experience on Apple devices.',
+  //     downloadUrl: '/api/download/ios',
+  //     version: '1.0.0',
+  //     size: '18 MB',
+  //     instructions: [
+  //       'Download the IPA file',
+  //       'Use AltStore or similar to install on your device',
+  //       'Trust the developer in Settings > General > Device Management'
+  //     ]
+  //   },
+  //   {
+  //     platform: 'Windows',
+  //     icon: <Monitor size={24} />,
+  //     iconBg: 'bg-purple-100',
+  //     iconColor: 'text-purple-600',
+  //     recommendedBg: 'bg-purple-500',
+  //     description: 'Install our Windows app for a desktop experience with offline capabilities.',
+  //     downloadUrl: '/api/download/windows',
+  //     version: '1.0.0',
+  //     size: '25 MB',
+  //     instructions: [
+  //       'Download the installer (.exe file)',
+  //       'Run the installer as administrator',
+  //       'Follow the installation wizard',
+  //       'Launch the app from your Start menu'
+  //     ]
+  //   }
+  // ];
 
   // Function to handle the download process
   const handleDownload = async (platform: string, downloadUrl: string) => {
@@ -98,35 +99,35 @@ const DownloadPage: React.FC = () => {
         platform,
         status: 'downloading'
       });
-      
+
       // For Android APK, we need to handle the download manually
       if (platform.toLowerCase() === 'android') {
         const response = await fetch(downloadUrl);
-        
+
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
-        
+
         // Get the blob from the response
         const blob = await response.blob();
-        
+
         // Create a URL for the blob
         const url = window.URL.createObjectURL(blob);
-        
+
         // Create a temporary anchor element
         const a = document.createElement('a');
         a.style.display = 'none';
         a.href = url;
         a.download = 'not-student-portal.apk';
-        
+
         // Add to the DOM and trigger the download
         document.body.appendChild(a);
         a.click();
-        
+
         // Clean up
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
-        
+
         setDownloadStatus({
           platform,
           status: 'success'
@@ -134,7 +135,7 @@ const DownloadPage: React.FC = () => {
       } else {
         // For other platforms, we can use the direct link
         window.location.href = downloadUrl;
-        
+
         // Set a timeout to update the status after a short delay
         setTimeout(() => {
           setDownloadStatus({
@@ -156,40 +157,62 @@ const DownloadPage: React.FC = () => {
   return (
     <div className="flex-grow ">
 
-<PageTitle title="Download Our Apps" icon={<Download />} />
-      <div className="max-w-5xl mx-auto">
+      <PageTitle
+        title="Download Our Apps"
+        icon={<Download />}
+      />
+
+      {/* Main Content */}
+      <div className="mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-5xl">
+
         {/* Header Section */}
-        <div className="mb-8 pt-10 text-center">
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            Access the Student Portal anytime, anywhere with our cross-platform applications.
-            Choose the version that works best for your device.
-          </p>
-        </div>
-        {/* App Logo Section */}
-        {/* <div className="flex justify-center mb-8">
-          <div className="relative w-32 h-32 bg-white rounded-xl shadow-md p-4">
-            <Image
-              src="/diuLogo.png"
-              alt="Student Portal Logo"
-              fill
-              sizes="(max-width: 768px) 100vw, 33vw"
-              className="object-contain p-2"
-            />
+        {/* <div className="mb-6">
+          <div className="text-center relative overflow-hidden bg-gradient-to-r from-teal-50 via-white to-emerald-50 rounded-lg p-4 shadow-sm border border-teal-100/50">
+            
+            <h2 className="text-base md:text-lg font-bold text-teal-700 mb-1.5 tracking-tight">
+              Access Anywhere, Anytime
+            </h2>
+            
+            <p className="text-gray-600 text-sm max-w-2xl mx-auto mb-2 leading-relaxed">
+              Get the Not Student Portal on all your devices with our cross-platform applications.
+            </p>
+            
+            <div className="flex justify-center gap-2 mt-2">
+              <div className="flex items-center text-xs text-teal-700 bg-teal-50 px-2 py-1 rounded-full">
+                <Smartphone className="w-3 h-3 mr-1" />
+                <span>Mobile</span>
+              </div>
+              <div className="flex items-center text-xs text-teal-700 bg-teal-50 px-2 py-1 rounded-full">
+                <Monitor className="w-3 h-3 mr-1" />
+                <span>Desktop</span>
+              </div>
+              <div className="flex items-center text-xs text-teal-700 bg-teal-50 px-2 py-1 rounded-full">
+                <Check className="w-3 h-3 mr-1" />
+                <span>Offline</span>
+              </div>
+            </div>
           </div>
         </div> */}
+
+        <ComingSoonCard
+          title="Mobile & Desktop Apps"
+          description="We're working on native applications for Android, iOS, and Windows to provide you with the best experience across all your devices."
+          expectedLaunch="Q3 2025"
+          actionText="Get Notified When Available"
+        />
 
 
 
         {/* Download Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+        {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
           {appVersions.map((app, index) => (
             <div key={index} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 relative">
-              {!isLoading && deviceType && deviceType !== 'unknown' && 
+              {!isLoading && deviceType && deviceType !== 'unknown' &&
                 deviceType === app.platform.toLowerCase() && (
-                <div className={`absolute top-0 right-0 ${app.recommendedBg} text-white text-xs font-bold px-2 py-1 rounded-bl-md z-10`}>
-                  Recommended
-                </div>
-              )}
+                  <div className={`absolute top-0 right-0 ${app.recommendedBg} text-white text-xs font-bold px-2 py-1 rounded-bl-md z-10`}>
+                    Recommended
+                  </div>
+                )}
               <div className="p-6">
                 <div className={`${app.iconBg} ${app.iconColor} w-12 h-12 rounded-full flex items-center justify-center mb-4`}>
                   {app.icon}
@@ -200,7 +223,7 @@ const DownloadPage: React.FC = () => {
                   <span>Version: {app.version}</span>
                   <span>Size: {app.size}</span>
                 </div>
-                <button 
+                <button
                   onClick={() => handleDownload(app.platform, app.downloadUrl)}
                   disabled={downloadStatus?.platform === app.platform && downloadStatus?.status === 'downloading'}
                   className="flex items-center justify-center w-full bg-teal-600 hover:bg-teal-700 text-white py-2 px-4 rounded-md transition-colors duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed"
@@ -217,9 +240,9 @@ const DownloadPage: React.FC = () => {
                     </>
                   )}
                 </button>
-                
+
                 {/* Installation Instructions */}
-                <div className="mt-4 border-t border-gray-200 pt-4">
+                {/* <div className="mt-4 border-t border-gray-200 pt-4">
                   <h4 className="text-sm font-semibold text-gray-700 mb-2">Installation Instructions</h4>
                   <ol className="text-xs text-gray-600 list-decimal list-inside space-y-1">
                     {app.instructions.map((instruction, idx) => (
@@ -233,10 +256,10 @@ const DownloadPage: React.FC = () => {
               </div>
             </div>
           ))}
-        </div>
+        </div> */}
 
         {/* Installation Instructions */}
-        <div className="bg-gray-50 rounded-lg p-6 mb-8">
+        {/* <div className="bg-gray-50 rounded-lg p-6 mb-8">
           <h2 className="text-xl font-semibold mb-4">Installation Instructions</h2>
           <div className="space-y-4">
             <div>
@@ -266,8 +289,7 @@ const DownloadPage: React.FC = () => {
               </ol>
             </div>
           </div>
-        </div>
-
+        </div> */}
 
       </div>
     </div>
