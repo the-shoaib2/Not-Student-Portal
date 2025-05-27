@@ -43,3 +43,40 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Android
+/.idea/
+/android/.gradle
+/android/build/
+/android/app/build/
+/android/captures/
+/android/local.properties
+/android/*.log
+/android/.externalNativeBuild
+/android/.cxx
+/android/*.hprof
+
+# Keep the app icon files in git
+# android/app/src/main/res/mipmap-*/ic_launcher.png
+# android/app/src/main/res/mipmap-*/ic_launcher_round.png
+# android/app/src/main/res/mipmap-*/ic_launcher_foreground.png
+
+# iOS
+/ios/build/
+/ios/Pods/
+/ios/App/Pods/
+/ios/App/build/
+/ios/App/App/public/
+/ios/DerivedData/
+/ios/.DS_Store
+/ios/App/App.xcworkspace/xcuserdata/
+/ios/App/App.xcodeproj/xcuserdata/
+/ios/App/Pods/
+/ios/App/output/
+/ios/App/App/capacitor.config.json
+/ios/App/App/config.xml
+
+# Capacitor
+/capacitor.config.json
+/ios/capacitor-cordova-ios-plugins
+/android/capacitor-cordova-android-plugins

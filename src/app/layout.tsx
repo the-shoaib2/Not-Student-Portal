@@ -6,6 +6,7 @@ import LayoutWrapper from '@/app/LayoutWrapper'
 import { Toaster } from 'react-hot-toast'
 import { LoadingBar } from '@/components/LoadingBar'
 import { LoadingProvider } from '@/hooks/useLoading'
+import NetworkDetector from '@/components/NetworkDetector'
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -28,7 +29,9 @@ export default function RootLayout({
         <LoadingProvider>
           <AuthProvider>
             <LayoutWrapper>
-              {children}
+              <NetworkDetector>
+                {children}
+              </NetworkDetector>
               <LoadingBar />
             </LayoutWrapper>
           </AuthProvider>

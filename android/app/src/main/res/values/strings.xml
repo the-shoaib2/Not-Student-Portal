@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">NotStudentPortal</string>
+    <string name="title_activity_main">NotStudentPortal</string>
+    <string name="package_name">com.notstudent.portal</string>
+    <string name="custom_url_scheme">com.notstudent.portal</string>
+</resources>
