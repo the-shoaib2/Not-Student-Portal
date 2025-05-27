@@ -1,29 +1,19 @@
 "use client"
-import React, { useState, useEffect } from "react"
+import React, { useState } from "react"
 import { Button } from "./ui/button"
-import { ArrowLeft, Loader2, Eye, EyeOff } from "lucide-react"
-import { authService } from "../services/proxy-api"
+import { ArrowLeft, Loader2, CheckCircle } from "lucide-react"
 import toast from "react-hot-toast"
-import { InputOTP } from "./ui/input-otp"
-import { PasswordStrengthMeter } from "./ui/password-strength-meter"
+import { authService } from "../services/proxy-api"
 
 interface ForgotPasswordFormProps {
   onClose: () => void
 }
 
-type Step = 'email' | 'verify' | 'reset'
-
 export function ForgotPasswordForm({ onClose }: ForgotPasswordFormProps) {
-  const [step, setStep] = useState<Step>('email')
   const [email, setEmail] = useState('')
-  const [verificationCode, setVerificationCode] = useState('')
-  const [newPassword, setNewPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
-  const [countdown, setCountdown] = useState(0)
+  const [isSuccess, setIsSuccess] = useState(false)
 
   const handleSendEmail = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -35,284 +25,108 @@ export function ForgotPasswordForm({ onClose }: ForgotPasswordFormProps) {
         throw new Error('Please enter your email address')
       }
 
+      // Basic email validation
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
       if (!emailRegex.test(email)) {
         throw new Error('Please enter a valid email address')
       }
 
-      // Simulate API call with timeout
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      // Show success
-      toast.success('Verification code sent to your email')
-      setStep('verify')
-      setCountdown(60)
+      // DIU email validation
+      const diuEmailRegex = /^[^\s@]+@diu\.edu\.bd$/
+      if (!diuEmailRegex.test(email)) {
+        throw new Error('Please enter a valid DIU email address (example@diu.edu.bd)')
+      }
+
+      try {
+        // Call the actual API endpoint with GET request and query parameter
+        await authService.forgotPassword({ email })
+        
+        // Show success
+        setIsSuccess(true)
+      } catch (apiError: any) {
+        // Handle API-specific errors
+        if (apiError.response?.status === 400) {
+          throw new Error('Email not found. Please check your email address.')
+        } else if (apiError.response?.status === 404) {
+          throw new Error('Service unavailable. Please try again later.')
+        } else if (apiError.response?.data?.message) {
+          throw new Error(apiError.response.data.message)
+        } else {
+          throw new Error('Server error. Please try again later.')
+        }
+      }
     } catch (err: any) {
-      const errorMessage = err?.message || 'Failed to send verification code'
+      const errorMessage = err?.message || 'Failed to send password reset link'
       setError(errorMessage)
       toast.error(errorMessage)
     } finally {
       setIsLoading(false)
     }
   }
-
-  const handleVerifyCode = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
-    setError('')
-
-    try {
-      if (!verificationCode || verificationCode.length !== 6) {
-        throw new Error('Please enter a valid 6-digit code')
-      }
-
-      // Simulate API call with timeout
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      // Show success
-      toast.success('Code verified successfully')
-      setStep('reset')
-    } catch (err: any) {
-      const errorMessage = err?.message || 'Invalid verification code'
-      setError(errorMessage)
-      toast.error(errorMessage)
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const handleResetPassword = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
-    setError('')
-
-    try {
-      if (!newPassword || !confirmPassword) {
-        throw new Error('Please enter both passwords')
-      }
-
-      if (newPassword !== confirmPassword) {
-        throw new Error('Passwords do not match')
-      }
-
-      // Password validation
-      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
-      if (!passwordRegex.test(newPassword)) {
-        throw new Error('Password must be at least 8 characters long and contain uppercase, lowercase, number and special character')
-      }
-
-      // Simulate API call with timeout
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      // Show success
-      toast.success('Password reset successful')
-      onClose()
-    } catch (err: any) {
-      const errorMessage = err?.message || 'Failed to reset password'
-      setError(errorMessage)
-      toast.error(errorMessage)
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const handleResendCode = async () => {
-    if (countdown > 0) return
-    setIsLoading(true)
-    setError('')
-
-    try {
-      // Simulate API call with timeout
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      // Show success
-      toast.success('New verification code sent')
-      setCountdown(60)
-    } catch (err: any) {
-      const errorMessage = err?.message || 'Failed to resend code'
-      setError(errorMessage)
-      toast.error(errorMessage)
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  // Countdown effect
-  useEffect(() => {
-    if (countdown > 0) {
-      const timer = setTimeout(() => setCountdown(countdown - 1), 1000)
-      return () => clearTimeout(timer)
-    }
-  }, [countdown])
 
   return (
     <div className="flex flex-col h-full">
-      <div className="p-4 space-y-4 flex-grow">
-        <div className="mb-4 text-center">
-          <h3 className="text-base font-semibold text-gray-900">
-            {step === 'email' ? 'Forgot Password' :
-             step === 'verify' ? 'Verify Code' :
-             'Reset Password'}
-          </h3>
-        </div>
-
-        {step === 'email' && (
-          <form onSubmit={handleSendEmail} className="space-y-4">
-            <div className="space-y-2">
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email address"
-                className="w-full border-b border-gray-300 focus:outline-none p-2 mb-2 text-xs pr-10 text-center"
-              />
-              {error && <p className="text-xs text-red-500 text-center">{error}</p>}
-            </div>
-            <Button 
-              type="submit" 
-              className="w-full bg-teal-600 hover:bg-teal-700 text-white"
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Sending...
-                </>
-              ) : (
-                'Send Verification Code'
-              )}
-            </Button>
-          </form>
-        )}
-
-        {step === 'verify' && (
-          <form onSubmit={handleVerifyCode} className="space-y-4">
-            <div className="space-y-2">
-              <InputOTP
-                maxLength={6}
-                value={verificationCode}
-                onChange={setVerificationCode}
-                disabled={isLoading}
-                className="justify-center"
-              />
-              {error && <p className="text-xs text-red-500 text-center">{error}</p>}
-              <div className="text-center">
-                <button
-                  type="button"
-                  onClick={handleResendCode}
-                  disabled={isLoading || countdown > 0}
-                  className="text-xs text-teal-600 hover:text-teal-700 disabled:text-gray-400"
+      <div className="p-3 sm:p-4 space-y-3 sm:space-y-4 flex-grow">
+        {!isSuccess ? (
+          <>
+            <form onSubmit={handleSendEmail} className="space-y-3 sm:space-y-4">
+              <div className="space-y-2">
+                <input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your email address"
+                  className="w-full border-b border-gray-300 focus:outline-none p-2 mb-1 sm:mb-2 text-xs sm:text-sm pr-8 sm:pr-10 text-center"
+                  autoFocus
+                />
+                {error && <p className="text-[10px] sm:text-xs text-red-500 text-center">{error}</p>}
+              </div>
+              <div className="flex gap-2 mt-3 sm:mt-4">
+                <Button 
+                  type="button" 
+                  onClick={onClose}
+                  className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs sm:text-sm py-1 sm:py-2 h-auto"
+                  variant="outline"
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  type="submit" 
+                  className="flex-1 bg-teal-600 hover:bg-teal-700 text-white text-xs sm:text-sm py-1 sm:py-2 h-auto"
+                  disabled={isLoading}
                 >
                   {isLoading ? (
                     <>
-                      <Loader2 className="mr-1 h-3 w-3 animate-spin inline" />
-                      Resending...
+                      <Loader2 className="mr-1 h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
+                      Sending...
                     </>
-                  ) : countdown > 0 ? (
-                    `Resend code in ${countdown}s`
                   ) : (
-                    'Resend code'
+                    'Send Email'
                   )}
-                </button>
+                </Button>
               </div>
-            </div>
-            <Button 
-              type="submit" 
-              className="w-full bg-teal-600 hover:bg-teal-700 text-white"
-              disabled={isLoading || verificationCode.length !== 6}
+            </form>
+          </>
+        ) : (
+          <div className="text-center py-4 sm:py-6">
+            <CheckCircle className="h-8 w-8 sm:h-12 sm:w-12 text-green-500 mx-auto mb-2 sm:mb-4" />
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-1 sm:mb-2">Email Sent Successfully</h3>
+            <p className="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-6">
+              We've sent a password reset link to <span className="font-medium">{email}</span>. 
+              Please check your inbox and follow the instructions to reset your password.
+            </p>
+            <p className="text-[10px] sm:text-xs text-gray-500 mb-3 sm:mb-4">
+              If you don't see the email, please check your spam folder or try again.
+            </p>
+            <Button
+              onClick={onClose}
+              className="bg-teal-600 hover:bg-teal-700 text-white text-xs sm:text-sm py-1 sm:py-2 h-auto"
             >
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Verifying...
-                </>
-              ) : (
-                'Verify Code'
-              )}
+              Close
             </Button>
-          </form>
+          </div>
         )}
-
-        {step === 'reset' && (
-          <form onSubmit={handleResetPassword} className="space-y-4">
-            <div className="space-y-2">
-              <div className="relative">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="New password"
-                  className="w-full border-b border-gray-300 focus:outline-none p-2 mb-2 text-xs pr-10 text-center"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-2 top-2 text-gray-500 hover:text-gray-700"
-                >
-                  {showPassword ? (
-                    <EyeOff className="w-4 h-4" />
-                  ) : (
-                    <Eye className="w-4 h-4" />
-                  )}
-                </button>
-              </div>
-              <div className="relative">
-                <input
-                  type={showConfirmPassword ? "text" : "password"}
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="Confirm password"
-                  className="w-full border-b border-gray-300 focus:outline-none p-2 mb-2 text-xs pr-10 text-center"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-2 top-2 text-gray-500 hover:text-gray-700"
-                >
-                  {showConfirmPassword ? (
-                    <EyeOff className="w-4 h-4" />
-                  ) : (
-                    <Eye className="w-4 h-4" />
-                  )}
-                </button>
-              </div>
-              {error && <p className="text-xs text-red-500 text-center">{error}</p>}
-              
-              {newPassword && (
-                <div className="mt-4">
-                  <PasswordStrengthMeter password={newPassword} />
-                </div>
-              )}
-            </div>
-            <Button 
-              type="submit" 
-              className="w-full bg-teal-600 hover:bg-teal-700 text-white"
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Resetting...
-                </>
-              ) : (
-                'Reset Password'
-              )}
-            </Button>
-          </form>
-        )}
-      </div>
-
-      {/* Footer with back button */}
-      <div className="border-t border-gray-100 p-4 text-center">
-        <Button
-          onClick={onClose}
-          className="inline-flex bg-transparent items-center hover:bg-teal-600/10 text-teal-600 hover:text-teal-600 text-sm"
-          variant="ghost"
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Login
-        </Button>
       </div>
     </div>
   )

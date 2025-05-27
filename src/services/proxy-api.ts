@@ -720,17 +720,23 @@ export const authService = {
 
   logout: async () => {
     try {
-      await api.post('/logout');
+      await proxyRequest({
+        method: 'POST',
+        url: '/logout',
+      });
     } finally {
       localStorage.removeItem('user');
       localStorage.removeItem('isAuthenticated');
     }
   },
-
+  //  Forgot Password
   changePassword: async (data: PasswordChangeRequest): Promise<void> => {
     const token = profileService.getAuthToken();
     try {
-      await api.post('/passwordChange', data, {
+      await proxyRequest({
+        method: 'POST',
+        url: '/passwordChange',
+        data,
         headers: {
           Authorization: `Bearer ${token}`,
           accessToken: token,
@@ -747,36 +753,16 @@ export const authService = {
     }
   },
 
+  // Forgot Password
   forgotPassword: async (data: ForgotPasswordRequest): Promise<void> => {
-   const response = await api.post('/resetForgotPassword/forgotPassword', data);
-   return response.data;
-  },
-
-  findUser: async (data: FindUserRequest): Promise<FindUserResponse> => {
-    try {
-      const response = await api.post<FindUserResponse>('/findUser', data);
-      return response.data;
-    } catch (error: any) {
-      let message = 'Failed to find user';
-      if (error.response?.data?.message) {
-        message = error.response.data.message;
-      } else if (error.message) {
-        message = error.message;
-      }
-      throw new Error(message);
-    }
-  },
-
-  sendResetCode: async (data: SendResetCodeRequest): Promise<void> => {
     try {
       const response = await proxyRequest({
         method: 'POST',
-        url: '/resetForgotPassword/sendResetCode',
-        data
+        url: `/resetForgotPassword/forgotPassword?email=${data.email}`,
       });
-      return response;
+      return response.data;
     } catch (error: any) {
-      let message = 'Failed to send reset code';
+      let message = 'Failed to send password reset link';
       if (error.response?.data?.message) {
         message = error.response.data.message;
       } else if (error.message) {
@@ -1478,8 +1464,8 @@ export const liveResultService = {
         'Accept': '*/*'
       }
     });
-    if(process.env.DEV === 'development') {
-      console.log("Fetched Semesters:",response)
+    if (process.env.DEV === 'development') {
+      console.log("Fetched Semesters:", response)
     }
     return response;
   },

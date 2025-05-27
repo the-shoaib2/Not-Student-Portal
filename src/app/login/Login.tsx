@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Dialog, Transition } from '@headlessui/react';
 import * as Tabs from '@radix-ui/react-tabs';
 import { cn } from '@/lib/utils';
 import { Loader, Eye, EyeOff } from 'lucide-react';
@@ -10,6 +9,13 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLoading } from '@/hooks/useLoading';
 import { ForgotPasswordForm } from "@/components/forgot-password-form";
 import Image from 'next/image';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 
 const Login: React.FC = () => {
   const router = useRouter();
@@ -57,8 +63,6 @@ const Login: React.FC = () => {
       setIsLoading(false);
     }
   };
-
-
 
   return (
     <div className="min-h-screen flex items-center justify-center ">
@@ -226,44 +230,17 @@ const Login: React.FC = () => {
       </div>
 
       {/* Forgot Password Dialog */}
-      <Transition show={isForgotPasswordOpen} as={React.Fragment}>
-        <Dialog
-          onClose={() => setIsForgotPasswordOpen(false)}
-          className="relative z-50"
-        >
-          <Transition.Child
-            as={React.Fragment}
-            enter="ease-out duration-500"
-            enterFrom="opacity-0"
-            enterTo="opacity-100"
-            leave="ease-in duration-400"
-            leaveFrom="opacity-100"
-            leaveTo="opacity-0"
-          >
-            <div className="fixed inset-0 bg-black/30 backdrop-blur-sm" aria-hidden="true" />
-          </Transition.Child>
-
-          <Transition.Child
-            as={React.Fragment}
-            enter="ease-out duration-500"
-            enterFrom="opacity-0 scale-95 translate-y-4"
-            enterTo="opacity-100 scale-100 translate-y-0"
-            leave="ease-in duration-400"
-            leaveFrom="opacity-100 scale-100 translate-y-0"
-            leaveTo="opacity-0 scale-95 translate-y-4"
-          >
-            <div className="fixed inset-0 flex items-center justify-center z-50">
-              <Dialog.Panel className="bg-white rounded-lg shadow-lg p-0 w-full max-w-sm mx-auto transform transition-all">
-                <div className="p-4 border-b border-gray-100 text-center">
-                  <h3 className="text-base font-semibold text-gray-900">Forgot Password</h3>
-                  <p className="text-xs text-gray-500 mt-1">Enter your email to receive a password reset link</p>
-                </div>
-                <ForgotPasswordForm onClose={() => setIsForgotPasswordOpen(false)} />
-              </Dialog.Panel>
-            </div>
-          </Transition.Child>
-        </Dialog>
-      </Transition>
+      <Dialog open={isForgotPasswordOpen} onOpenChange={setIsForgotPasswordOpen}>
+        <DialogContent className="p-0 w-full max-w-[90%] sm:max-w-sm mx-auto rounded-xl sm:rounded-lg overflow-hidden">
+          <DialogHeader className="p-3 sm:p-4 border-b border-gray-100 text-center">
+            <DialogTitle className="text-sm sm:text-base font-semibold text-gray-900">Forgot Password</DialogTitle>
+            <DialogDescription className="text-[10px] sm:text-xs text-gray-500 mt-1">
+              Enter your email to receive a password reset link
+            </DialogDescription>
+          </DialogHeader>
+          <ForgotPasswordForm onClose={() => setIsForgotPasswordOpen(false)} />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
