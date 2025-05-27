@@ -54,11 +54,6 @@ export interface LoginCredentials {
     };
   }
   
-  export interface SendResetCodeRequest {
-    userId: string;
-    method: 'email' | 'sms';
-    type: 'code' | 'link';
-  }
   
   // Profile Interfaces
   export interface StudentInfo {

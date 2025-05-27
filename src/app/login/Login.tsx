@@ -232,9 +232,9 @@ const Login: React.FC = () => {
       {/* Forgot Password Dialog */}
       <Dialog open={isForgotPasswordOpen} onOpenChange={setIsForgotPasswordOpen}>
         <DialogContent className="p-0 w-full max-w-[90%] sm:max-w-sm mx-auto rounded-xl sm:rounded-lg overflow-hidden">
-          <DialogHeader className="p-3 sm:p-4 border-b border-gray-100 text-center">
-            <DialogTitle className="text-sm sm:text-base font-semibold text-gray-900">Forgot Password</DialogTitle>
-            <DialogDescription className="text-[10px] sm:text-xs text-gray-500 mt-1">
+          <DialogHeader className="p-3 pb-0 sm:p-4 sm:pb-2 text-center">
+            <DialogTitle className="text-lg sm:text-base font-semibold text-gray-900">Forgot Password</DialogTitle>
+            <DialogDescription className="text-[10px] sm:text-xs text-gray-500 ">
               Enter your email to receive a password reset link
             </DialogDescription>
           </DialogHeader>
