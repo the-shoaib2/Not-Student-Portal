@@ -56,10 +56,7 @@ next-env.d.ts
 /android/.cxx
 /android/*.hprof
 
-# Keep the app icon files in git
-# android/app/src/main/res/mipmap-*/ic_launcher.png
-# android/app/src/main/res/mipmap-*/ic_launcher_round.png
-# android/app/src/main/res/mipmap-*/ic_launcher_foreground.png
+
 
 # iOS
 /ios/build/

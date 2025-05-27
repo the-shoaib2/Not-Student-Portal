@@ -2,38 +2,45 @@
 
 import React, { Suspense } from 'react';
 import { GraduationCap, BookOpen, Calendar, Building2, Briefcase } from 'lucide-react';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Skeleton } from '@/components/ui/skeleton';
 
+// Dynamically import the DownloadCard component with SSR disabled
+const DownloadCard = dynamic(() => import('@/components/DownloadCard'), {
+  ssr: false,
+  loading: () => <Skeleton className="h-64 w-full rounded-xl" />
+});
+
 const Home: React.FC = () => {
   const router = useRouter();
   const quickLinks = [
-    { 
+    {
       icon: <GraduationCap size={20} />,
       title: 'Academic',
       description: 'View your academic progress and results',
       href: '/academic'
     },
-    { 
+    {
       icon: <BookOpen size={20} />,
       title: 'Library',
       description: 'Access digital library resources',
       href: '/library'
     },
-    { 
+    {
       icon: <Calendar size={20} />,
       title: 'Calendar',
       description: 'Check academic calendar and events',
       href: '/calendar'
     },
-    { 
+    {
       icon: <Building2 size={20} />,
       title: 'Hall',
       description: 'Manage residential hall services',
       href: '/hall'
     },
-    { 
+    {
       icon: <Briefcase size={20} />,
       title: 'Career',
       description: 'Explore internship and job opportunities',
@@ -72,13 +79,13 @@ const Home: React.FC = () => {
           </h1>
           {/* Logo */}
           <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-3 relative z-10">
-          <Image
-  src="/diuLogo.png"
-  alt="DIU Logo"
-  fill
-  sizes="(max-width: 768px) 100vw, 33vw"
-  className="object-contain"
-/>
+            <Image
+              src="/diuLogo.png"
+              alt="DIU Logo"
+              fill
+              sizes="(max-width: 768px) 100vw, 33vw"
+              className="object-contain"
+            />
 
           </div>
           {/* Text Content */}
@@ -90,11 +97,21 @@ const Home: React.FC = () => {
         </div>
 
         {/* Quick Links Grid with Suspense */}
-        <Suspense fallback={<Skeleton />}> 
+        <Suspense fallback={<Skeleton />}>
           <QuickLinksContent />
         </Suspense>
+
+        {/* Download Section */}
+        <Suspense fallback={<Skeleton className="h-64 w-full rounded-xl" />}>
+          <DownloadCard />
+        </Suspense>
+
+
       </div>
     </main>
+
+
+
   );
 };
 

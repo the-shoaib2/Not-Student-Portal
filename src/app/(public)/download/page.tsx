@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Download, Smartphone, Monitor, Apple, Check, Loader2 } from 'lucide-react';
+import PageTitle from '@/components/PageTitle';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -43,30 +44,50 @@ const DownloadPage: React.FC = () => {
       icon: <Smartphone size={24} />,
       iconBg: 'bg-green-100',
       iconColor: 'text-green-600',
+      recommendedBg: 'bg-green-500',
       description: 'Download our Android app for a seamless mobile experience on your Android device.',
       downloadUrl: '/api/download/android',
       version: '1.0.0',
-      size: '15 MB'
+      size: '15 MB',
+      instructions: [
+        'Download the APK file',
+        'Open the file from your downloads',
+        'If prompted, allow installation from unknown sources',
+        'Follow the on-screen instructions to complete installation'
+      ]
     },
     {
       platform: 'iOS',
       icon: <Apple size={24} />,
       iconBg: 'bg-blue-100',
       iconColor: 'text-blue-600',
+      recommendedBg: 'bg-blue-500',
       description: 'Get our iOS app for your iPhone or iPad for the best experience on Apple devices.',
       downloadUrl: '/api/download/ios',
       version: '1.0.0',
-      size: '18 MB'
+      size: '18 MB',
+      instructions: [
+        'Download the IPA file',
+        'Use AltStore or similar to install on your device',
+        'Trust the developer in Settings > General > Device Management'
+      ]
     },
     {
       platform: 'Windows',
       icon: <Monitor size={24} />,
       iconBg: 'bg-purple-100',
       iconColor: 'text-purple-600',
+      recommendedBg: 'bg-purple-500',
       description: 'Install our Windows app for a desktop experience with offline capabilities.',
       downloadUrl: '/api/download/windows',
       version: '1.0.0',
-      size: '25 MB'
+      size: '25 MB',
+      instructions: [
+        'Download the installer (.exe file)',
+        'Run the installer as administrator',
+        'Follow the installation wizard',
+        'Launch the app from your Start menu'
+      ]
     }
   ];
 
@@ -133,19 +154,19 @@ const DownloadPage: React.FC = () => {
   };
 
   return (
-    <main className="flex-grow p-4 pt-10">
+    <div className="flex-grow ">
+
+<PageTitle title="Download Our Apps" icon={<Download />} />
       <div className="max-w-5xl mx-auto">
         {/* Header Section */}
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Download Our Apps</h1>
+        <div className="mb-8 pt-10 text-center">
           <p className="text-gray-600 max-w-2xl mx-auto">
             Access the Student Portal anytime, anywhere with our cross-platform applications.
             Choose the version that works best for your device.
           </p>
         </div>
-
         {/* App Logo Section */}
-        <div className="flex justify-center mb-8">
+        {/* <div className="flex justify-center mb-8">
           <div className="relative w-32 h-32 bg-white rounded-xl shadow-md p-4">
             <Image
               src="/diuLogo.png"
@@ -155,7 +176,7 @@ const DownloadPage: React.FC = () => {
               className="object-contain p-2"
             />
           </div>
-        </div>
+        </div> */}
 
 
 
@@ -165,7 +186,7 @@ const DownloadPage: React.FC = () => {
             <div key={index} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 relative">
               {!isLoading && deviceType && deviceType !== 'unknown' && 
                 deviceType === app.platform.toLowerCase() && (
-                <div className="absolute top-0 right-0 bg-teal-500 text-white text-xs font-bold px-2 py-1 rounded-bl-md z-10">
+                <div className={`absolute top-0 right-0 ${app.recommendedBg} text-white text-xs font-bold px-2 py-1 rounded-bl-md z-10`}>
                   Recommended
                 </div>
               )}
@@ -173,7 +194,7 @@ const DownloadPage: React.FC = () => {
                 <div className={`${app.iconBg} ${app.iconColor} w-12 h-12 rounded-full flex items-center justify-center mb-4`}>
                   {app.icon}
                 </div>
-                <h3 className="text-xl font-semibold mb-2">{app.platform} App</h3>
+                <h3 className="text-xl font-semibold mb-2">{app.platform}</h3>
                 <p className="text-gray-600 text-sm mb-4">{app.description}</p>
                 <div className="flex justify-between text-sm text-gray-500 mb-4">
                   <span>Version: {app.version}</span>
@@ -196,6 +217,16 @@ const DownloadPage: React.FC = () => {
                     </>
                   )}
                 </button>
+                
+                {/* Installation Instructions */}
+                <div className="mt-4 border-t border-gray-200 pt-4">
+                  <h4 className="text-sm font-semibold text-gray-700 mb-2">Installation Instructions</h4>
+                  <ol className="text-xs text-gray-600 list-decimal list-inside space-y-1">
+                    {app.instructions.map((instruction, idx) => (
+                      <li key={idx}>{instruction}</li>
+                    ))}
+                  </ol>
+                </div>
                 {downloadStatus?.platform === app.platform && downloadStatus?.status === 'error' && (
                   <p className="text-red-500 text-xs mt-2">{downloadStatus.error || 'Download failed. Please try again.'}</p>
                 )}
@@ -239,7 +270,7 @@ const DownloadPage: React.FC = () => {
 
 
       </div>
-    </main>
+    </div>
   );
 };
 

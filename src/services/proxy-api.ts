@@ -748,7 +748,8 @@ export const authService = {
   },
 
   forgotPassword: async (data: ForgotPasswordRequest): Promise<void> => {
-    await api.post('/resetForgotPassword/forgotPassword', data);
+   const response = await api.post('/resetForgotPassword/forgotPassword', data);
+   return response.data;
   },
 
   findUser: async (data: FindUserRequest): Promise<FindUserResponse> => {

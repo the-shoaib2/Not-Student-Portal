@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 
-export default function NetworkDetector({ children }: { children: React.ReactNode }) {
+export function NetworkDetector({ children }: { children: React.ReactNode }) {
   const [online, setOnline] = useState(true)
 
   useEffect(() => {
@@ -45,3 +45,6 @@ export default function NetworkDetector({ children }: { children: React.ReactNod
   // Render children when online
   return <>{children}</>
 }
+
+export default NetworkDetector
+
