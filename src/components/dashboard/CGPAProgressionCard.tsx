@@ -96,7 +96,7 @@ const CGPAProgressionCard: React.FC<CGPAProgressionCardProps> = ({ cgpaData, loa
         return <div className="w-full h-40 flex items-center justify-center text-gray-400">No data available</div>;
       default:
         return (
-          <ChartContainer config={chartConfig}>
+          <ChartContainer config={chartConfig} className="max-h-[350px] w-full overflow-hidden">
             <BarChart width={590} height={332} data={chartData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis
