@@ -1,7 +1,6 @@
 "use client"
 
-import React, { useState } from "react"
-import { Skeleton } from "@/components/ui/skeleton"
+import React from "react"
 import { Label } from "@/components/ui/label"
 import { CalendarIcon } from "lucide-react"
 import { SemesterDropdown } from "@/components/ui/semester-dropdown"
@@ -18,35 +17,22 @@ interface SemesterSelectorProps {
   semesters: SemesterInfo[]
   onChange: (semester: SemesterInfo) => void
   loading: boolean
-  error?: string
 }
 
-const SemesterSelector = React.memo(({ 
-  selectedSemester, 
-  semesters, 
-  onChange, 
-  loading,
-  error 
-}: SemesterSelectorProps) => {
-  const [isChanging, setIsChanging] = useState(false)
+const SemesterSelector = React.memo(({ selectedSemester, semesters, onChange, loading }: SemesterSelectorProps) => {
+  const [isChanging, setIsChanging] = React.useState(false)
 
   const handleSemesterChange = async (semesterId: string) => {
-    const semester = semesters.find(s => s.semesterId === semesterId)
-    if (!semester) return
+    const selected = semesters.find(s => s.semesterId === semesterId)
+    if (!selected) return
     
     setIsChanging(true)
     try {
-      await onChange(semester)
+      await onChange(selected)
     } finally {
       setIsChanging(false)
     }
   }
-
-
-  // Format the display text for the selected semester
-  const semesterDisplay = selectedSemester 
-    ? `${selectedSemester.semesterName} ${selectedSemester.semesterYear}`
-    : "Select a Semester"
 
   return (
     <div className="w-full sm:w-auto flex-shrink-0 mb-2 sm:mb-0">
@@ -57,15 +43,13 @@ const SemesterSelector = React.memo(({
           </Label>
           <CalendarIcon className="h-4 w-4 text-teal-700" />
         </div>
-        
         <SemesterDropdown
           semesters={semesters}
           selectedSemester={selectedSemester?.semesterId || ''}
-          semesterDisplay={semesterDisplay}
+          semesterDisplay={selectedSemester ? `${selectedSemester.semesterName} ${selectedSemester.semesterYear}` : 'Select a Semester'}
           isLoading={loading || isChanging}
           onSemesterChange={handleSemesterChange}
           className="w-full sm:w-80 md:w-64"
-          error={error}
         />
       </div>
     </div>

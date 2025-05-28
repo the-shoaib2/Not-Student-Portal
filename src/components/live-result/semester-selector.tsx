@@ -39,7 +39,7 @@ export function SemesterSelector({
             semesterDisplay={semesterDisplay}
             isLoading={isLoading}
             onSemesterChange={onSemesterChange}
-            className="w-full"
+            className="w-full sm:w-80 md:w-64"
           />
         </div>
       </CardContent>
