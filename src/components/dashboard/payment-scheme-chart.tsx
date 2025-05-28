@@ -22,6 +22,30 @@ const getBarColor = (amount: number) => {
   return '#d8a6a6';                       // Light Red (Lowest)
 };
 
+// Custom legend renderer to ensure teal color for the circle
+const renderCustomizedLegend = (props: any) => {
+  const { payload } = props;
+  
+  return (
+    <div className="custom-legend" style={{ display: 'flex', justifyContent: 'center', marginTop: '5px' }}>
+      {payload.map((entry: any, index: number) => (
+        <div key={`item-${index}`} style={{ display: 'flex', alignItems: 'center', marginRight: '10px' }}>
+          <div 
+            style={{ 
+              width: '8px', 
+              height: '8px', 
+              borderRadius: '50%', 
+              backgroundColor: '#1f6f6f', 
+              marginRight: '5px' 
+            }} 
+          />
+          <span style={{ color: '#1f6f6f', fontSize: '10px', fontWeight: 'bold' }}>{entry.value}</span>
+        </div>
+      ))}
+    </div>
+  );
+};
+
 export default function PaymentSchemeChart({ data, loading = false }: PaymentSchemeChartProps) {
   // Transform data for the chart
   const chartData = data.map((item) => ({
@@ -87,15 +111,14 @@ export default function PaymentSchemeChart({ data, loading = false }: PaymentSch
                 }}
                 labelStyle={{ fontWeight: 'bold', marginBottom: '4px' }}
                 itemStyle={{ padding: '2px 0' }}
-                cursor={{ fill: 'rgba(79, 70, 229, 0.1)' }}
+                cursor={{ fill: 'rgba(31, 111, 111, 0.2)' }} // teal highlight
               />
               <Legend 
-                wrapperStyle={{ fontSize: '10px' }}
-                iconSize={8}
-                margin={{ top: 0, right: 0, left: 0, bottom: 0 }}
+                content={renderCustomizedLegend}
               />
               <Bar 
                 dataKey="amount" 
+                name="Amount"
                 radius={[4, 4, 0, 0]}
               >
                 {chartData.map((entry, index) => (

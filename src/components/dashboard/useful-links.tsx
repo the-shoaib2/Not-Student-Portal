@@ -17,9 +17,9 @@ export default function UsefulLinks() {
   ]
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Useful Links</CardTitle>
+    <Card className="shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300">
+      <CardHeader className="p-2 sm:p-3 bg-gradient-to-r from-blue-50 to-indigo-50 border-b">
+        <CardTitle className="text-base font-semibold text-blue-800">Useful Links</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-3 gap-4">

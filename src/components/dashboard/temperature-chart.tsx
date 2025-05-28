@@ -19,13 +19,13 @@ export default function TemperatureChart() {
   ]
 
   return (
-    <Card>
-      <CardHeader className="pb-2">
-        <CardTitle className="text-center">Monthly Average Temperature</CardTitle>
+    <Card className="shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300">
+      <CardHeader className="p-2 sm:p-3 bg-gradient-to-r from-green-50 to-emerald-50 border-b">
+        <CardTitle className="text-base font-semibold text-green-800 text-center">Monthly Average Temperature</CardTitle>
         <p className="text-center text-muted-foreground text-sm">Dhaka, Bangladesh</p>
         <p className="text-center text-muted-foreground text-xs">Source: WorldClimate.com</p>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-2 sm:p-3">
         <div className="h-[300px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart
@@ -46,7 +46,22 @@ export default function TemperatureChart() {
                   style: { textAnchor: "middle" },
                 }}
               />
-              <Tooltip formatter={(value) => [`${value}°C`, ""]} />
+              <Tooltip 
+                formatter={(value, name) => {
+                  return [`${value}°C`, name === 'max' ? 'Maximum' : 'Minimum'];
+                }} 
+                contentStyle={{ 
+                  backgroundColor: 'white', 
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '8px',
+                  boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
+                  padding: '8px 12px',
+                  fontSize: '12px'
+                }}
+                labelStyle={{ fontWeight: 'bold', marginBottom: '4px' }}
+                itemStyle={{ padding: '2px 0' }}
+                cursor={{ stroke: '#1f6f6f', strokeWidth: 1 }}
+              />
               <Legend />
               <Line
                 type="monotone"

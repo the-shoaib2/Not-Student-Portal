@@ -16,9 +16,7 @@ export default function PaymentSchemePage() {
   const [paymentData, setPaymentData] = useState<PaymentScheme[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [activeTab, setActiveTab] = useState('all')
   const [refreshing, setRefreshing] = useState(false)
-  const [selectedSemester, setSelectedSemester] = useState<string | null>(null)
 
   const fetchPaymentData = async () => {
     try {
@@ -44,24 +42,9 @@ export default function PaymentSchemePage() {
     setRefreshing(true)
     fetchPaymentData()
   }
-  
-
-  // Handle semester change (only updates selected semester)
-  const handleSemesterChange = (semesterId: string) => {
-    setSelectedSemester(semesterId)
-  }
 
   const getFilteredData = () => {
     let filteredData = paymentData;
-
-    // Filter by tab
-    if (activeTab !== 'all') {
-      filteredData = filteredData.filter(item => 
-        activeTab === 'one-time' 
-          ? item.multiple === 'ONE_TIME' 
-          : item.multiple === 'RECURRING'
-      );
-    }
 
     return filteredData;
   }
@@ -113,27 +96,16 @@ export default function PaymentSchemePage() {
 
 
         {/* Payment Scheme Table */}
-        <Card className="mb-6">
+        <Card className="mb-6 overflow-hidden">
           <CardHeader className="pb-2 bg-gradient-to-r from-teal-50 to-teal-50 border-b">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <CardTitle className="text-lg font-semibold text-gray-900">Payment Scheme Details</CardTitle>
                 <CardDescription className="text-sm text-gray-500">
-                  {activeTab === 'all' 
-                    ? 'All payment items' 
-                    : activeTab === 'one-time' 
-                      ? 'One-time payments' 
-                      : 'Recurring payments'}
+                  All payment items
                 </CardDescription>
               </div>
               <div className="flex items-center gap-4">
-                <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full sm:w-auto">
-                  <TabsList className="grid w-full grid-cols-3">
-                    <TabsTrigger value="all">All</TabsTrigger>
-                    <TabsTrigger value="one-time">One-time</TabsTrigger>
-                    <TabsTrigger value="recurring">Recurring</TabsTrigger>
-                  </TabsList>
-                </Tabs>
                 <Button
                   variant="outline"
                   size="sm"

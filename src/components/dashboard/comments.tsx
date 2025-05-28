@@ -14,11 +14,11 @@ export default function Comments() {
     return () => clearInterval(interval)
   }, [])
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Comments</CardTitle>
+    <Card className="shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300">
+      <CardHeader className="p-2 sm:p-3 bg-gradient-to-r from-purple-50 to-pink-50 border-b">
+        <CardTitle className="text-base font-semibold text-purple-800">Comments</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-2 sm:p-3">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="part-one">PART ONE</TabsTrigger>

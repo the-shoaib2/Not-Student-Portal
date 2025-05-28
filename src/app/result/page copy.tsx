@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import { resultService } from '@/services/proxy-api';
 import { Search, Loader, BookOpen, Award, LayoutDashboard } from 'lucide-react';
-import { SemesterDropdown } from '@/components/ui/semester-dropdown';
 import { toast } from 'react-hot-toast';
 import { Confetti } from '@/components/magicui/confetti';
 import { Button } from '@/components/ui/button';
@@ -311,19 +310,37 @@ const Result: React.FC<ResultProps> = () => {
               />
             </div>
             <div>
-              <label className="block text-red-500 mb-1 text-xs sm:text-sm font-medium">Select Semester *</label>
-              <SemesterDropdown
-                semesters={semesters}
-                selectedSemester={semester}
-                semesterDisplay={selectedSemesterName || 'Select a semester'}
-                isLoading={isLoading}
-                onSemesterChange={(semesterId) => {
-                  setSemester(semesterId);
-                  const selectedSem = semesters.find(s => s.semesterId === semesterId);
+              <label htmlFor="semester" className="block text-red-500 mb-1 text-xs sm:text-sm font-medium">Select Semester *</label>
+              <div className="relative">
+                <select 
+                  id="semester" 
+                  className="w-full px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm border rounded-md appearance-none focus:outline-none focus:ring-1 focus:ring-teal-500 transition"
+                  value={semester}
+                  onChange={(e) => {
+                  setSemester(e.target.value);
+                  const selectedSem = semesters.find(s => s.semesterId === e.target.value);
                   setSelectedSemesterName(selectedSem ? `${selectedSem.semesterName} ${selectedSem.semesterYear}` : '');
                 }}
-                className="w-full"
-              />
+                >
+                  <option value="">Select a semester</option>
+                  {isLoading ? (
+                    <option value="">Loading...</option>
+                  ) : error ? (
+                    <option value="">{error}</option>
+                  ) : (
+                    semesters.map((sem) => (
+                      <option key={sem.semesterId} value={sem.semesterId}>
+                        {sem.semesterName} {sem.semesterYear}
+                      </option>
+                    ))
+                  )}
+                </select>
+                <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                  <svg className="w-4 h-4 fill-current text-gray-500" viewBox="0 0 20 20">
+                    <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                  </svg>
+                </div>
+              </div>
             </div>
             <div className="flex justify-center py-2 px-2 sm:py-0 md:justify-start">
               <Button

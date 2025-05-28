@@ -5,6 +5,8 @@ import PageTitle from "@/components/PageTitle"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Bell } from "lucide-react"
 
+import { ComingSoonCard } from "@/components/coming-soon/coming-soon-card"
+
 interface Notice {
   id: string
   title: string
@@ -43,50 +45,28 @@ export default function NoticesPage() {
   }, [])
 
   return (
-    <div>
+    <>
       <PageTitle 
         title="Notices" 
         icon={<Bell className="h-6 w-6" />}
       />
-      <div className="p-4 max-w-4xl mx-auto">
-        {loading ? (
-          <div className="space-y-4">
-            {[1, 2, 3].map((i) => (
-              <Card key={i} className="animate-pulse">
-                <CardHeader>
-                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
-                  <div className="h-4 bg-gray-200 rounded w-2/3"></div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        ) : notices.length > 0 ? (
-          <div className="space-y-4">
-            {notices.map((notice) => (
-              <Card key={notice.id}>
-                <CardHeader>
-                  <CardTitle className="text-lg">{notice.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600 mb-2">{notice.content}</p>
-                  <p className="text-sm text-gray-500">
-                    Posted on: {notice.date}
-                  </p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        ) : (
-          <Card>
-            <CardContent className="p-6 text-center text-gray-500">
-              No notices available at the moment.
-            </CardContent>
-          </Card>
-        )}
+      {/* Main Content */}
+      <div className="mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-5xl">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <ComingSoonCard
+            title="Notice Board"
+            description="Access all your important university notices in one place. Stay updated with announcements, events, and deadlines."
+            expectedLaunch="June 2025"
+            actionText="Get Notified When Available"
+          />
+          <ComingSoonCard
+            title="Personalized Notifications"
+            description="Receive customized notifications based on your department, courses, and interests. Never miss important updates."
+            expectedLaunch="July 2025"
+            actionText="Join Waiting List"
+          />
+        </div>
       </div>
-    </div>
+    </>
   )
 }
