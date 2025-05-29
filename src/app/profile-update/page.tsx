@@ -14,7 +14,23 @@ import { profileService } from '@/services/proxy-api'
 
 const ProfileUpdate: React.FC = () => {
   const [activeTab, setActiveTab] = useState("personal")
-  const [data, setData] = useState<any>({
+  interface ProfileData {
+  personal: any;
+  guardian: any;
+  contact: any;
+  education: any;
+  photograph: any;
+  insurance: any;
+  maritalStatus: any[];
+  bloodGroup: any[];
+  religion: any[];
+  district: any[];
+  division: any[];
+  country: any[];
+  degree: any[];
+}
+
+const [data, setData] = useState<ProfileData>({
     personal: null,
     guardian: null,
     contact: null,
@@ -29,6 +45,25 @@ const ProfileUpdate: React.FC = () => {
     country: [],
     degree: []
   })
+
+  const fetchGuardianData = async () => {
+    try {
+      const guardianData = await profileService.getGuardianInfo()
+      setData((prev: ProfileData) => ({
+        ...prev,
+        guardian: guardianData
+      }))
+      return guardianData
+    } catch (error) {
+      console.error('Error fetching guardian data:', error)
+      throw error
+    }
+  }
+
+  useEffect(() => {
+    // Initial fetch of guardian data
+    fetchGuardianData()
+  }, [])
 
   useEffect(() => {
     // Only fetch data if activeTab is defined and not empty
@@ -196,7 +231,7 @@ const ProfileUpdate: React.FC = () => {
             />
           </TabsContent>
           <TabsContent value="guardian">
-            <GuardianTab {...{ data: data.guardian }} />
+            <GuardianTab data={data.guardian} onUpdate={fetchGuardianData} />
           </TabsContent>
           <TabsContent value="contact">
             <ContactTab 
