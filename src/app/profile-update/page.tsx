@@ -120,15 +120,16 @@ const ProfileUpdate: React.FC = () => {
   }, [activeTab])
 
   return (
-    <div className="w-full min-h-screen bg-gradient-to-b from-gray-50 to-white flex flex-col">
-      <div className="w-full bg-white border-b">
-        <PageTitle
-          title={"Profile Information"}
-          icon={<UserCog />}
-        />
-      </div>
+    <div className="w-full">
+      <PageTitle
+        title={"Profile Information"}
+        icon={<UserCog />}
+      />
 
-      <div className="flex-1 px-4 sm:px-6 lg:px-8 pt-6 pb-8">
+      {/* Main Content */}
+      <div className="mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+
         <div className="mb-6 bg-gray-100 p-4 rounded-md">
           <h2 className="font-bold mb-2">Note:</h2>
           <ul className="list-disc pl-6 space-y-1">
@@ -161,14 +162,14 @@ const ProfileUpdate: React.FC = () => {
               value="contact"
               className="data-[state=active]:bg-blue-700 text-white data-[state=active]:text-white"
             >
-              CONTACT / ADDRESS
+              CONTACT
             </TabsTrigger>
             <TabsTrigger
               key="education"
               value="education"
               className="data-[state=active]:bg-blue-700 text-white data-[state=active]:text-white"
             >
-              EDUCATION / TRAINING
+              EDUCATION
             </TabsTrigger>
             <TabsTrigger
               key="photograph"
