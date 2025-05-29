@@ -28,7 +28,7 @@ export default function ContactTab({ data, district, division, country }: Contac
                 <Label htmlFor="mobile">
                   Mobile <span className="text-red-500">*</span>
                 </Label>
-                <Input id="mobile" defaultValue="01909978166" />
+                <Input id="mobile" />
               </div>
 
               <div className="space-y-2">
@@ -47,12 +47,12 @@ export default function ContactTab({ data, district, division, country }: Contac
                 <Label htmlFor="email">
                   Email <span className="text-red-500">*</span>
                 </Label>
-                <Input id="email" defaultValue="khan23105101484@diu.edu.bd" />
+                <Input id="email" />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="personalEmail">Personal Email</Label>
-                <Input id="personalEmail" defaultValue="abrohoman019@gmail.com" />
+                <Input id="personalEmail" />
               </div>
             </div>
           </div>
@@ -67,7 +67,7 @@ export default function ContactTab({ data, district, division, country }: Contac
                 <Label htmlFor="permanentAddress">
                   Address <span className="text-red-500">*</span>
                 </Label>
-                <Input id="permanentAddress" defaultValue="Bangori Atiamamudpur Mirzapur,Tangail" />
+                <Input id="permanentAddress" />
               </div>
 
               <div className="space-y-2">
@@ -89,11 +89,11 @@ export default function ContactTab({ data, district, division, country }: Contac
                     <SelectValue placeholder="Select district" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="dhaka">Dhaka</SelectItem>
-                    <SelectItem value="chittagong">Chittagong</SelectItem>
-                    <SelectItem value="rajshahi">Rajshahi</SelectItem>
-                    <SelectItem value="khulna">Khulna</SelectItem>
-                    <SelectItem value="tangail">Tangail</SelectItem>
+                    {district?.map((item) => (
+                      <SelectItem key={item.value} value={item.value}>
+                        {item.label}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -125,16 +125,16 @@ export default function ContactTab({ data, district, division, country }: Contac
                 <Label htmlFor="permanentCountry">
                   Country <span className="text-red-500">*</span>
                 </Label>
-                <Select defaultValue="bangladesh">
+                <Select>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="bangladesh">Bangladesh</SelectItem>
-                    <SelectItem value="india">India</SelectItem>
-                    <SelectItem value="pakistan">Pakistan</SelectItem>
-                    <SelectItem value="nepal">Nepal</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
+                    {country?.map((item) => (
+                      <SelectItem key={item.value} value={item.value}>
+                        {item.label}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -197,7 +197,18 @@ export default function ContactTab({ data, district, division, country }: Contac
 
               <div className="space-y-2">
                 <Label htmlFor="presentCountry">Country</Label>
-                <Input id="presentCountry" required />
+                <Select>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select country" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {country?.map((item) => (
+                      <SelectItem key={item.value} value={item.value}>
+                        {item.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 <div className="text-xs text-red-500">Required</div>
               </div>
 

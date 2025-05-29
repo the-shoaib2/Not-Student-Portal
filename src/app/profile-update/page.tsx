@@ -116,7 +116,7 @@ const [data, setData] = useState<ProfileData>({
 
             case "education":
               if (!data.education) {
-                const educationData = await profileService.education()
+                const educationData = await profileService.getEducationListUpdate()
                 const degreeData = await profileService.degreeList()
                 setData((prev: any) => ({
                   ...prev,

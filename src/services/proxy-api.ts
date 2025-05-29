@@ -1073,33 +1073,17 @@ export const profileService = {
 
   // Fetch education list
   getEducationListUpdate: async (): Promise<any[]> => {
-    const token = profileService.getAuthToken();
+      const token = profileService.getAuthToken();
     const response = await proxyRequest({
-      method: 'GET',
-      url: '/profileUpdate/educationList',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        accessToken: token,
+        method: 'GET',
+        url: '/profileUpdate/educationList',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          accessToken: token,
         'Accept': '*/*'
-      }
-    });
-    return response || [];
-  },
-
-  // Update education list
-  updateEducationList: async (data: any): Promise<any> => {
-    const token = profileService.getAuthToken();
-    const response = await proxyRequest({
-      method: 'POST',
-      url: '/profileUpdate/educationList',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        accessToken: token,
-        'Accept': '*/*'
-      },
-      data
-    });
-    return response;
+        }
+      });
+    return response ;
   },
 
 
@@ -1320,23 +1304,6 @@ export const profileService = {
       return response;
     } catch (error) {
       throw new Error(`Failed to fetch country list: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    }
-  },
-  education: async (): Promise<EducationResponse[] | null> => {
-    try {
-      const token = profileService.getAuthToken();
-      const response = await proxyRequest({
-        method: 'GET',
-        url: '/profileUpdate/education',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          accessToken: token,
-          'Accept': '*/*'
-        }
-      });
-      return response;
-    } catch (error) {
-      throw new Error(`Failed to fetch education: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   },
   degreeList: async (): Promise<DegreeListResponse[] | null> => {
