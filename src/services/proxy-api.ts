@@ -186,6 +186,8 @@ export interface PhotographInfo {
   image?: string;
 }
 
+export type PhotographInfoOrNull = PhotographInfo | null;
+
 // Result Interfaces
 export interface Semester {
   semesterId: string;
@@ -774,7 +776,7 @@ export const profileService = {
   /**
    * Get student photograph
    */
-  getPhotograph: async (): Promise<PhotographInfo> => {
+  getPhotograph: async (): Promise<PhotographInfoOrNull> => {
     try {
       const token = profileService.getAuthToken();
       const response = await proxyRequest({
@@ -790,6 +792,11 @@ export const profileService = {
       // Validate and process response
       if (!response) {
         throw new Error('No photograph data received');
+      }
+
+      // Handle 'file not found' case (base64 for 'file not found' is 'ZmlsZSBub3QgZm91bmQ=')
+      if (response === 'ZmlsZSBub3QgZm91bmQ=' || response.photoUrl === 'ZmlsZSBub3QgZm91bmQ=') {
+        return null;
       }
 
       // If response is already a base64 image or has a photoUrl
@@ -972,7 +979,7 @@ export const profileService = {
   },
 
   // Fetch photograph info
-  getPhotographInfo: async (): Promise<any> => {
+  getPhotographInfo: async (): Promise<PhotographInfoOrNull> => {
     const token = profileService.getAuthToken();
     const response = await proxyRequest({
       method: 'GET',

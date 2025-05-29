@@ -76,7 +76,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     // Set token in cookie
     Cookies.set('token', userData.accessToken, { 
-      expires: 1, // 1 day
+      expires: 30, // 1 day
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict'
     });

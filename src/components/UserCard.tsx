@@ -1,5 +1,5 @@
 "use client"
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import { LogOut, User, BadgeCheck, Bell } from "lucide-react"
 import { useRouter } from "next/navigation"
 import toast from "react-hot-toast"
@@ -26,11 +26,38 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { profileService } from "@/services/proxy-api"
 
 export default function UserCard() {
   const router = useRouter()
   const { user, logout } = useAuth()
   const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const [photograph, setPhotograph] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+
+  const hasFetched = useRef(false)
+  
+  useEffect(() => {
+    // Skip if we've already fetched the photo or don't have a username
+    if (hasFetched.current || !user?.userName) return;
+    
+    const fetchPhotograph = async () => {
+      try {
+        setIsLoading(true)
+        const photoData = await profileService.getPhotograph()
+        if (photoData?.photoUrl) {
+          setPhotograph(photoData.photoUrl)
+        }
+      } catch (error) {
+        console.error('Error loading photograph:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    hasFetched.current = true
+    fetchPhotograph()
+  }, [user?.userName])
 
   const handleLogout = async (e: React.MouseEvent) => {
     e.preventDefault()
@@ -72,19 +99,23 @@ export default function UserCard() {
         <DropdownMenuLabel className="font-normal">
           <div className="flex items-center space-x-3">
             <Avatar className="h-8 w-8">
-              <AvatarImage alt={user?.name || 'User'} />
-              <AvatarFallback className="bg-teal-100 text-teal-800">
-                {getInitials(user?.name)}
-              </AvatarFallback>
+              {!isLoading && photograph ? (
+                <AvatarImage 
+                  src={photograph} 
+                  alt={user?.name || 'User'} 
+                  className="object-cover"
+                />
+              ) : (
+                <AvatarFallback className="bg-teal-100 text-teal-800">
+                  {getInitials(user?.name)}
+                </AvatarFallback>
+              )}
             </Avatar>
             <div className="flex flex-col space-y-1">
               <p className="text-sm font-medium leading-none">{user?.name}</p>
               <p className="text-xs leading-none text-muted-foreground">
                 ID: {user?.userName}
               </p>
-              {/* <p className="text-xs leading-none text-muted-foreground">
-                Role: {user?.commaSeparatedRoles}
-              </p> */}
             </div>
           </div>
         </DropdownMenuLabel>
