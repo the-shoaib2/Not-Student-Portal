@@ -15,22 +15,22 @@ import { profileService } from '@/services/proxy-api'
 const ProfileUpdate: React.FC = () => {
   const [activeTab, setActiveTab] = useState("personal")
   interface ProfileData {
-  personal: any;
-  guardian: any;
-  contact: any;
-  education: any;
-  photograph: any;
-  insurance: any;
-  maritalStatus: any[];
-  bloodGroup: any[];
-  religion: any[];
-  district: any[];
-  division: any[];
-  country: any[];
-  degree: any[];
-}
+    personal: any;
+    guardian: any;
+    contact: any;
+    education: any;
+    photograph: any;
+    insurance: any;
+    maritalStatus: any[];
+    bloodGroup: any[];
+    religion: any[];
+    district: any[];
+    division: any[];
+    country: any[];
+    degree: any[];
+  }
 
-const [data, setData] = useState<ProfileData>({
+  const [data, setData] = useState<ProfileData>({
     personal: null,
     guardian: null,
     contact: null,
@@ -165,7 +165,7 @@ const [data, setData] = useState<ProfileData>({
       <div className="mx-auto px-4 sm:px-6 lg:px-8 py-6">
 
 
-        <div className="mb-6 bg-gray-100 p-4 rounded-md">
+        <div className="mb-6 bg-gray-100 w-full max-w-6xl mx-auto p-4 rounded-md">
           <h2 className="font-bold mb-2">Note:</h2>
           <ul className="list-disc pl-6 space-y-1">
             <li>To update your profile Click on Personal, Guardian, Contact/Address, Education/Training, Photograph.</li>
@@ -176,88 +176,91 @@ const [data, setData] = useState<ProfileData>({
           </ul>
         </div>
 
-        <Tabs defaultValue="personal" value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-3 md:grid-cols-6 bg-blue-500 mb-6">
-            <TabsTrigger
-              key="personal"
-              value="personal"
-              className="data-[state=active]:bg-blue-700 text-white data-[state=active]:text-white"
-            >
-              PERSONAL
-            </TabsTrigger>
-            <TabsTrigger
-              key="guardian"
-              value="guardian"
-              className="data-[state=active]:bg-blue-700 text-white data-[state=active]:text-white"
-            >
-              GUARDIAN
-            </TabsTrigger>
-            <TabsTrigger
-              key="contact"
-              value="contact"
-              className="data-[state=active]:bg-blue-700 text-white data-[state=active]:text-white"
-            >
-              CONTACT
-            </TabsTrigger>
-            <TabsTrigger
-              key="education"
-              value="education"
-              className="data-[state=active]:bg-blue-700 text-white data-[state=active]:text-white"
-            >
-              EDUCATION
-            </TabsTrigger>
-            <TabsTrigger
-              key="photograph"
-              value="photograph"
-              className="data-[state=active]:bg-blue-700 text-white data-[state=active]:text-white"
-            >
-              PHOTOGRAPH
-            </TabsTrigger>
-            <TabsTrigger
-              key="insurance"
-              value="insurance"
-              className="data-[state=active]:bg-blue-700 text-white data-[state=active]:text-white"
-            >
-              INSURANCE
-            </TabsTrigger>
-          </TabsList>
+        <div className="w-full max-w-4xl mx-auto">
+          <Tabs defaultValue="personal" value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid grid-cols-3 md:grid-cols-6 bg-blue-500 mb-6">
+              <TabsTrigger
+                key="personal"
+                value="personal"
+                className="data-[state=active]:bg-blue-700 text-white data-[state=active]:text-white"
+              >
+                PERSONAL
+              </TabsTrigger>
+              <TabsTrigger
+                key="guardian"
+                value="guardian"
+                className="data-[state=active]:bg-blue-700 text-white data-[state=active]:text-white"
+              >
+                GUARDIAN
+              </TabsTrigger>
+              <TabsTrigger
+                key="contact"
+                value="contact"
+                className="data-[state=active]:bg-blue-700 text-white data-[state=active]:text-white"
+              >
+                CONTACT
+              </TabsTrigger>
+              <TabsTrigger
+                key="education"
+                value="education"
+                className="data-[state=active]:bg-blue-700 text-white data-[state=active]:text-white"
+              >
+                EDUCATION
+              </TabsTrigger>
+              <TabsTrigger
+                key="photograph"
+                value="photograph"
+                className="data-[state=active]:bg-blue-700 text-white data-[state=active]:text-white"
+              >
+                PHOTOGRAPH
+              </TabsTrigger>
+              <TabsTrigger
+                key="insurance"
+                value="insurance"
+                className="data-[state=active]:bg-blue-700 text-white data-[state=active]:text-white"
+              >
+                INSURANCE
+              </TabsTrigger>
+            </TabsList>
 
-          <TabsContent value="personal">
-            <PersonalTab
-              data={data.personal}
-              maritalStatus={data.maritalStatus}
-              bloodGroup={data.bloodGroup}
-              religion={data.religion}
-            />
-          </TabsContent>
-          <TabsContent value="guardian">
-            <GuardianTab data={data.guardian} onUpdate={fetchGuardianData} />
-          </TabsContent>
-          <TabsContent value="contact">
-            <ContactTab 
-              {...{
-                data: data.contact,
-                district: data.district,
-                division: data.division,
-                country: data.country
-              }}
-            />
-          </TabsContent>
-          <TabsContent value="education">
-            <EducationTab 
-              {...{
-                data: data.education,
-                degree: data.degree
-              }}
-            />
-          </TabsContent>
-          <TabsContent value="photograph">
-            <PhotographTab {...{ data: data.photograph }} />
-          </TabsContent>
-          <TabsContent value="insurance">
-            <InsuranceTab {...{ data: data.insurance }} />
-          </TabsContent>
-        </Tabs>
+            <TabsContent value="personal">
+              <PersonalTab
+                data={data.personal}
+                maritalStatus={data.maritalStatus}
+                bloodGroup={data.bloodGroup}
+                religion={data.religion}
+              />
+            </TabsContent>
+            <TabsContent value="guardian">
+              <GuardianTab data={data.guardian} onUpdate={fetchGuardianData} />
+            </TabsContent>
+            <TabsContent value="contact">
+              <ContactTab
+                {...{
+                  data: data.contact,
+                  district: data.district,
+                  division: data.division,
+                  country: data.country
+                }}
+              />
+            </TabsContent>
+            <TabsContent value="education">
+              <EducationTab
+                {...{
+                  data: data.education,
+                  degree: data.degree
+                }}
+              />
+            </TabsContent>
+            <TabsContent value="photograph">
+              <PhotographTab {...{ data: data.photograph }} />
+            </TabsContent>
+            <TabsContent value="insurance">
+              <InsuranceTab {...{ data: data.insurance }} />
+            </TabsContent>
+          </Tabs>
+        </div>
+
       </div>
     </div>
   );

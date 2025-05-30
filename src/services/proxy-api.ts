@@ -315,6 +315,16 @@ export interface FormData {
   [key: string]: string | number | boolean | null;
 }
 
+// Consolidated PhotographResponse interface
+export interface PhotographResponse {
+  photoUrl: string;
+  photoData: string;
+  image?: string;
+  success?: boolean;
+  message?: string;
+  error?: string;
+}
+
 // Add type for API call metadata
 interface ApiCallMetadata {
   endpoint: string;
@@ -448,11 +458,7 @@ export interface DegreeListResponse {
   name: string;
 }
 
-export interface PhotographResponse {
-  photoUrl: string;
-  photoData: string;
-  image?: string;
-}
+
 
 export interface InsuranceResponse {
   id: string;
@@ -978,35 +984,46 @@ export const profileService = {
     return response;
   },
 
-  // Fetch photograph info
-  getPhotographInfo: async (): Promise<PhotographInfoOrNull> => {
-    const token = profileService.getAuthToken();
-    const response = await proxyRequest({
-      method: 'GET',
-      url: '/profileUpdate/photograph',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        accessToken: token,
-        'Accept': '*/*'
-      }
-    });
-    return response;
-  },
-
   // Update photograph info
-  updatePhotographInfo: async (data: any): Promise<any> => {
+  updatePhotographInfo: async (formData: globalThis.FormData): Promise<{ success: boolean; photoUrl?: string }> => {
     const token = profileService.getAuthToken();
-    const response = await proxyRequest({
-      method: 'POST',
-      url: '/profileUpdate/photograph',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        accessToken: token,
-        'Accept': '*/*'
-      },
-      data
-    });
-    return response;
+    try {
+      const response = await proxyRequest({
+        method: 'POST',
+        url: '/profileUpdate/photograph',
+        data: formData,
+        timeout: 120000,
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'accessToken': token,
+          'Accept': 'application/json',
+          'Content-Type': 'multipart/form-data',
+        }
+      });
+      
+      return response;
+    } catch (error: any) {
+      console.error('Error in updatePhotographInfo:', error);
+      
+      if (error.response) {
+        try {
+          const errorData = typeof error.response.data === 'string' 
+            ? JSON.parse(error.response.data) 
+            : error.response.data;
+          
+          error.message = errorData.message || error.message;
+          error.details = errorData;
+        } catch (e) {
+          console.error('Could not parse error response:', e);
+        }
+      } else if (error.request) {
+        console.error('No response received. Request details:', error.request);
+      } else {
+        console.error('Request setup error:', error.message);
+      }
+      
+      throw error;
+    }
   },
 
   // Fetch insurance info
@@ -1335,11 +1352,13 @@ export const profileService = {
           'Accept': '*/*'
         }
       });
-      return response;
+      return response as PhotographResponse;
     } catch (error) {
-      throw new Error(`Failed to fetch photograph: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      console.error('Error fetching photograph:', error);
+      return null;
     }
   },
+
   insurance: async (): Promise<InsuranceResponse | null> => {
     try {
       const token = profileService.getAuthToken();

@@ -120,7 +120,7 @@ export const proxyRequest = async ({
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
-          'X-Target-URL': API_BASE_URL, // Add the target URL header
+          'X-Target-URL': API_BASE_URL,
           ...headers
         }
       });

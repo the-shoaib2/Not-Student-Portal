@@ -44,34 +44,159 @@ export default function PhotographTab({ data }: PhotographTabProps) {
     fetchPhotograph()
   }, [])
 
+  const resizeAndCropImage = (file: File): Promise<Blob> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image()
+      const reader = new FileReader()
+      
+      reader.onload = (e) => {
+        if (!e.target?.result) return reject(new Error('Failed to read file'))
+        
+        img.onload = () => {
+          const canvas = document.createElement('canvas')
+          const ctx = canvas.getContext('2d')
+          if (!ctx) return reject(new Error('Canvas context not available'))
+          
+          // Calculate dimensions for 4:5 aspect ratio
+          let width = img.width
+          let height = img.height
+          const targetAspect = 4 / 5
+          const currentAspect = width / height
+          
+          if (currentAspect > targetAspect) {
+            // Image is wider than target, crop width
+            width = height * targetAspect
+          } else {
+            // Image is taller than target, crop height
+            height = width / targetAspect
+          }
+          
+          // Set canvas size to target dimensions
+          canvas.width = 800 // Max width
+          canvas.height = 1000 // 4:5 aspect ratio
+          
+          // Calculate source and destination dimensions for cropping
+          const sx = (img.width - width) / 2
+          const sy = (img.height - height) / 2
+          
+          // Draw image with 4:5 aspect ratio
+          ctx.drawImage(
+            img,
+            sx, sy, width, height, // source rectangle
+            0, 0, canvas.width, canvas.height // destination rectangle
+          )
+          
+          // Convert to blob with quality adjustment to meet size limit
+          let quality = 0.9
+          const checkSize = (blob: Blob): boolean => blob.size <= 1 * 1024 * 1024 // 1MB
+          
+          const process = () => {
+            canvas.toBlob((blob) => {
+              if (!blob) {
+                reject(new Error('Failed to create image blob'))
+                return
+              }
+              
+              if (checkSize(blob) || quality <= 0.1) {
+                resolve(blob)
+              } else {
+                quality -= 0.1
+                canvas.toBlob((smallerBlob) => {
+                  if (smallerBlob) {
+                    resolve(smallerBlob)
+                  } else {
+                    resolve(blob)
+                  }
+                }, 'image/jpeg', quality)
+              }
+            }, 'image/jpeg', quality)
+          }
+          
+          process()
+        }
+        
+        img.src = e.target.result as string
+      }
+      
+      reader.onerror = () => reject(new Error('Failed to read file'))
+      reader.readAsDataURL(file)
+    })
+  }
+
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
 
     if (!file.type.startsWith('image/')) {
-      toast.error('Please upload an image file')
+      toast.error('Please upload an image file (JPEG, PNG, etc.)')
       return
     }
 
-    if (file.size > 10 * 1024 * 1024) {
-      toast.error('File size should be less than 10MB')
+    if (file.size > 5 * 1024 * 1024) { // Initial check for very large files
+      toast.error('File size should be less than 5MB')
       return
     }
 
     try {
       setIsUploading(true)
-      const formData = new FormData()
-      formData.append('file', file)
       
-      const response = await profileService.updatePhotographInfo(formData)
+      // Process the image (resize, crop, compress)
+      const processedBlob = await resizeAndCropImage(file)
       
-      if (response?.photoUrl) {
-        setPhotograph(response.photoUrl)
-        toast.success('Photograph updated successfully')
+      // Check final size
+      if (processedBlob.size > 1 * 1024 * 1024) {
+        toast.error('Unable to reduce image size below 1MB while maintaining quality')
+        return
+      }
+      
+      // Create form data and append the processed image
+      // Use type assertion to ensure we're using the browser's FormData
+      const formData = new window.FormData() as unknown as FormData
+      const processedFile = new File([processedBlob], 'profile.jpg', {
+        type: 'image/jpeg',
+        lastModified: Date.now()
+      })
+      formData.append('file', processedFile)
+      
+      // Add any additional required fields
+      formData.append('uploadType', 'profile')
+      
+      // Show preview of processed image
+      const previewUrl = URL.createObjectURL(processedBlob)
+      setPhotograph(previewUrl)
+      
+      try {
+        // Upload the processed image
+        const { success, photoUrl } = await profileService.updatePhotographInfo(formData)
+        
+        if (success && photoUrl) {
+          // Clean up the preview URL and set the new photo URL
+          URL.revokeObjectURL(previewUrl)
+          setPhotograph(photoUrl)
+          toast.success('Photograph updated successfully')
+        } else {
+          // If no photoUrl in response, fetch the latest photo
+          const photoData = await profileService.photograph()
+          if (photoData?.photoUrl) {
+            setPhotograph(photoData.photoUrl)
+          }
+          toast.success('Photograph updated successfully')
+        }
+      } catch (error: any) {
+        console.error('Upload error:', error)
+        // Revert the preview if upload fails
+        setPhotograph(photograph) // Revert to previous photo
+          
+        if (error.response?.data?.message) {
+          toast.error(`Upload failed: ${error.response.data.message}`)
+        } else {
+          toast.error('Failed to upload photograph. Please try again.')
+        }
+        throw error // Re-throw to be caught by the outer catch
       }
     } catch (error) {
-      console.error('Error uploading photograph:', error)
-      toast.error('Failed to upload photograph')
+      console.error('Error processing/uploading photograph:', error)
+      // Don't show another error toast here as it might be redundant
     } finally {
       setIsUploading(false)
       if (fileInputRef.current) {
@@ -116,7 +241,7 @@ export default function PhotographTab({ data }: PhotographTabProps) {
           <h2 className="text-base font-semibold text-orange-800">Photograph</h2>
         </CardHeader>
         <CardContent className="p-4">
-          <div className="grid gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Image Preview */}
             <div className="flex flex-col items-center justify-center border-none rounded-lg p-6 bg-gray-50">
               {isLoading ? (
@@ -124,8 +249,8 @@ export default function PhotographTab({ data }: PhotographTabProps) {
                   <Skeleton 
                     className="rounded-md" 
                     style={{
-                      width: '200px',
-                      height: '200px',
+                      width: '150px',
+                      height: '150px',
                       objectFit: 'contain'
                     }}
                   />
@@ -136,8 +261,8 @@ export default function PhotographTab({ data }: PhotographTabProps) {
                   alt="Student Photograph Preview" 
                   className="max-w-full h-auto object-contain"
                   style={{
-                    maxHeight: '300px',
-                    maxWidth: '100%',
+                    maxHeight: '150px',
+                    maxWidth: '150px',
                     height: 'auto',
                     width: 'auto'
                   }}
@@ -175,7 +300,7 @@ export default function PhotographTab({ data }: PhotographTabProps) {
                   or click to select a file
                 </p>
                 <p className="text-xs text-gray-500">
-                  JPG, PNG up to 10MB
+                  JPG, PNG up to 1MB (Auto-cropped to 4:5)
                 </p>
               </div>
               <input
