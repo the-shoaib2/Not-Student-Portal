@@ -597,6 +597,68 @@ export interface PaymentLedgerItem {
   showLedger: string
 }
 
+// Mentor Meeting Interfaces
+export interface MentorData {
+  teacher_id: string;
+  FIRST_NAME: string;
+  EMAIL: string;
+  MOBILE: string | null;
+}
+
+export interface Semester {
+  semesterId: string;
+  semesterYear: number;
+  semesterName: string;
+}
+
+export interface MeetingWithStudent {
+  id: string;
+  semester_id: string;
+  meeting_topic: string;
+  meeting_instruction: string;
+  meeting_remarks: string;
+  teacher_id: string;
+  student_id: string;
+  next_meeting_date: string | null;
+  next_meeting_time: string;
+  meeting_file_location: string | null;
+  created_date: number;
+}
+
+export interface MeetingWithGuardian {
+  id: string;
+  semester_id: string;
+  meeting_topic: string;
+  meeting_instruction: string;
+  meeting_remarks: string;
+  teacher_id: string;
+  student_id: string;
+  guardian_name: string;
+  relation: string;
+  mobile: string;
+  email: string;
+  next_meeting_date: string | null;
+  next_meeting_time: string;
+  meeting_file_location: string | null;
+  created_date: number;
+}
+
+export interface MeetingWithCourseTeacher {
+  id: string;
+  semester_id: string;
+  course_id: string;
+  course_title: string;
+  teacher_id: string;
+  teacher_name: string;
+  meeting_topic: string;
+  meeting_instruction: string;
+  meeting_remarks: string;
+  next_meeting_date: string | null;
+  next_meeting_time: string;
+  meeting_file_location: string | null;
+  created_date: number;
+  status: 'pending' | 'completed' | 'cancelled';
+}
 
 // Export proxyRequest directly
 export { proxyRequest };
@@ -670,8 +732,6 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
-
 
 // Auth Service
 export const authService = {
@@ -1397,7 +1457,6 @@ export const profileService = {
 
 };
 
-
 // Result Service
 export const resultService = {
   getSemesterList: async (): Promise<Semester[]> => {
@@ -1905,4 +1964,163 @@ export const dashboardService = {
     // }
   },
 
+};
+
+// Mentor Meeting Service
+export const mentorMeetingService = {
+  // Get mentor details
+  getMentorDetails: async (): Promise<MentorData> => {
+      const token = profileService.getAuthToken();
+      const response = await proxyRequest({
+        method: 'GET',
+        url: '/mentorMeeting/mentorDetails',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          accessToken: token,
+          'Accept': '*/*'
+        },
+      });
+      return response;
+  },
+
+  // Get semester list
+  getSemesterList: async (): Promise<Semester[]> => {
+    const token = profileService.getAuthToken();
+    const response = await proxyRequest({
+      method: 'GET',
+      url: '/mentorMeeting/semesterList',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        accessToken: token,
+        'Accept': '*/*'
+      }
+    });
+    return response;
+  },
+
+  // Get meetings with students for a semester
+  getMeetingsWithStudents: async (semesterId: string): Promise<MeetingWithStudent[]> => {
+    try {
+      const token = profileService.getAuthToken();
+      const response = await proxyRequest({
+        method: 'GET',
+        url: `/mentorMeeting/meetingWithStudentList?semesterId=${semesterId}`,
+        headers: {
+          Authorization: `Bearer ${token}`,
+          accessToken: token,
+          'Accept': '*/*'
+        },
+      });
+      return response || [];
+    } catch (error) {
+      console.error('Error fetching student meetings:', error);
+      return [];
+    }
+  },
+
+  // Get meetings with guardians for a semester
+  getMeetingsWithGuardians: async (semesterId: string): Promise<MeetingWithGuardian[]> => {
+    try {
+      const token = profileService.getAuthToken();
+      const response = await proxyRequest({
+        method: 'GET',
+        url: `/mentorMeeting/meetingWithGuardianList?semesterId=${semesterId}`,
+        headers: {
+          Authorization: `Bearer ${token}`,
+          accessToken: token,
+          'Accept': '*/*'
+        },
+      });
+      return response || [];
+    } catch (error) {
+      console.error('Error fetching guardian meetings:', error);
+      return [];
+    }
+  },
+
+  // Get pending meetings with course teachers for a semester
+  getPendingMeetingsWithCourseTeachers: async (semesterId: string): Promise<MeetingWithCourseTeacher[]> => {
+    try {
+      const token = profileService.getAuthToken();
+      const response = await proxyRequest({
+        method: 'GET',
+        url: `/mentorMeeting/meetingWithCourseTeacherListPending?semesterId=${semesterId}`,
+        headers: {
+          Authorization: `Bearer ${token}`,
+          accessToken: token,
+          'Accept': '*/*'
+        },
+      });
+      return response || [];
+    } catch (error) {
+      console.error('Error fetching course teacher meetings:', error);
+      return [];
+    }
+  },
+
+  // Add a new meeting with student
+  addMeetingWithStudent: async (data: Omit<MeetingWithStudent, 'id' | 'created_date'>): Promise<MeetingWithStudent> => {
+    try {
+      const token = profileService.getAuthToken();
+      const response = await proxyRequest({
+        method: 'POST',
+        url: '/mentorMeeting/meetingWithStudent',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          accessToken: token,
+          'Accept': '*/*'
+        },
+        data,
+      });
+      return response;
+    } catch (error) {
+      console.error('Error adding student meeting:', error);
+      throw error;
+    }
+  },
+
+  // Add a new meeting with guardian
+  addMeetingWithGuardian: async (data: Omit<MeetingWithGuardian, 'id' | 'created_date'>): Promise<MeetingWithGuardian> => {
+    try {
+      const token = profileService.getAuthToken();
+      const response = await proxyRequest({
+        method: 'POST',
+        url: '/mentorMeeting/meetingWithGuardian',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          accessToken: token,
+          'Accept': '*/*'
+        },
+        data,
+      });
+      return response;
+    } catch (error) {
+      console.error('Error adding guardian meeting:', error);
+      throw error;
+    }
+  },
+
+  // Request a meeting with course teacher
+  requestMeetingWithCourseTeacher: async (data: Omit<MeetingWithCourseTeacher, 'id' | 'created_date' | 'status'>): Promise<MeetingWithCourseTeacher> => {
+    try {
+      const token = profileService.getAuthToken();
+      const response = await proxyRequest({
+        method: 'POST',
+        url: '/mentorMeeting/requestMeetingWithCourseTeacher',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          accessToken: token,
+          'Accept': '*/*'
+        },
+        data: {
+          ...data,
+          status: 'pending'
+        },
+      });
+      return response;
+    } catch (error) {
+      console.error('Error requesting course teacher meeting:', error);
+      throw error;
+    }
+  },
 };

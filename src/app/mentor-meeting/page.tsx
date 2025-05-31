@@ -1,40 +1,112 @@
-"use client";
+"use client"
 
-import React from 'react';
+import { useEffect, useState, useRef } from "react"
+import { MentorDetails } from "@/components/mentor-meetings/mentor-details"
+import { StudentMeetingsSection } from "@/components/mentor-meetings/student-meetings-section"
+import { GuardianMeetingsSection } from "@/components/mentor-meetings/guardian-meetings-section"
+import { CourseTeacherMeetingsSection } from "@/components/mentor-meetings/course-teacher-meetings-section"
 import PageTitle from '@/components/PageTitle';
-import { useAuth } from '@/contexts/AuthContext';
-import { Users } from 'lucide-react';
-import { ComingSoonCard } from '@/components/coming-soon/coming-soon-card';
+import { Award, Loader2 } from 'lucide-react';
+import { mentorMeetingService } from "@/services/proxy-api"
+import { toast } from "react-hot-toast";
+
+interface MentorData {
+  teacher_id: string
+  FIRST_NAME: string
+  EMAIL: string
+  MOBILE: string | null
+  DEPARTMENT?: string
+  DESIGNATION?: string
+}
+
+interface Semester {
+  semesterId: string
+  semesterYear: number
+  semesterName: string
+}
+
+export default function MentorMeetingsPage() {
+  const [mentorData, setMentorData] = useState<MentorData | null>(null)
+  const [semesters, setSemesters] = useState<Semester[]>([])
+  const [selectedSemester, setSelectedSemester] = useState<string>("")
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const initialLoadRef = useRef(false)
+
+  // Load initial data on component mount
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+      
+      try {
+        // Fetch both mentor details and semester list in parallel
+        const [mentorData, semesters] = await Promise.all([
+          mentorMeetingService.getMentorDetails(),
+          mentorMeetingService.getSemesterList(),
+        ]);
+
+        // Set mentor data directly
+        setMentorData(mentorData);
+        
+        // Set semesters and default to the first one if available
+        setSemesters(semesters);
+
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setError('Failed to load data. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (!initialLoadRef.current) {
+      initialLoadRef.current = true;
+      fetchData();
+    }
+
+  }, []);
+
+  const handleSemesterChange = (semesterId: string) => {
+    setSelectedSemester(semesterId)
+  }
 
 
-const MentorMeetingComponent: React.FC = () => {
-  const { user } = useAuth();
 
 
   return (
-    <div className="w-full">
-      {/* Page Title */}
-      <div className="w-full">
-        <PageTitle
-          title={"Mentor Meeting"}
-          icon={<Users />}
-        />
-      </div>
+    <>
+      <PageTitle
+        title={"Mentor Teacher Meetings"}
+        icon={<Award />}
+      />
 
       {/* Main Content */}
-      <div className="mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-3xl">
-        <ComingSoonCard
-          title="Mentor Meeting Feature"
-          description="We're working hard to bring you the best mentor meeting experience."
-          expectedLaunch="Q3 2025"
+      <div className="mx-auto px-4 sm:px-6 max-w-6xl lg:px-8 py-6 space-y-6">
+
+        <MentorDetails 
+          mentorData={mentorData}
+          loading={loading}
+        />
+
+        <StudentMeetingsSection
+          selectedSemester={selectedSemester}
+          semesters={semesters}
+          onSemesterChange={handleSemesterChange}
+        />
+
+        <GuardianMeetingsSection
+          selectedSemester={selectedSemester}
+          semesters={semesters}
+          onSemesterChange={handleSemesterChange}
+        />
+
+        <CourseTeacherMeetingsSection
+          selectedSemester={selectedSemester}
+          semesters={semesters}
+          onSemesterChange={handleSemesterChange}
         />
       </div>
-    </div>
-  );
-};
-
-const MentorMeetingPage = () => {
-  return <MentorMeetingComponent />;
-};
-
-export default MentorMeetingPage;
+    </>
+  )
+}
