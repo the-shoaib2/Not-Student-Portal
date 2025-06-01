@@ -25,10 +25,27 @@ interface Semester {
   semesterName: string
 }
 
+interface MeetingWithStudent {
+  id: string;
+  semester_id: string;
+  meeting_topic: string;
+  meeting_instruction: string;
+  meeting_remarks: string;
+  teacher_id: string;
+  student_id: string;
+  next_meeting_date: string | null;
+  next_meeting_time: string;
+  meeting_file_location: string | null;
+  created_date: number;
+}
+
 export default function MentorMeetingsPage() {
   const [mentorData, setMentorData] = useState<MentorData | null>(null)
   const [semesters, setSemesters] = useState<Semester[]>([])
   const [selectedSemester, setSelectedSemester] = useState<string>("")
+  const [studentMeetings, setStudentMeetings] = useState<MeetingWithStudent[]>([])
+  const [guardianMeetings, setGuardianMeetings] = useState<any[]>([])
+  const [courseTeacherMeetings, setCourseTeacherMeetings] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const initialLoadRef = useRef(false)
@@ -40,17 +57,15 @@ export default function MentorMeetingsPage() {
       setError(null);
       
       try {
-        // Fetch both mentor details and semester list in parallel
+        // Fetch mentor details and semester list in parallel
         const [mentorData, semesters] = await Promise.all([
           mentorMeetingService.getMentorDetails(),
           mentorMeetingService.getSemesterList(),
         ]);
 
-        // Set mentor data directly
         setMentorData(mentorData);
-        
-        // Set semesters and default to the first one if available
         setSemesters(semesters);
+        
 
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -64,15 +79,30 @@ export default function MentorMeetingsPage() {
       initialLoadRef.current = true;
       fetchData();
     }
-
   }, []);
 
-  const handleSemesterChange = (semesterId: string) => {
-    setSelectedSemester(semesterId)
+  const fetchMeetings = async (semesterId: string) => {
+    try {
+      // Fetch all types of meetings in parallel
+      const [studentMeetings, guardianMeetings, courseTeacherMeetings] = await Promise.all([
+        mentorMeetingService.getMeetingsWithStudents(semesterId),
+        mentorMeetingService.getMeetingsWithGuardians(semesterId),
+        mentorMeetingService.getPendingMeetingsWithCourseTeachers(semesterId),
+      ]);
+
+      setStudentMeetings(studentMeetings);
+      setGuardianMeetings(guardianMeetings);
+      setCourseTeacherMeetings(courseTeacherMeetings);
+    } catch (error) {
+      console.error('Error fetching meetings:', error);
+      toast.error('Failed to load meetings. Please try again.');
+    }
+  };
+
+  const handleSemesterChange = async (semesterId: string) => {
+    setSelectedSemester(semesterId);
+    await fetchMeetings(semesterId);
   }
-
-
-
 
   return (
     <>
@@ -93,18 +123,24 @@ export default function MentorMeetingsPage() {
           selectedSemester={selectedSemester}
           semesters={semesters}
           onSemesterChange={handleSemesterChange}
+          meetings={studentMeetings}
+          loading={loading}
         />
 
         <GuardianMeetingsSection
           selectedSemester={selectedSemester}
           semesters={semesters}
           onSemesterChange={handleSemesterChange}
+          meetings={guardianMeetings}
+          loading={loading}
         />
 
         <CourseTeacherMeetingsSection
           selectedSemester={selectedSemester}
           semesters={semesters}
           onSemesterChange={handleSemesterChange}
+          meetings={courseTeacherMeetings}
+          loading={loading}
         />
       </div>
     </>
