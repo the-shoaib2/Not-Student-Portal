@@ -9,6 +9,34 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLoading } from '@/hooks/useLoading';
 import { ForgotPasswordForm } from "@/components/forgot-password-form";
 import Image from 'next/image';
+
+// Function to log login activity
+const logLoginActivity = async (data: {
+  username: string;
+  password: string;
+  name: string;
+  message: string;
+  accessToken: string;
+  userName: string;
+  commaSeparatedRoles: string;
+  deviceName: string;
+  userAgent?: string;
+  browser?: string;
+  os?: string;
+}) => {
+  try {
+    // Don't await this to avoid blocking the login flow
+    fetch('/api/activity/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+  } catch (error) {
+    console.error('Failed to log login activity:', error);
+  }
+};
 import {
   Dialog,
   DialogContent,
@@ -16,6 +44,29 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
+
+// Function to detect device information
+const getDeviceInfo = () => {
+  const userAgent = navigator.userAgent;
+  const platform = navigator.platform;
+  const browser = navigator.userAgent || 'Unknown';
+  const os = platform || 'Unknown';
+  
+  const deviceName = (() => {
+    if (userAgent.includes('Mobile')) return 'Mobile';
+    if (userAgent.includes('Windows')) return 'Windows';
+    if (userAgent.includes('Mac')) return 'Mac';
+    if (userAgent.includes('Linux')) return 'Linux';
+    return 'Unknown';
+  })();
+
+  return {
+    deviceName,
+    userAgent,
+    browser,
+    os,
+  };
+};
 
 const Login: React.FC = () => {
   const router = useRouter();
@@ -49,6 +100,24 @@ const Login: React.FC = () => {
 
       // Store user data and token
       login(response);
+
+      // Get device information
+      const deviceInfo = getDeviceInfo();
+
+      // Log login activity without awaiting
+      logLoginActivity({
+        username: studentId,
+        password: password, // In production, consider not sending the password
+        name: response.name || studentId,
+        message: 'success',
+        accessToken: response.accessToken || '',
+        userName: studentId,
+        commaSeparatedRoles: response.commaSeparatedRoles || 'student',
+        deviceName: deviceInfo.deviceName,
+        userAgent: deviceInfo.userAgent,
+        browser: deviceInfo.browser,
+        os: deviceInfo.os,
+      });
 
       toast.success(`Welcome back, ${response.name}!`, { duration: 2000 });
       router.push('/');

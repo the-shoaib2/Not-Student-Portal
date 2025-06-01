@@ -48,9 +48,9 @@ export function CourseTeacherMeetingsSection({
   }, [selectedSemester]);
 
   return (
-    <Card>
-      <CardHeader className="bg-teal-600 text-white">
-        <CardTitle className="text-center">Mentor Teacher Meetings With Course Teacher</CardTitle>
+    <Card className="shadow-sm overflow-hidden ">
+      <CardHeader className="p-2 sm:p-3 bg-teal-600 text-white">
+        <CardTitle className="text-base font-semibold text-start">Mentor Teacher Meetings With Course Teacher</CardTitle>
       </CardHeader>
       <CardContent className="p-4">
         <SemesterDropdown
@@ -64,7 +64,7 @@ export function CourseTeacherMeetingsSection({
 
         {/* Completed Meetings Section */}
         <div className="mb-8">
-          <div className="bg-teal-600 text-white p-3 text-center font-medium mb-4">
+          <div className="bg-teal-600 text-white p-2 sm:p-2 text-center font-medium mb-4 rounded-md shadow-sm">
             Completed Meeting of Course Teacher
           </div>
           <div className="overflow-x-auto">
@@ -95,7 +95,7 @@ export function CourseTeacherMeetingsSection({
 
         {/* Pending Meetings Section */}
         <div>
-          <div className="bg-teal-600 text-white p-3 text-center font-medium mb-4">
+          <div className="bg-teal-600 text-white p-2 sm:p-2 text-center font-medium mb-4 rounded-md shadow-sm">
             Pending Meeting of Course Teacher
           </div>
           {loading ? (

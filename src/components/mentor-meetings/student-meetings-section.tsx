@@ -46,19 +46,20 @@ export function StudentMeetingsSection({ selectedSemester, semesters, onSemester
   }
 
   return (
-    <Card>
-      <CardHeader className="bg-teal-600 text-white">
-        <CardTitle className="text-center">Mentor Teacher Meetings with You</CardTitle>
+    <Card className="shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300">
+      <CardHeader className="p-2 sm:p-3 bg-teal-600 text-white">
+        <CardTitle className="text-base font-semibold text-center">Mentor Teacher Meetings with You</CardTitle>
       </CardHeader>
       <CardContent className="p-4">
-        <SemesterDropdown
-          semesters={semesters}
-          selectedSemester={selectedSemester}
-          semesterDisplay={semesters.find(s => s.semesterId === selectedSemester)?.semesterName || 'Select Semester'}
-          isLoading={loading}
-          onSemesterChange={onSemesterChange}
-          className="mb-4"
-        />
+        <div className="flex justify-center mb-4">
+          <SemesterDropdown
+            semesters={semesters}
+            selectedSemester={selectedSemester}
+            semesterDisplay={semesters.find(s => s.semesterId === selectedSemester)?.semesterName || 'Select Semester'}
+            isLoading={loading}
+            onSemesterChange={onSemesterChange}
+          />
+        </div>
 
         {loading ? (
           <div className="text-center py-4">Loading meetings...</div>

@@ -30,7 +30,7 @@ export default function UsefulLinks() {
               className="flex flex-col items-center justify-center p-2 rounded-md hover:bg-muted transition-colors"
             >
               <div className="relative w-full h-10 mb-2">
-                <Image src={link.image || "/dashbord/placeholder.svg"} alt={link.name} fill className="object-contain" />
+                <Image src={link.image || "/dashbord/placeholder.svg"} alt={link.name} fill className="object-contain" sizes="(max-width: 768px) 100vw, 100vw" />
               </div>
               <span className="text-xs text-center">{link.name}</span>
             </Link>

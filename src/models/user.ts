@@ -45,11 +45,11 @@ interface IUserModel extends Model<IUser> {
 
 const userSchema = new Schema<IUser, IUserModel>({
   username: { type: String, required: true, unique: true, trim: true, lowercase: true, minlength: 3, maxlength: 30 },
-  email: { type: String, required: true, unique: true, lowercase: true, match: [/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/, 'Please provide a valid email'] },
+  email: { type: String, required: false, unique: true, sparse: true, lowercase: true, match: [/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/, 'Please provide a valid email'] },
   password: { type: String, required: true },
   name: { type: String, required: true, trim: true, maxlength: 100 },
   studentId: { type: String, required: true, unique: true, trim: true },
-  roles: { type: [String], default: ['student'], enum: ['student', 'admin', 'faculty', 'moderator'] },
+  roles: { type: [String], default: ['student'] },
   isActive: { type: Boolean, default: true },
   lastLogin: { type: Date, default: Date.now },
   passwordChangedAt: Date,

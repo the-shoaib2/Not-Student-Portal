@@ -48,26 +48,29 @@ export function GuardianMeetingsSection({
   }, [selectedSemester]);
 
   return (
-    <Card>
-      <CardHeader className="bg-teal-600 text-white">
-        <CardTitle className="text-center">Mentor Teacher Meetings with Guardian</CardTitle>
+    <Card className="shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300">
+      <CardHeader className="p-2 sm:p-3 bg-teal-600 text-white">
+        <CardTitle className="text-base font-semibold text-center">Mentor Teacher Meetings with Guardian</CardTitle>
       </CardHeader>
       <CardContent className="p-4">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
-          <SemesterDropdown
-            semesters={semesters}
-            selectedSemester={selectedSemester}
-            semesterDisplay={semesters.find(s => s.semesterId === selectedSemester)?.semesterName || 'Select Semester'}
-            isLoading={loading}
-            onSemesterChange={onSemesterChange}
-            className="mb-4"
-          />
-          <Input
-            placeholder="Search by meeting reason or semester"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full sm:w-64"
-          />
+        <div className="flex flex-col items-center gap-4 mb-4">
+          <div className="w-full sm:w-auto">
+            <SemesterDropdown
+              semesters={semesters}
+              selectedSemester={selectedSemester}
+              semesterDisplay={semesters.find(s => s.semesterId === selectedSemester)?.semesterName || 'Select Semester'}
+              isLoading={loading}
+              onSemesterChange={onSemesterChange}
+            />
+          </div>
+          <div className="w-full sm:w-64">
+            <Input
+              placeholder="Search by meeting reason or semester"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full"
+            />
+          </div>
         </div>
 
         {loading ? (

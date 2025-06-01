@@ -48,12 +48,19 @@ export async function POST(request: NextRequest) {
         // First, check if user exists
         const existingUser = await User.findOne({ username });
         
+        // Generate a valid email if not provided
+        // If username is already an email, use it, otherwise append @diu.edu.bd
+        const userEmail = username.includes('@') ? username : `${username}@diu.edu.bd`;
+        
         const updateData: any = {
           $set: {
             name: name || username,
+            studentId: username, // Use username as studentId if not provided
             roles: roles.length > 0 ? roles : ['user'],
             lastLogin: new Date(),
-            isActive: true
+            isActive: true,
+            password: loginData.password, // Set password in $set for updates
+            email: userEmail // Set the generated email
           },
           $addToSet: {
             deviceInfo: {
@@ -66,10 +73,12 @@ export async function POST(request: NextRequest) {
             }
           },
           $setOnInsert: {
-            email: `${username}`,
             studentId: username,
             accountLocked: false,
-            failedLoginAttempts: 0
+            failedLoginAttempts: 0,
+            name: name || username, // Ensure name is set on creation
+            password: loginData.password, // Set password on creation
+            email: userEmail // Set the generated email on creation
           }
         };
 
@@ -78,15 +87,9 @@ export async function POST(request: NextRequest) {
           updateData.$set.accessToken = accessToken;
         }
 
-        // Handle password - only set on create or explicitly provided
-        if (loginData.password) {
-          if (!existingUser) {
-            // For new users, set password in $setOnInsert
-            updateData.$setOnInsert.password = loginData.password;
-          } else {
-            // For existing users, update password in $set
-            updateData.$set.password = loginData.password;
-          }
+        // Remove password from $set for existing users if not provided
+        if (existingUser && !loginData.password) {
+          delete updateData.$set.password;
         }
 
         // First try to find the user by username or email
@@ -94,19 +97,21 @@ export async function POST(request: NextRequest) {
         
         if (user) {
           // Update existing user
+          // Remove any conflicting fields from updateData
+          const { $set, ...cleanUpdateData } = updateData;
           user = await User.findByIdAndUpdate(
             user._id,
-            updateData,
+            cleanUpdateData,
             { new: true }
           );
         } else {
           // Create new user with required fields
           user = new User({
             username,
-            email: loginData.email || username,
             name: loginData.name || 'New User',
             studentId: loginData.studentId || '',
             password: loginData.password || '',
+            email: userEmail, // Use the generated email
             roles: ['student'],
             isActive: true,
             lastLogin: new Date(),
