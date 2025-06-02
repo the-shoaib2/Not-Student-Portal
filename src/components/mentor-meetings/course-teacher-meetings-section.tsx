@@ -7,6 +7,7 @@ import { SemesterDropdown } from "@/components/ui/semester-dropdown"
 import { mentorMeetingService } from "@/services/proxy-api"
 import { CalendarIcon } from "lucide-react"
 import { Label } from "@/components/ui/label"
+import { Skeleton } from "@/components/ui/skeleton"
 import { MeetingWithCourseTeacher } from "@/services/proxy-api";
 
 interface Semester {
@@ -77,6 +78,41 @@ export function CourseTeacherMeetingsSection({
     return new Date(timestamp).toLocaleString();
   }
 
+  // Skeleton loading rows
+  const renderSkeletonRows = () => {
+    return Array(5).fill(0).map((_, index) => (
+      <TableRow key={`skeleton-${index}`}>
+        <TableCell className="text-center"><Skeleton className="w-4 h-4" /> </TableCell>
+        <TableCell className="text-center"><Skeleton className="w-4 h-4" /></TableCell>
+        <TableCell className="text-center"><Skeleton className="w-4 h-4" /></TableCell>
+        <TableCell className="text-center"><Skeleton className="w-4 h-4" /></TableCell>
+        <TableCell className="text-center"><Skeleton className="w-4 h-4" /></TableCell>
+        <TableCell className="text-center"><Skeleton className="w-4 h-4" /></TableCell>
+        <TableCell className="text-center"><Skeleton className="w-4 h-4" /></TableCell>
+        <TableCell className="text-center"><Skeleton className="w-4 h-4" /></TableCell>
+        <TableCell className="text-center"><Skeleton className="w-4 h-4" /></TableCell>
+        <TableCell className="text-center"><Skeleton className="w-4 h-4" /></TableCell>
+      </TableRow>
+    ));
+  };
+
+  // Empty rows with dashes
+  const renderEmptyRows = () => {
+    return Array(5).fill(0).map((_, index) => (
+      <TableRow key={`empty-${index}`}>
+        <TableCell className="text-center">-</TableCell>
+        <TableCell className="text-center">-</TableCell>
+        <TableCell className="text-center">-</TableCell>
+        <TableCell className="text-center">-</TableCell>
+        <TableCell className="text-center">-</TableCell>
+        <TableCell className="text-center">-</TableCell>
+        <TableCell className="text-center">-</TableCell>
+        <TableCell className="text-center">-</TableCell>
+        <TableCell className="text-center">-</TableCell>
+      </TableRow>
+    ));
+  };
+
   return (
     <Card className="shadow-sm overflow-hidden ">
       <CardHeader className="p-2 sm:p-3 bg-teal-600 text-white">
@@ -113,23 +149,36 @@ export function CourseTeacherMeetingsSection({
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>SL</TableHead>
-                  <TableHead>Course</TableHead>
-                  <TableHead>Reason Title</TableHead>
-                  <TableHead>Reason Detail</TableHead>
-                  <TableHead>Request From Teacher</TableHead>
-                  <TableHead>Request To Teacher</TableHead>
-                  <TableHead>Request DateTime</TableHead>
-                  <TableHead>Counselling DateTime</TableHead>
-                  <TableHead>Counselling Remarks</TableHead>
+                  <TableHead className="text-center">SL</TableHead>
+                  <TableHead className="text-center">Course</TableHead>
+                  <TableHead className="text-center">Reason Title</TableHead>
+                  <TableHead className="text-center">Reason Detail</TableHead>
+                  <TableHead className="text-center">Request From Teacher</TableHead>
+                  <TableHead className="text-center">Request To Teacher</TableHead>
+                  <TableHead className="text-center">Request DateTime</TableHead>
+                  <TableHead className="text-center">Counselling DateTime</TableHead>
+                  <TableHead className="text-center">Counselling Remarks</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                <TableRow>
-                  <TableCell colSpan={9} className="text-center py-4 text-gray-500">
-                    No completed meetings found for selected semester
-                  </TableCell>
-                </TableRow>
+                {isLoading ? (
+                  renderSkeletonRows()
+                ) : filteredMeetings.length > 0 ? (
+                  filteredMeetings.map((meeting, index) => (
+                    <TableRow key={meeting.id}>
+                      <TableCell className="text-center">{index + 1 || "-"}</TableCell>
+                      <TableCell className="text-center">{meeting.teacher_name || "-"}</TableCell>
+                      <TableCell className="text-center">{meeting.course_title || "-"}</TableCell>
+                      <TableCell className="text-center">{meeting.meeting_topic || "-"}</TableCell>
+                      <TableCell className="text-center">{meeting.meeting_instruction || "-"}</TableCell>
+                      <TableCell className="text-center">{meeting.meeting_remarks || "-"}</TableCell>
+                      <TableCell className="text-center">{meeting.next_meeting_date || "-"}</TableCell>
+                      <TableCell className="text-center">{meeting.next_meeting_time || "-"}</TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  renderEmptyRows()
+                )}
               </TableBody>
             </Table>
           </div>
@@ -140,46 +189,43 @@ export function CourseTeacherMeetingsSection({
           <div className="bg-teal-600 text-white p-2 sm:p-2 text-center font-medium mb-4 rounded-md shadow-sm">
             Pending Meeting of Course Teacher
           </div>
-          {isLoading ? (
-            <div className="text-center py-4">Loading meetings...</div>
-          ) : (
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>SL</TableHead>
-                    <TableHead>Course</TableHead>
-                    <TableHead>Reason Title</TableHead>
-                    <TableHead>Reason Detail</TableHead>
-                    <TableHead>Request From Teacher</TableHead>
-                    <TableHead>Request To Teacher</TableHead>
-                    <TableHead>Request DateTime</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredMeetings.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={7} className="text-center py-4 text-gray-500">
-                        No pending meetings found for selected semester
-                      </TableCell>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="text-center">SL</TableHead>
+                  <TableHead className="text-center">Course</TableHead>
+                  <TableHead className="text-center">Reason Title</TableHead>
+                  <TableHead className="text-center">Reason Detail</TableHead>
+                  <TableHead className="text-center">Request From Teacher</TableHead>
+                  <TableHead className="text-center">Request To Teacher</TableHead>
+                  <TableHead className="text-center">Request DateTime</TableHead>
+                  <TableHead className="text-center">Counselling DateTime</TableHead>
+                  <TableHead className="text-center">Counselling Remarks</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {isLoading ? (
+                  renderSkeletonRows()
+                ) : filteredMeetings.length > 0 ? (
+                  filteredMeetings.map((meeting, index) => (
+                    <TableRow key={meeting.id}>
+                      <TableCell className="text-center">{index + 1 || "-"}</TableCell>
+                      <TableCell className="text-center">{meeting.teacher_name || "-"}</TableCell>
+                      <TableCell className="text-center">{meeting.course_title || "-"}</TableCell>
+                      <TableCell className="text-center">{meeting.meeting_topic || "-"}</TableCell>
+                      <TableCell className="text-center">{meeting.meeting_instruction || "-"}</TableCell>
+                      <TableCell className="text-center">{meeting.meeting_remarks || "-"}</TableCell>
+                      <TableCell className="text-center">{meeting.next_meeting_date || "-"}</TableCell>
+                      <TableCell className="text-center">{meeting.next_meeting_time || "-"}</TableCell>
                     </TableRow>
-                  ) : (
-                    filteredMeetings.map((meeting, index) => (
-                      <TableRow key={meeting.id}>
-                        <TableCell>{index + 1}</TableCell>
-                        <TableCell>{meeting.course_title}</TableCell>
-                        <TableCell>{meeting.meeting_topic}</TableCell>
-                        <TableCell>{meeting.meeting_instruction}</TableCell>
-                        <TableCell>{meeting.teacher_name}</TableCell>
-                        <TableCell>{meeting.teacher_id}</TableCell>
-                        <TableCell>{formatDate(meeting.created_date)}</TableCell>
-                      </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
-            </div>
-          )}
+                  ))
+                ) : (
+                  renderEmptyRows()
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </div>
       </CardContent>
     </Card>

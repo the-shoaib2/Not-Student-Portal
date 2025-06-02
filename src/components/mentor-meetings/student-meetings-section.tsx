@@ -7,6 +7,7 @@ import { SemesterDropdown } from "@/components/ui/semester-dropdown"
 import { CalendarIcon } from "lucide-react"
 import { Label } from "@/components/ui/label"
 import { mentorMeetingService, MeetingWithStudent } from "@/services/proxy-api"
+import { Skeleton } from "@/components/ui/skeleton"
 
 interface Semester {
   semesterId: string
@@ -54,6 +55,38 @@ export function StudentMeetingsSection({ semesters }: StudentMeetingsSectionProp
     return new Date(timestamp).toLocaleDateString()
   }
 
+  // Skeleton loading rows
+  const renderSkeletonRows = () => {
+    return Array(5).fill(0).map((_, index) => (
+      <TableRow key={`skeleton-${index}`}>
+        <TableCell className="text-center"><Skeleton className="w-12 h-4" /></TableCell>
+        <TableCell className="text-center"><Skeleton className="w-12 h-4" /></TableCell>
+        <TableCell className="text-center"><Skeleton className="w-12 h-4" /></TableCell>
+        <TableCell className="text-center"><Skeleton className="w-12 h-4" /></TableCell>
+        <TableCell className="text-center"><Skeleton className="w-12 h-4" /></TableCell>
+        <TableCell className="text-center"><Skeleton className="w-12 h-4" /></TableCell>
+        <TableCell className="text-center"><Skeleton className="w-12 h-4" /></TableCell>
+        <TableCell className="text-center"><Skeleton className="w-12 h-4" /></TableCell>
+      </TableRow>
+    ));
+  };
+
+  // Empty rows with dashes
+  const renderEmptyRows = () => {
+    return Array(5).fill(0).map((_, index) => (
+      <TableRow key={`empty-${index}`}>
+        <TableCell className="text-center">-</TableCell>
+        <TableCell className="text-center">-</TableCell>
+        <TableCell className="text-center">-</TableCell>
+        <TableCell className="text-center">-</TableCell>
+        <TableCell className="text-center">-</TableCell>
+        <TableCell className="text-center">-</TableCell>
+        <TableCell className="text-center">-</TableCell>
+        <TableCell className="text-center">-</TableCell>
+      </TableRow>
+    ));
+  };
+
   return (
     <Card className="shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300">
       <CardHeader className="p-2 sm:p-3 bg-teal-600 text-white">
@@ -81,48 +114,42 @@ export function StudentMeetingsSection({ semesters }: StudentMeetingsSectionProp
           />
         </div>
 
-        {isLoading ? (
-          <div className="text-center py-4">Loading meetings...</div>
-        ) : (
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>SL</TableHead>
-                  <TableHead>Meeting Date</TableHead>
-                  <TableHead>Reason for meeting</TableHead>
-                  <TableHead>Instruction / Action Taken</TableHead>
-                  <TableHead>Remarks</TableHead>
-                  <TableHead>Next Meeting Date</TableHead>
-                  <TableHead>Next Meeting Time</TableHead>
-                  <TableHead>File</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {meetings.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={8} className="text-center py-4 text-gray-500">
-                      No meetings found for selected semester
-                    </TableCell>
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="text-center">SL</TableHead>
+                <TableHead className="text-center">Meeting Date</TableHead>
+                <TableHead className="text-center">Reason for meeting</TableHead>
+                <TableHead className="text-center">Instruction / Action Taken</TableHead>
+                <TableHead className="text-center">Remarks</TableHead>
+                <TableHead className="text-center">Next Meeting Date</TableHead>
+                <TableHead className="text-center">Next Meeting Time</TableHead>
+                <TableHead className="text-center">File</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {isLoading ? (
+                renderSkeletonRows()
+              ) : meetings.length > 0 ? (
+                meetings.map((meeting, index) => (
+                  <TableRow key={meeting.id}>
+                    <TableCell className="text-center">{index + 1}</TableCell>
+                    <TableCell className="text-center">{formatDate(meeting.created_date)}</TableCell>
+                    <TableCell className="text-center">{meeting.meeting_topic}</TableCell>
+                    <TableCell className="text-center">{meeting.meeting_instruction}</TableCell>
+                    <TableCell className="text-center">{meeting.meeting_remarks || "-"}</TableCell>
+                    <TableCell className="text-center">{meeting.next_meeting_date || "-"}</TableCell>
+                    <TableCell className="text-center">{meeting.next_meeting_time || "-"}</TableCell>
+                    <TableCell className="text-center">{meeting.meeting_file_location ? "📎" : "-"}</TableCell>
                   </TableRow>
-                ) : (
-                  meetings.map((meeting, index) => (
-                    <TableRow key={meeting.id}>
-                      <TableCell>{index + 1}</TableCell>
-                      <TableCell>{formatDate(meeting.created_date)}</TableCell>
-                      <TableCell>{meeting.meeting_topic}</TableCell>
-                      <TableCell>{meeting.meeting_instruction}</TableCell>
-                      <TableCell>{meeting.meeting_remarks || "-"}</TableCell>
-                      <TableCell>{meeting.next_meeting_date || "-"}</TableCell>
-                      <TableCell>{meeting.next_meeting_time || "-"}</TableCell>
-                      <TableCell>{meeting.meeting_file_location ? "📎" : "-"}</TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        )}
+                ))
+              ) : (
+                renderEmptyRows()
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </CardContent>
     </Card>
   )

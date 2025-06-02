@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label"
 import { SemesterDropdown } from "@/components/ui/semester-dropdown"
 import { mentorMeetingService, MeetingWithGuardian } from "@/services/proxy-api"
 import { CalendarIcon, SearchIcon } from "lucide-react"
+import { Skeleton } from "@/components/ui/skeleton"
 
 interface Semester {
   semesterId: string
@@ -32,7 +33,6 @@ export function GuardianMeetingsSection({
     setSelectedSemester(semesterId);
   };
 
-  // Fetch meetings when selectedSemester changes
   useEffect(() => {
     const fetchMeetings = async () => {
       if (!selectedSemester) {
@@ -40,7 +40,7 @@ export function GuardianMeetingsSection({
         setFilteredMeetings([]);
         return;
       }
-      
+
       setIsLoading(true);
       try {
         const data = await mentorMeetingService.getMeetingsWithGuardians(selectedSemester);
@@ -48,7 +48,6 @@ export function GuardianMeetingsSection({
         setFilteredMeetings(data);
       } catch (error) {
         console.error('Error fetching guardian meetings:', error);
-        // You might want to show a toast/notification here
         setMeetings([]);
         setFilteredMeetings([]);
       } finally {
@@ -59,15 +58,13 @@ export function GuardianMeetingsSection({
     fetchMeetings();
   }, [selectedSemester]);
 
-  // Filter meetings based on search term
   useEffect(() => {
     if (!searchTerm.trim()) {
       setFilteredMeetings(meetings);
     } else {
-      const filtered = meetings.filter(meeting => 
+      const filtered = meetings.filter(meeting =>
         (meeting.guardian_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        // meeting.student_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        meeting.meeting_topic?.toLowerCase().includes(searchTerm.toLowerCase()))
+          meeting.meeting_topic?.toLowerCase().includes(searchTerm.toLowerCase()))
       );
       setFilteredMeetings(filtered);
     }
@@ -76,6 +73,40 @@ export function GuardianMeetingsSection({
   const formatDate = (timestamp: number) => {
     return new Date(timestamp).toLocaleString();
   }
+
+  const renderSkeletonRows = () => {
+    return Array(5).fill(0).map((_, index) => (
+      <TableRow key={`skeleton-${index}`}>
+        <TableCell className="text-center"><Skeleton className="w-4 h-4" /></TableCell>
+        <TableCell className="text-center"><Skeleton className="w-24 h-4" /></TableCell>
+        <TableCell className="text-center"><Skeleton className="w-16 h-4" /></TableCell>
+        <TableCell className="text-center"><Skeleton className="w-32 h-4" /></TableCell>
+        <TableCell className="text-center"><Skeleton className="w-48 h-4" /></TableCell>
+        <TableCell className="text-center"><Skeleton className="w-64 h-4" /></TableCell>
+        <TableCell className="text-center"><Skeleton className="w-48 h-4" /></TableCell>
+        <TableCell className="text-center"><Skeleton className="w-24 h-4" /></TableCell>
+        <TableCell className="text-center"><Skeleton className="w-20 h-4" /></TableCell>
+        <TableCell className="text-center"><Skeleton className="w-6 h-4" /></TableCell>
+      </TableRow>
+    ));
+  };
+
+  const renderEmptyRows = () => {
+    return Array(5).fill(0).map((_, index) => (
+      <TableRow key={`empty-${index}`}>
+        <TableCell className="text-center">-</TableCell>
+        <TableCell className="text-center">-</TableCell>
+        <TableCell className="text-center">-</TableCell>
+        <TableCell className="text-center">-</TableCell>
+        <TableCell className="text-center">-</TableCell>
+        <TableCell className="text-center">-</TableCell>
+        <TableCell className="text-center">-</TableCell>
+        <TableCell className="text-center">-</TableCell>
+        <TableCell className="text-center">-</TableCell>
+        <TableCell className="text-center">-</TableCell>
+      </TableRow>
+    ));
+  };
 
   return (
     <Card className="shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300">
@@ -86,7 +117,6 @@ export function GuardianMeetingsSection({
         <div className="flex flex-col items-center w-full mb-4">
           <div className="w-full max-w-xl">
             <div className="flex flex-col sm:flex-row gap-8 w-full justify-center">
-              {/* Semester Selector */}
               <div className="w-full max-w-md">
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center gap-2">
@@ -109,8 +139,6 @@ export function GuardianMeetingsSection({
                   />
                 </div>
               </div>
-              
-              {/* Search Input */}
               <div className="w-full max-w-md">
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center gap-2">
@@ -131,54 +159,48 @@ export function GuardianMeetingsSection({
             </div>
           </div>
         </div>
-        
-        {isLoading ? (
-          <div className="text-center py-4">Loading meetings...</div>
-        ) : (
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>SL</TableHead>
-                  <TableHead>Guardian Name</TableHead>
-                  <TableHead>Relation</TableHead>
-                  <TableHead>Meeting Date</TableHead>
-                  <TableHead>Meeting Topic</TableHead>
-                  <TableHead>Instructions</TableHead>
-                  <TableHead>Remarks</TableHead>
-                  <TableHead>Next Meeting Date</TableHead>
-                  <TableHead>Next Meeting Time</TableHead>
-                  <TableHead>Attachment</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredMeetings.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={10} className="text-center py-4 text-gray-500">
-                      No guardian meetings found for selected semester
-                    </TableCell>
+
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="text-center">SL</TableHead>
+                <TableHead className="text-center">Guardian Name</TableHead>
+                <TableHead className="text-center">Relation</TableHead>
+                <TableHead className="text-center">Meeting Date</TableHead>
+                <TableHead className="text-center">Meeting Topic</TableHead>
+                <TableHead className="text-center">Instructions</TableHead>
+                <TableHead className="text-center">Remarks</TableHead>
+                <TableHead className="text-center">Next Meeting Date</TableHead>
+                <TableHead className="text-center">Next Meeting Time</TableHead>
+                <TableHead className="text-center">Attachment</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {isLoading ? (
+                renderSkeletonRows()
+              ) : filteredMeetings.length > 0 ? (
+                filteredMeetings.map((meeting, index) => (
+                  <TableRow key={meeting.id}>
+                    <TableCell className="text-center">{index + 1}</TableCell>
+                    <TableCell className="text-center">{meeting.guardian_name || "-"}</TableCell>
+                    <TableCell className="text-center">{meeting.relation || "-"}</TableCell>
+                    <TableCell className="text-center">{meeting.created_date ? formatDate(meeting.created_date) : "-"}</TableCell>
+                    <TableCell className="text-center">{meeting.meeting_topic || "-"}</TableCell>
+                    <TableCell className="text-center">{meeting.meeting_instruction || "-"}</TableCell>
+                    <TableCell className="text-center">{meeting.meeting_remarks || "-"}</TableCell>
+                    <TableCell className="text-center">{meeting.next_meeting_date || "-"}</TableCell>
+                    <TableCell className="text-center">{meeting.next_meeting_time || "-"}</TableCell>
+                    <TableCell className="text-center">{meeting.meeting_file_location ? "📎" : "-"}</TableCell>
                   </TableRow>
-                ) : (
-                  filteredMeetings.map((meeting, index) => (
-                    <TableRow key={meeting.id}>
-                      <TableCell>{index + 1}</TableCell>
-                      <TableCell>{meeting.guardian_name}</TableCell>
-                      <TableCell>{meeting.relation}</TableCell>
-                      <TableCell>{formatDate(meeting.created_date)}</TableCell>
-                      <TableCell>{meeting.meeting_topic}</TableCell>
-                      <TableCell>{meeting.meeting_instruction}</TableCell>
-                      <TableCell>{meeting.meeting_remarks || "-"}</TableCell>
-                      <TableCell>{meeting.next_meeting_date || "-"}</TableCell>
-                      <TableCell>{meeting.next_meeting_time || "-"}</TableCell>
-                      <TableCell>{meeting.meeting_file_location ? "📎" : "-"}</TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        )}
+                ))
+              ) : (
+                renderEmptyRows()
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </CardContent>
     </Card>
-  )
+  );
 }
