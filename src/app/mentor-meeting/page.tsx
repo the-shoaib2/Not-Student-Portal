@@ -25,39 +25,20 @@ interface Semester {
   semesterName: string
 }
 
-interface MeetingWithStudent {
-  id: string;
-  semester_id: string;
-  meeting_topic: string;
-  meeting_instruction: string;
-  meeting_remarks: string;
-  teacher_id: string;
-  student_id: string;
-  next_meeting_date: string | null;
-  next_meeting_time: string;
-  meeting_file_location: string | null;
-  created_date: number;
-}
-
 export default function MentorMeetingsPage() {
-  const [mentorData, setMentorData] = useState<MentorData | null>(null)
-  const [semesters, setSemesters] = useState<Semester[]>([])
-  const [selectedSemester, setSelectedSemester] = useState<string>("")
-  const [studentMeetings, setStudentMeetings] = useState<MeetingWithStudent[]>([])
-  const [guardianMeetings, setGuardianMeetings] = useState<any[]>([])
-  const [courseTeacherMeetings, setCourseTeacherMeetings] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const initialLoadRef = useRef(false)
+  const [mentorData, setMentorData] = useState<any>(null);
+  const [semesters, setSemesters] = useState<Semester[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const initialLoadRef = useRef(false);
 
-  // Load initial data on component mount
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       setError(null);
       
       try {
-        // Fetch mentor details and semester list in parallel
+        // Only fetch mentor data and semesters
         const [mentorData, semesters] = await Promise.all([
           mentorMeetingService.getMentorDetails(),
           mentorMeetingService.getSemesterList(),
@@ -66,7 +47,6 @@ export default function MentorMeetingsPage() {
         setMentorData(mentorData);
         setSemesters(semesters);
         
-
       } catch (error) {
         console.error('Error fetching data:', error);
         setError('Failed to load data. Please try again later.');
@@ -81,29 +61,6 @@ export default function MentorMeetingsPage() {
     }
   }, []);
 
-  const fetchMeetings = async (semesterId: string) => {
-    try {
-      // Fetch all types of meetings in parallel
-      const [studentMeetings, guardianMeetings, courseTeacherMeetings] = await Promise.all([
-        mentorMeetingService.getMeetingsWithStudents(semesterId),
-        mentorMeetingService.getMeetingsWithGuardians(semesterId),
-        mentorMeetingService.getPendingMeetingsWithCourseTeachers(semesterId),
-      ]);
-
-      setStudentMeetings(studentMeetings);
-      setGuardianMeetings(guardianMeetings);
-      setCourseTeacherMeetings(courseTeacherMeetings);
-    } catch (error) {
-      console.error('Error fetching meetings:', error);
-      toast.error('Failed to load meetings. Please try again.');
-    }
-  };
-
-  const handleSemesterChange = async (semesterId: string) => {
-    setSelectedSemester(semesterId);
-    await fetchMeetings(semesterId);
-  }
-
   return (
     <>
       <PageTitle
@@ -117,31 +74,11 @@ export default function MentorMeetingsPage() {
         <MentorDetails 
           mentorData={mentorData}
           loading={loading}
-        />
+      />
 
-        <StudentMeetingsSection
-          selectedSemester={selectedSemester}
-          semesters={semesters}
-          onSemesterChange={handleSemesterChange}
-          meetings={studentMeetings}
-          loading={loading}
-        />
-
-        <GuardianMeetingsSection
-          selectedSemester={selectedSemester}
-          semesters={semesters}
-          onSemesterChange={handleSemesterChange}
-          meetings={guardianMeetings}
-          loading={loading}
-        />
-
-        <CourseTeacherMeetingsSection
-          selectedSemester={selectedSemester}
-          semesters={semesters}
-          onSemesterChange={handleSemesterChange}
-          meetings={courseTeacherMeetings}
-          loading={loading}
-        />
+      <StudentMeetingsSection semesters={semesters} />
+      <GuardianMeetingsSection semesters={semesters} />
+      <CourseTeacherMeetingsSection semesters={semesters} />
       </div>
     </>
   )

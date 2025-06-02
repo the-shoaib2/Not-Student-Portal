@@ -16,41 +16,66 @@ interface Semester {
 }
 
 interface CourseTeacherMeetingsSectionProps {
-  selectedSemester: string
   semesters: Semester[]
-  onSemesterChange: (semesterId: string) => void
-  meetings: any[]
-  loading: boolean
 }
 
 export function CourseTeacherMeetingsSection({
-  selectedSemester,
   semesters,
-  onSemesterChange,
-  meetings,
-  loading,
 }: CourseTeacherMeetingsSectionProps) {
-  const [pendingMeetings, setPendingMeetings] = useState<MeetingWithCourseTeacher[]>([])
-  const [loadingState, setLoading] = useState(false)
+  const [meetings, setMeetings] = useState<MeetingWithCourseTeacher[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [selectedSemester, setSelectedSemester] = useState<string>("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredMeetings, setFilteredMeetings] = useState<MeetingWithCourseTeacher[]>([]);
+
+  const handleSemesterChange = (semesterId: string) => {
+    setSelectedSemester(semesterId);
+  };
 
   // Fetch meetings when selectedSemester changes
   useEffect(() => {
     const fetchMeetings = async () => {
-      if (!selectedSemester) return;
+      if (!selectedSemester) {
+        setMeetings([]);
+        setFilteredMeetings([]);
+        return;
+      }
       
-      setLoading(true);
+      setIsLoading(true);
       try {
-        const response = await mentorMeetingService.getPendingMeetingsWithCourseTeachers(selectedSemester);
-        setPendingMeetings(response);
+        const data = await mentorMeetingService.getPendingMeetingsWithCourseTeachers(selectedSemester);
+        setMeetings(data);
+        setFilteredMeetings(data);
       } catch (error) {
-        console.error("Error fetching course teacher meetings:", error);
+        console.error('Error fetching course teacher meetings:', error);
+        // You might want to show a toast/notification here
+        setMeetings([]);
+        setFilteredMeetings([]);
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     };
 
     fetchMeetings();
   }, [selectedSemester]);
+
+  // Filter meetings based on search term
+  useEffect(() => {
+    if (!searchTerm.trim()) {
+      setFilteredMeetings(meetings);
+    } else {
+      const filtered = meetings.filter(meeting => 
+        (meeting.teacher_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+         meeting.course_title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+         meeting.meeting_topic?.toLowerCase().includes(searchTerm.toLowerCase()))
+      );
+      setFilteredMeetings(filtered);
+    }
+  }, [searchTerm, meetings]);
+
+  const formatDate = (timestamp: number) => {
+    return new Date(timestamp).toLocaleString();
+  }
 
   return (
     <Card className="shadow-sm overflow-hidden ">
@@ -73,8 +98,8 @@ export function CourseTeacherMeetingsSection({
                 ? `${semesters.find(s => s.semesterId === selectedSemester)?.semesterName}-${semesters.find(s => s.semesterId === selectedSemester)?.semesterYear}`
                 : 'Select Semester'
             }
-            isLoading={loadingState}  
-            onSemesterChange={onSemesterChange}
+            isLoading={isLoading}
+            onSemesterChange={handleSemesterChange}
             className="w-full sm:w-80 md:w-64"
           />
         </div>
@@ -115,7 +140,7 @@ export function CourseTeacherMeetingsSection({
           <div className="bg-teal-600 text-white p-2 sm:p-2 text-center font-medium mb-4 rounded-md shadow-sm">
             Pending Meeting of Course Teacher
           </div>
-          {loadingState ? (
+          {isLoading ? (
             <div className="text-center py-4">Loading meetings...</div>
           ) : (
             <div className="overflow-x-auto">
@@ -132,14 +157,14 @@ export function CourseTeacherMeetingsSection({
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {pendingMeetings.length === 0 ? (
+                  {filteredMeetings.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={7} className="text-center py-4 text-gray-500">
                         No pending meetings found for selected semester
                       </TableCell>
                     </TableRow>
                   ) : (
-                    pendingMeetings.map((meeting, index) => (
+                    filteredMeetings.map((meeting, index) => (
                       <TableRow key={meeting.id}>
                         <TableCell>{index + 1}</TableCell>
                         <TableCell>{meeting.course_title}</TableCell>
@@ -147,7 +172,7 @@ export function CourseTeacherMeetingsSection({
                         <TableCell>{meeting.meeting_instruction}</TableCell>
                         <TableCell>{meeting.teacher_name}</TableCell>
                         <TableCell>{meeting.teacher_id}</TableCell>
-                        <TableCell>{new Date(meeting.created_date).toLocaleString()}</TableCell>
+                        <TableCell>{formatDate(meeting.created_date)}</TableCell>
                       </TableRow>
                     ))
                   )}
@@ -160,4 +185,3 @@ export function CourseTeacherMeetingsSection({
     </Card>
   )
 }
- 

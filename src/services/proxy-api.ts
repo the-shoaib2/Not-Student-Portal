@@ -2011,7 +2011,7 @@ export const mentorMeetingService = {
           'Accept': '*/*'
         },
       });
-      return response || [];
+      return response;
     } catch (error) {
       console.error('Error fetching student meetings:', error);
       return [];
@@ -2031,7 +2031,7 @@ export const mentorMeetingService = {
           'Accept': '*/*'
         },
       });
-      return response || [];
+      return response;
     } catch (error) {
       console.error('Error fetching guardian meetings:', error);
       return [];
@@ -2051,7 +2051,7 @@ export const mentorMeetingService = {
           'Accept': '*/*'
         },
       });
-      return response || [];
+      return response;
     } catch (error) {
       console.error('Error fetching course teacher meetings:', error);
       return [];
@@ -2070,7 +2070,6 @@ export const mentorMeetingService = {
           accessToken: token,
           'Accept': '*/*'
         },
-        data,
       });
       return response;
     } catch (error) {
@@ -2091,7 +2090,6 @@ export const mentorMeetingService = {
           accessToken: token,
           'Accept': '*/*'
         },
-        data,
       });
       return response;
     } catch (error) {
@@ -2111,10 +2109,6 @@ export const mentorMeetingService = {
           Authorization: `Bearer ${token}`,
           accessToken: token,
           'Accept': '*/*'
-        },
-        data: {
-          ...data,
-          status: 'pending'
         },
       });
       return response;

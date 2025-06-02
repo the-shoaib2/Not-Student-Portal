@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { SemesterDropdown } from "@/components/ui/semester-dropdown"
@@ -15,20 +15,41 @@ interface Semester {
 }
 
 interface StudentMeetingsSectionProps {
-  selectedSemester: string
-  semesters: Semester[]
-  onSemesterChange: (semesterId: string) => void
-  meetings: MeetingWithStudent[]
-  loading: boolean
+  semesters: Array<{ semesterId: string; semesterName: string; semesterYear: number }>
 }
 
-export function StudentMeetingsSection({ 
-  selectedSemester, 
-  semesters, 
-  onSemesterChange,
-  meetings,
-  loading
-}: StudentMeetingsSectionProps) {
+export function StudentMeetingsSection({ semesters }: StudentMeetingsSectionProps) {
+  const [meetings, setMeetings] = useState<MeetingWithStudent[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [selectedSemester, setSelectedSemester] = useState<string>("");
+
+  const handleSemesterChange = (semesterId: string) => {
+    setSelectedSemester(semesterId);
+  };
+
+  useEffect(() => {
+    const fetchMeetings = async () => {
+      if (!selectedSemester) {
+        setMeetings([]); // Clear meetings when no semester is selected
+        return;
+      }
+      
+      setIsLoading(true);
+      try {
+        const data = await mentorMeetingService.getMeetingsWithStudents(selectedSemester);
+        setMeetings(data);
+      } catch (error) {
+        console.error('Error fetching student meetings:', error);
+        // You might want to show a toast/notification here
+        setMeetings([]); // Clear meetings on error
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchMeetings();
+  }, [selectedSemester]);
+
   const formatDate = (timestamp: number) => {
     return new Date(timestamp).toLocaleDateString()
   }
@@ -54,13 +75,13 @@ export function StudentMeetingsSection({
                 ? `${semesters.find(s => s.semesterId === selectedSemester)?.semesterName}-${semesters.find(s => s.semesterId === selectedSemester)?.semesterYear}` 
                 : 'Select Semester'
             }
-            isLoading={loading}
-            onSemesterChange={onSemesterChange}
+            isLoading={isLoading}
+            onSemesterChange={handleSemesterChange}
             className="w-full sm:w-80 md:w-64"
           />
         </div>
 
-        {loading ? (
+        {isLoading ? (
           <div className="text-center py-4">Loading meetings...</div>
         ) : (
           <div className="overflow-x-auto">
