@@ -2056,65 +2056,161 @@ export const mentorMeetingService = {
       console.error('Error fetching course teacher meetings:', error);
       return [];
     }
-  },
+  }
+};
 
-  // Add a new meeting with student
-  addMeetingWithStudent: async (data: Omit<MeetingWithStudent, 'id' | 'created_date'>): Promise<MeetingWithStudent> => {
+// Transport Card Types
+export interface TransportPackage {
+  id: number;
+  name: string;
+  amount: string;
+  startdate: string;
+  expirydate: string;
+  status: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TransportApplication {
+  id: number;
+  user_id: string;
+  user_name: string;
+  user_email: string;
+  phone: string;
+  program: string;
+  user_type: string;
+  semester_type: string | null;
+  image: string;
+  location: string;
+  package_id: number;
+  startdate: string;
+  expirydate: string;
+  apply_amount: string;
+  paid_amount: string;
+  amount: string;
+  payment_method: string;
+  status: string;
+  paymentstatus: string;
+  created_at: string;
+  updated_at: string;
+  cardstatus: string;
+  printed_at: string | null;
+  delivery_at: string | null;
+  remarks: string | null;
+  package: TransportPackage;
+}
+
+export interface TransportUserInfo {
+  studentId: string;
+  semesterType: string;
+}
+
+// Transport Service
+export const transportService = {
+  // Get all transport card applications
+  getTransportCards: async (): Promise<TransportApplication[]> => {
     try {
       const token = profileService.getAuthToken();
       const response = await proxyRequest({
-        method: 'POST',
-        url: '/mentorMeeting/meetingWithStudent',
+        method: 'GET',
+        url: '/bus/application-list',
         headers: {
           Authorization: `Bearer ${token}`,
           accessToken: token,
-          'Accept': '*/*'
-        },
+          'Accept': 'application/json'
+        }
       });
       return response;
     } catch (error) {
-      console.error('Error adding student meeting:', error);
+      console.error('Error fetching transport cards:', error);
+      return [];
+    }
+  },
+
+  // Get available transport packages
+  getTransportPackages: async (): Promise<TransportPackage[]> => {
+    try {
+      const token = profileService.getAuthToken();
+      const response = await proxyRequest({
+        method: 'GET',
+        url: '/bus/package-list',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          accessToken: token,
+          'Accept': 'application/json'
+        }
+      });
+      return response;
+    } catch (error) {
+      console.error('Error fetching transport packages:', error);
+      return [];
+    }
+  },
+
+  // Get user transport info
+  getUserTransportInfo: async (): Promise<TransportUserInfo> => {
+    try {
+      const token = profileService.getAuthToken();
+      const response = await proxyRequest({
+        method: 'GET',
+        url: '/bus/user-info',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          accessToken: token,
+          'Accept': 'application/json'
+        }
+      });
+      return response;
+    } catch (error) {
+      console.error('Error fetching user transport info:', error);
       throw error;
     }
   },
 
-  // Add a new meeting with guardian
-  addMeetingWithGuardian: async (data: Omit<MeetingWithGuardian, 'id' | 'created_date'>): Promise<MeetingWithGuardian> => {
+  // Apply for transport card
+  applyForTransportCard: async (locationName: string, packageId: number, semesterTypeId: string): Promise<{ payment_1card: string; payment_link: string }> => {
     try {
       const token = profileService.getAuthToken();
       const response = await proxyRequest({
         method: 'POST',
-        url: '/mentorMeeting/meetingWithGuardian',
+        url: `/bus/application-apply?locationName=${encodeURIComponent(locationName)}&packageId=${packageId}&semesterTypeId=${semesterTypeId}`,
         headers: {
           Authorization: `Bearer ${token}`,
           accessToken: token,
-          'Accept': '*/*'
-        },
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
       });
       return response;
     } catch (error) {
-      console.error('Error adding guardian meeting:', error);
+      console.error('Error applying for transport card:', error);
       throw error;
     }
   },
 
-  // Request a meeting with course teacher
-  requestMeetingWithCourseTeacher: async (data: Omit<MeetingWithCourseTeacher, 'id' | 'created_date' | 'status'>): Promise<MeetingWithCourseTeacher> => {
+  // Pay for transport card
+  payTransportCard: async (applicationId: number): Promise<{ url: string }> => {
     try {
       const token = profileService.getAuthToken();
       const response = await proxyRequest({
         method: 'POST',
-        url: '/mentorMeeting/requestMeetingWithCourseTeacher',
+        url: `/bus/pay?applicationId=${applicationId}`,
         headers: {
-          Authorization: `Bearer ${token}`,
-          accessToken: token,
-          'Accept': '*/*'
-        },
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
       });
+      
+      // Store the current URL in localStorage to redirect back after payment
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('returnUrl', window.location.href);
+      }
+      
       return response;
     } catch (error) {
-      console.error('Error requesting course teacher meeting:', error);
+      console.error('Error initiating transport card payment:', error);
       throw error;
     }
-  },
+  }
 };

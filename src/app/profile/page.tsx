@@ -199,7 +199,7 @@ const ProfileComponent: React.FC = () => {
   const isLoading = loading.studentInfo || loading.photograph || loading.educationList || loading.presentAddress || loading.permanentAddress;
 
   return (
-    <div className="w-full">
+    <>
       
       {/* Page Title */}
       <PageTitle 
@@ -210,46 +210,50 @@ const ProfileComponent: React.FC = () => {
       {/* Main Content */}
       <div className="mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Profile Header */}
-        <Card className="overflow-hidden mb-8">
-          <CardHeader className="p-4 sm:p-5 bg-gradient-to-r from-teal-50 to-cyan-50 border-b">
+        <Card className="overflow-hidden mb-4">
+          <CardHeader className="bg-gradient-to-r from-teal-50 to-cyan-50 border-b">
             <CardTitle className="text-base font-semibold text-teal-800 flex items-center justify-between">
               <span>Profile Overview</span>
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-4 sm:p-5 ">
-            <div className="flex items-center gap-3 sm:gap-6">
+          <CardContent className="p-4 sm:p-5">
+            <div className="flex flex-col items-center sm:flex-row gap-4 sm:gap-6">
+              <div className="w-full sm:w-1/4">
                 <ProfileCard 
                   studentInfo={studentInfo} 
                   photograph={photograph}
                   loading={loading}
-                className="w-1/4"
+                  className="w-full"
                 />
-              <div className="flex-grow">
+              </div>
+              <div className="w-full sm:w-3/4">
                 {loading.studentInfo ? (
                   <ProfileHeaderSkeleton />
                 ) : (
-                  <Table  className="rounded-md">
-                    <TableBody>
-                      <TableRow>
-                        <TableCell className="text-xs text-gray-500 w-1/3 py-1 sm:py-3">Name</TableCell>
-                        <TableCell className="text-sm font-medium text-gray-800 w-2/3 py-1 sm:py-3">
-                        {studentInfo?.firstName || 'N/A'}
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell className="text-xs text-gray-500 w-1/3 py-1 sm:py-3">Student ID</TableCell>
-                        <TableCell className="text-sm font-medium text-gray-800 w-2/3 py-1 sm:py-3">
-                        {user?.userName || 'N/A'}
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell className="text-xs text-gray-500 w-1/3 py-1 sm:py-3">Email</TableCell>
-                        <TableCell className="text-sm font-medium text-gray-800 w-2/3 py-3 sm:py-3">
-                        {studentInfo?.email || 'N/A'}
-                        </TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
+                  <div className="overflow-x-auto">
+                    <Table className="w-full">
+                      <TableBody>
+                        <TableRow>
+                          <TableCell className="text-xs text-gray-500 w-1/3 py-1 sm:py-3">Name</TableCell>
+                          <TableCell className="text-sm font-medium text-gray-800 py-1 sm:py-3">
+                            {studentInfo?.firstName || 'N/A'}
+                          </TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell className="text-xs text-gray-500 w-1/3 py-1 sm:py-3">Student ID</TableCell>
+                          <TableCell className="text-sm font-medium text-gray-800 py-1 sm:py-3">
+                            {user?.userName || 'N/A'}
+                          </TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell className="text-xs text-gray-500 w-1/3 py-1 sm:py-3">Email</TableCell>
+                          <TableCell className="text-sm font-medium text-gray-800 py-1 sm:py-3">
+                            {studentInfo?.email || 'N/A'}
+                          </TableCell>
+                        </TableRow>
+                      </TableBody>
+                    </Table>
+                  </div>
                 )}
               </div>
             </div>
@@ -257,12 +261,12 @@ const ProfileComponent: React.FC = () => {
         </Card>
 
         {/* All profile information */}
-        <div className="space-y-8 animate-fadeIn">
+        <div className="space-y-6 animate-fadeIn">
           {/* Personal Information Section */}
           {isLoading ? (
             <ContentSkeleton />
           ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 animate-in fade-in-50 duration-500">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-4 animate-in fade-in-50 duration-500">
               <PersonalInfoTab 
                 studentInfo={studentInfo} 
                 photograph={photograph} 
@@ -295,7 +299,7 @@ const ProfileComponent: React.FC = () => {
           )}
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
