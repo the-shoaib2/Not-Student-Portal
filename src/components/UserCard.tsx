@@ -1,10 +1,9 @@
 "use client"
 import { useState, useEffect, useRef } from "react"
-import { LogOut, User, BadgeCheck, Bell } from "lucide-react"
+import { LogOut, User, BadgeCheck, Bell, IdCard } from "lucide-react"
 import { useRouter } from "next/navigation"
 import toast from "react-hot-toast"
 import { useAuth } from "@/contexts/AuthContext"
-import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
   AlertDialog,
@@ -124,6 +123,10 @@ export default function UserCard() {
           <DropdownMenuItem onSelect={() => router.push('/settings')}>
             <BadgeCheck className="mr-2 h-4 w-4" />
             <span>Account</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem onSelect={() => router.push('/student-id')}>
+            <IdCard  className="mr-2 h-4 w-4" />
+            <span>Student ID</span>
           </DropdownMenuItem>
           <DropdownMenuItem onSelect={() => router.push('/settings/notifications')}>
             <Bell className="mr-2 h-4 w-4" />
