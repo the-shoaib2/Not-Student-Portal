@@ -7,6 +7,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
 import { useForm } from "react-hook-form"
+import { Loader2 } from "lucide-react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { toast } from "react-hot-toast"
@@ -318,9 +319,14 @@ export function TransportCardApplyDialog({ open, onOpenChange, onSuccess }: Tran
               <Button
                 type="submit"
                 disabled={loading}
-                className="flex-1 bg-teal-600 hover:bg-teal-700 text-white"
+                className="flex-1 bg-teal-600 hover:bg-teal-700 text-white gap-2"
               >
-                {loading ? 'Applying...' : 'Apply Now'}
+                {loading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Applying...
+                  </>
+                ) : 'Apply Now'}
               </Button>
             </div>
           </form>
