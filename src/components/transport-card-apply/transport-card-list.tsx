@@ -10,111 +10,61 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertCircle, FileText, DollarSign, Loader2, RefreshCw } from "lucide-react"
 import { transportService } from "@/services/proxy-api"
 
-interface Package {
-  id: number
-  name: string
-  amount: string
-  startdate: string
-  expirydate: string
-  status: number
+export interface Package {
+  id: number;
+  name: string;
+  amount: string;
+  startdate: string;
+  expirydate: string;
+  status: number;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface TransportCard {
-  id: number
-  user_id: string
-  user_name: string
-  user_email: string
-  phone: string
-  program: string
-  user_type: string
-  semester_type: string | null
-  image: string
-  location: string
-  package_id: number
-  startdate: string
-  expirydate: string
-  apply_amount: string
-  paid_amount: string
-  amount: string
-  payment_method: string
-  status: string
-  paymentstatus: string
-  cardstatus: string
-  printed_at: string | null
-  delivery_at: string | null
-  remarks: string | null
-  created_at: string
-  updated_at: string
-  package: {
-    id: number
-    name: string
-    amount: string
-    startdate: string
-    expirydate: string
-    status: number
-    created_at: string
-    updated_at: string
-  }
+  id: number;
+  user_id: string;
+  user_name: string;
+  user_email: string;
+  phone: string;
+  program: string;
+  user_type: string;
+  semester_type: string | null;
+  image: string | null;
+  location: string;
+  package_id: number;
+  package: Package;
+  startdate: string;
+  expirydate: string;
+  apply_amount: string;
+  paid_amount: string;
+  amount: string;
+  payment_method: string;
+  status: string;
+  paymentstatus: string;
+  cardstatus: string;
+  created_at: string;
+  updated_at: string;
+  printed_at: string | null;
+  delivery_at: string | null;
+  remarks: string | null;
 }
 
-// Type for API response
-type TransportApiResponse = 
-  | TransportCard[] 
-  | { message: string; data?: string | TransportCard[] }
+interface TransportCardListProps {
+  cards: TransportCard[];
+  loading: boolean;
+  onRefresh: () => void;
+}
 
-export function TransportCardList() {
-  const [cards, setCards] = useState<TransportCard[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+export function TransportCardList({
+  cards = [],
+  loading = false,
+  onRefresh
+}: TransportCardListProps) {
   const [isPaying, setIsPaying] = useState<number | null>(null)
 
-  useEffect(() => {
-    fetchTransportCards()
-  }, [])
-
-  const fetchTransportCards = async () => {
-    try {
-      setLoading(true)
-      setError(null)
-      
-      // The transport service returns a Promise<TransportApplication[]>
-      const response = await transportService.getTransportCards() as TransportCard[] | { message: string; data?: unknown }
-      
-      // Case 1: Response is an array of transport cards
-      if (Array.isArray(response)) {
-        setCards(response)
-        return
-      }
-      
-      // Case 2: Response is an object with a message (error or no data)
-      if (response && typeof response === 'object' && 'message' in response) {
-        // Handle case when no applications exist
-        if (response.message === 'Application either expired or not found') {
-          setCards([])
-          return
-        }
-        
-        // Handle case where data might be in the response
-        if ('data' in response && Array.isArray(response.data)) {
-          setCards(response.data as TransportCard[])
-          return
-        }
-        
-        // Handle other error messages
-        console.error('Error from API:', response.message)
-        setError(response.message)
-        return
-      }
-      
-      // Handle unexpected response format
-      console.error('Unexpected response format:', response)
-      setError('Received data in an unexpected format')
-    } catch (err) {
-      console.error("Error fetching transport cards:", err)
-      setError(err instanceof Error ? err.message : 'An unknown error occurred')
-    } finally {
-      setLoading(false)
-    }
+  const handleRefresh = () => {
+    onRefresh();
   }
 
   const formatDate = (dateString: string | null) => {
@@ -239,12 +189,12 @@ export function TransportCardList() {
       
       if (status === 'success') {
         // Show success message and refresh the list
-        fetchTransportCards();
+        onRefresh();
         // Remove the status from URL
         window.history.replaceState({}, document.title, window.location.pathname);
       } else if (status === 'failed') {
         // Show error message
-        setError('Payment failed. Please try again.');
+        console.error('Payment failed. Please try again.');
         // Remove the status from URL
         window.history.replaceState({}, document.title, window.location.pathname);
       }
@@ -253,22 +203,21 @@ export function TransportCardList() {
     checkPaymentStatus();
   }, []);
 
-  const handlePayNow = async (applicationId: number) => {
+  const handlePayNow = async (cardId: number) => {
     try {
-      setIsPaying(applicationId);
-      const response = await transportService.payTransportCard(applicationId);
+      setIsPaying(cardId)
+      const result = await transportService.payTransportCard(cardId)
       
-      if (response && response.url) {
-        // Redirect to the payment URL
-        window.location.href = response.url;
+      if (result.url) {
+        // Refresh the list after successful payment
+        onRefresh()
       } else {
-        console.error('No payment URL received');
-        setError('Failed to initiate payment. Please try again.');
+        // console.error('Payment failed:', result.message)
       }
-    } catch (error) {
-      console.error('Payment error:', error);
-      setError(error instanceof Error ? error.message : 'Failed to process payment');
-      setIsPaying(null);
+    } catch (err) {
+      console.error('Error processing payment:', err)
+    } finally {
+      setIsPaying(null)
     }
   };
 
@@ -309,7 +258,7 @@ export function TransportCardList() {
               variant="outline"
               size="sm"
               className="text-xs bg-white/10 hover:bg-white/20 text-white border-white/20 hover:border-white/30"
-              onClick={fetchTransportCards}
+              onClick={handleRefresh}
             >
               <RefreshCw className="mr-1 h-3.5 w-3.5" />
               Refresh

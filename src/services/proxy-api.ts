@@ -2140,7 +2140,8 @@ export const transportService = {
           'Accept': 'application/json'
         }
       });
-      return response;
+      
+      return response.data;
     } catch (error) {
       console.error('Error fetching transport packages:', error);
       return [];
