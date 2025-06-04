@@ -2172,20 +2172,86 @@ export const transportService = {
   applyForTransportCard: async (locationName: string, packageId: number, semesterTypeId: string): Promise<{ payment_1card: string; payment_link: string }> => {
     try {
       const token = profileService.getAuthToken();
+      
+      // Create the request URL with properly encoded parameters
+      const queryParams = new URLSearchParams({
+        locationName: locationName,  // Already formatted with + for spaces
+        packageId: packageId.toString(),
+        semesterTypeId: semesterTypeId
+      }).toString();
+      
+      const requestUrl = `/bus/application-apply?${queryParams}`;
+      
+      console.log('Sending request to:', requestUrl);
+      
       const response = await proxyRequest({
-        method: 'POST',
-        url: `/bus/application-apply?locationName=${encodeURIComponent(locationName)}&packageId=${packageId}&semesterTypeId=${semesterTypeId}`,
+        method: 'GET',
+        url: requestUrl,
         headers: {
-          Authorization: `Bearer ${token}`,
-          accessToken: token,
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
+          'Authorization': `Bearer ${token}`,
+          'accessToken': token,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
         }
       });
-      return response;
-    } catch (error) {
-      console.error('Error applying for transport card:', error);
-      throw error;
+
+      console.log('Transport card application response:', response);
+      
+      // Handle the response format we see in the working example
+      if (response && response.message === 'success') {
+        if (response.payment_link || response.payment_1card) {
+          return {
+            payment_link: response.payment_link,
+            payment_1card: response.payment_1card
+          };
+        }
+      }
+      
+      // Handle case where response is nested under data property
+      if (response.data && response.data.message === 'success') {
+        if (response.data.payment_link || response.data.payment_1card) {
+          return {
+            payment_link: response.data.payment_link,
+            payment_1card: response.data.payment_1card
+          };
+        }
+      }
+      
+      // If we get here, the response format is unexpected
+      console.error('Unexpected response format:', response);
+      throw new Error('Unexpected response format from server');
+      
+    } catch (error: any) {
+      console.error('Error in applyForTransportCard:', {
+        error,
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+        stack: error.stack
+      });
+      
+      let errorMessage = 'Failed to apply for transport card';
+      
+      if (error.response) {
+        // If we have a response with data, use its message if available
+        if (error.response.data && error.response.data.message) {
+          errorMessage = error.response.data.message;
+        } else if (error.response.status === 400) {
+          errorMessage = 'Invalid request. Please check your input and try again.';
+        } else if (error.response.status === 401) {
+          errorMessage = 'Session expired. Please log in again.';
+        } else if (error.response.status >= 500) {
+          errorMessage = 'Server error. Please try again later.';
+        }
+      } else if (error.request) {
+        // The request was made but no response was received
+        errorMessage = 'No response from server. Please check your connection.';
+      } else {
+        // Something happened in setting up the request
+        errorMessage = error.message || 'An unexpected error occurred';
+      }
+      
+      throw new Error(errorMessage);
     }
   },
 

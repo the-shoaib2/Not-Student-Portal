@@ -23,7 +23,6 @@ import { Skeleton } from "@/components/ui/skeleton"
 
 const formSchema = z.object({
   packageId: z.string().min(1, "Please select a package"),
-  locationName: z.string().min(1, "Please enter your location"),
   route: z.string().min(1, "Please select a route"),
   semesterType: z.string().min(1, "Please select a semester type"),
   acceptPolicy: z.boolean().refine((val) => val === true, "You must accept the Transport User Policy"),
@@ -69,7 +68,6 @@ export function TransportCardApplyDialog({ open, onOpenChange, onSuccess }: Tran
     resolver: zodResolver(formSchema),
     defaultValues: {
       packageId: "",
-      locationName: "",
       semesterType: "",
       route: "",
       acceptPolicy: false,
@@ -120,31 +118,90 @@ export function TransportCardApplyDialog({ open, onOpenChange, onSuccess }: Tran
 
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    setLoading(true)
+    if (!values.route || !values.packageId || !values.semesterType) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
+
+    setLoading(true);
+    
     try {
+      // Format the route name to match the expected API format
+      const formattedRoute = values.route.replace(/\s+/g, '+');
+      
+      console.log('Submitting transport card application with:', {
+        locationName: formattedRoute,
+        packageId: values.packageId,
+        semesterType: values.semesterType
+      });
+      
       const response = await transportService.applyForTransportCard(
-        values.locationName,
+        formattedRoute,
         parseInt(values.packageId),
         values.semesterType
-      )
-
-      if (response.payment_link) {
-        toast.success("Application submitted successfully! Redirecting to payment...")
-        window.open(response.payment_link, "_blank")
+      );
+      
+      console.log('Transport card application successful:', response);
+      
+      const paymentLink = response.payment_link || response.payment_1card;
+      
+      if (paymentLink) {
+        // Open payment in a new tab
+        const newWindow = window.open(paymentLink, '_blank');
+        
+        if (!newWindow) {
+          toast.error('Please allow popups to complete the payment');
+          return;
+        }
+        
+        // Show success message
+        toast.success('Redirecting to payment page...');
+        
+        // Close the dialog and reset the form
+        onSuccess();
+        onOpenChange(false);
+        
+        // Reset form
+        form.reset({
+          packageId: "",
+          semesterType: "",
+          route: "",
+          acceptPolicy: false,
+        });
+        setSelectedPackage(null);
       } else {
-        toast.success("Application submitted successfully!")
+        throw new Error('No payment link received from server');
       }
-
-      onSuccess()
-      onOpenChange(false)
-      form.reset()
+      
     } catch (error: any) {
-      console.error("Error submitting application:", error)
-      toast.error(error.message || "Failed to submit application")
+      console.error('Error in form submission:', error);
+      
+      let errorMessage = 'Failed to apply for transport card';
+      
+      if (error.response) {
+        // Handle different HTTP status codes
+        if (error.response.data?.message) {
+          errorMessage = error.response.data.message;
+        } else if (error.response.status === 400) {
+          errorMessage = 'Invalid request. Please check your input and try again.';
+        } else if (error.response.status === 401) {
+          errorMessage = 'Session expired. Please log in again.';
+        } else if (error.response.status >= 500) {
+          errorMessage = 'Server error. Please try again later.';
+        }
+      } else if (error.request) {
+        // The request was made but no response was received
+        errorMessage = 'No response from server. Please check your connection.';
+      } else {
+        // Something happened in setting up the request
+        errorMessage = error.message || 'An unexpected error occurred';
+      }
+      
+      toast.error(errorMessage);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handlePackageChange = (packageId: string) => {
     const pkg = packages.find((p) => p.id.toString() === packageId)

@@ -111,18 +111,20 @@ export const proxyRequest = async ({
       // Ensure requests go through the proxy by prefixing the URL
       const proxyUrl = url.startsWith('/') ? url : `/${url}`;
       
+      const isFormData = typeof FormData !== 'undefined' && data instanceof FormData;
+      const requestHeaders = {
+        'Accept': 'application/json',
+        ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
+        'X-Target-URL': API_BASE_URL, // Add the tar
+        ...headers
+      };
       const response = await proxyClient.request({
         method,
         url: proxyUrl,
         data,
         responseType,
         timeout,
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          'X-Target-URL': API_BASE_URL,
-          ...headers
-        }
+        headers: requestHeaders
       });
       
       // If responseType is blob or arraybuffer, return the data as an ArrayBuffer
